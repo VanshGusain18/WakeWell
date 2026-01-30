@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D67C6D8C2F2CCA91004ECCDB /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = D67C6D8B2F2CCA88004ECCDB /* readme.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D67C6D732F2CC9F4004ECCDB /* WakeWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WakeWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D67C6D8B2F2CCA88004ECCDB /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -45,6 +50,7 @@
 		D67C6D6A2F2CC9F4004ECCDB = {
 			isa = PBXGroup;
 			children = (
+				D67C6D8B2F2CCA88004ECCDB /* readme.md */,
 				D67C6D752F2CC9F4004ECCDB /* WakeWell */,
 				D67C6D742F2CC9F4004ECCDB /* Products */,
 			);
@@ -122,6 +128,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D67C6D8C2F2CCA91004ECCDB /* readme.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

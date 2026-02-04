@@ -129,5 +129,4 @@ fix/battery-drain
 ## ⚠️ Disclaimer
 
 WakeWell is a wellness-focused educational project and **not a medical device**.
-
-pari - testing
+pari smort

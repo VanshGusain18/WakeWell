@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class PriyanshuViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

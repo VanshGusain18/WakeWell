@@ -21,10 +21,10 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                             </button>
-                            <label opaque="NO" contentMode="left" fixedFrame="YES" text="teamp" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j8M-mm-oam">
-                                <rect key="frame" x="132" y="245" width="49" height="21"/>
+                            <label opaque="NO" contentMode="left" fixedFrame="YES" text="hellothere" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j8M-mm-oam">
+                                <rect key="frame" x="153" y="238" width="129" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>

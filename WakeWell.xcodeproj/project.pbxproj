@@ -13,6 +13,7 @@
 /* Begin PBXFileReference section */
 		D67C6D732F2CC9F4004ECCDB /* WakeWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WakeWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D67C6D8B2F2CCA88004ECCDB /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
+		D6C5DC742F35C1C4002DE663 /* sounds_tab.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sounds_tab.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -60,6 +61,13 @@
 			isa = PBXGroup;
 			children = (
 				D67C6D732F2CC9F4004ECCDB /* WakeWell.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D6C5DC762F35C1C4002DE663 /* Products */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,6 +124,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D67C6D742F2CC9F4004ECCDB /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = D6C5DC762F35C1C4002DE663 /* Products */;
+					ProjectRef = D6C5DC742F35C1C4002DE663 /* sounds_tab.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				D67C6D722F2CC9F4004ECCDB /* WakeWell */,

@@ -5,49 +5,44 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+
     <scenes>
-        <!--fd-->
-        <scene sceneID="stH-cK-38L">
-            <objects>
-                <viewControllerPlaceholder storyboardIdentifier="fd" storyboardName="fd" referencedIdentifier="fd" id="yOw-hp-xgL" sceneMemberID="viewController"/>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Gxy-8W-jj8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-439" y="331"/>
-        </scene>
-        <!--View Controller-->
+
+        <!-- View Controller -->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-<<<<<<< Updated upstream
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-=======
+
+                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor"/>
+
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="vansh" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j8M-mm-oam">
+
+                            <label opaque="NO" contentMode="left" text="vansh" translatesAutoresizingMaskIntoConstraints="NO" id="j8M-mm-oam">
                                 <rect key="frame" x="174" y="350" width="45" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nac-YH-CBs">
+
+                            <button contentMode="scaleToFill" buttonType="system" translatesAutoresizingMaskIntoConstraints="NO" id="Nac-YH-CBs">
                                 <rect key="frame" x="168" y="522" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button"/>
                                 <connections>
-                                    <segue destination="yOw-hp-xgL" kind="presentation" id="5iE-BA-jfI"/>
+                                    <segue destination="BYZ-38-t0r" kind="presentation" id="5iE-BA-jfI"/>
                                 </connections>
                             </button>
+
                         </subviews>
->>>>>>> Stashed changes
+
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
+
     </scenes>
 </document>

@@ -7,15 +7,19 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
+class MainViewController: UIViewController {
 
+    @IBOutlet weak var here: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
     
-
+    @IBAction func but(_ sender: Any) {
+        here.text = "Hello"
+    }
+    
     /*
     // MARK: - Navigation
 

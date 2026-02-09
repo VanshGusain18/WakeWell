@@ -12,15 +12,12 @@ class WakeUpTableViewController: UITableViewController {
     @IBOutlet weak var smartAlarmSwitch: UISwitch!
     @IBOutlet weak var timeWindowCell: UITableViewCell!
     @IBOutlet weak var alarmToneCell: UITableViewCell!
+    @IBOutlet weak var datePicker: UIDatePicker!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         updateSmartRows(isEnabled: smartAlarmSwitch.isOn)
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        self.clearsSelectionOnViewWillAppear = false
     }
 
     // MARK: - Table view data source
@@ -31,7 +28,6 @@ class WakeUpTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         if section == 0 {
             return 1
         }
@@ -53,7 +49,43 @@ class WakeUpTableViewController: UITableViewController {
                 }
             }
         }
+    protocol DatePickerDelegate: AnyObject {
+        func didSelectTime(_ time: String)
+    }
+    weak var delegate: DatePickerDelegate?
 
+    
+    func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        
+        return formatter.string(from: date)
+    }
+    @IBAction func savePressed(_ sender: UIBarButtonItem) {
+            let timeString = formatTime(datePicker.date)
+            delegate?.didSelectTime(timeString)
+            dismiss(animated: true)
+    }
+    
+//    var isTimeWindowCell = false
+//
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        if indexPath.section == 1 && indexPath.row == 1 { // Adjust index as needed
+//            isTimeWindowCell.toggle()
+//            
+//            tableView.beginUpdates()
+//            tableView.endUpdates()
+//        }
+//        tableView.deselectRow(at: indexPath, animated: true)
+//    }
+//
+//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        // Check if this is the row containing the Picker
+//        if indexPath.section == 1 && indexPath.row == 2 {
+//            return isTimeWindowCell ? 216 : 0
+//        }
+//        return UITableView.automaticDimension
+//    }
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)

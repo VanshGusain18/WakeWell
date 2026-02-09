@@ -7,16 +7,13 @@
 
 import UIKit
 
-class AlarmTableViewController: UITableViewController {
+class AlarmTableViewController: UITableViewController, WakeUpTableViewController.DatePickerDelegate {
 
+    @IBOutlet weak var wakeTimeLabel: UILabel!
+    @IBOutlet weak var bedTimeLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
     // MARK: - Table view data source
@@ -29,6 +26,20 @@ class AlarmTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return 2
         
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let nav = segue.destination as? UINavigationController,
+           let destinationVC = nav.topViewController as? WakeUpTableViewController {
+            destinationVC.delegate = self
+        }
+        else if let destinationVC = segue.destination as? WakeUpTableViewController {
+            destinationVC.delegate = self
+        }
+    }
+    func didSelectTime(_ time: String) {
+        print("Data Recieved: \(time)")
+        wakeTimeLabel.text = time
     }
 
     /*

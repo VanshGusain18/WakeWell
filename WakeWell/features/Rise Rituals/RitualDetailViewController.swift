@@ -12,7 +12,7 @@ class RitualDetailViewController: UIViewController {
     
     @IBOutlet weak var backgroundImage: UIImageView!
     @IBOutlet weak var popupView: UIView!
-    @IBOutlet weak var descLabel: UILabel!
+    //@IBOutlet weak var descLabel: UILabel!
     
     var ritual: Ritual?
     override func viewDidLoad() {
@@ -24,7 +24,7 @@ class RitualDetailViewController: UIViewController {
             guard let ritual = ritual else { return }
             
             backgroundImage.image = UIImage(named: ritual.imagePath) // or ritual.image
-            descLabel.text = ritual.description
+            //descLabel.text = ritual.description
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(dismissMe))
             view.addGestureRecognizer(tap)

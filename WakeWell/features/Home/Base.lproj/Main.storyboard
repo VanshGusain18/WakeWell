@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Main View Controller-->
+        <!--Home-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
@@ -16,23 +16,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" contentMode="left" fixedFrame="YES" text="i am new here" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j8M-mm-oam">
-                                <rect key="frame" x="108" y="364" width="177" height="36"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                            </label>
-                            <button contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nac-YH-CBs">
-                                <rect key="frame" x="159" y="483" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nac-YH-CBs">
+                                <rect key="frame" x="67" y="194" width="40" height="35"/>
                                 <state key="normal" title="Alarm"/>
                                 <connections>
                                     <action selector="but:" destination="BYZ-38-t0r" eventType="touchUpInside" id="A3h-FU-Cgc"/>
                                     <segue destination="9zz-RQ-VkM" kind="show" id="1Sk-K0-6HC"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lPm-5V-vVw">
-                                <rect key="frame" x="168" y="526" width="57" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lPm-5V-vVw">
+                                <rect key="frame" x="209" y="194" width="57" height="35"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Rise"/>
                                 <connections>
@@ -42,11 +35,16 @@
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="lPm-5V-vVw" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Nac-YH-CBs" secondAttribute="trailing" constant="8" symbolic="YES" id="UFL-2y-TQ7"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="lPm-5V-vVw" secondAttribute="trailing" constant="127" id="UYv-g5-lyG"/>
+                            <constraint firstItem="lPm-5V-vVw" firstAttribute="top" secondItem="Nac-YH-CBs" secondAttribute="top" id="gEI-8e-jaX"/>
+                            <constraint firstItem="Nac-YH-CBs" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="67" id="u5b-hQ-qEp"/>
+                            <constraint firstItem="lPm-5V-vVw" firstAttribute="bottom" secondItem="Nac-YH-CBs" secondAttribute="bottom" id="vnK-OS-ZtJ"/>
+                            <constraint firstItem="lPm-5V-vVw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="22" id="yvG-Tb-Brd"/>
+                        </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="3hl-HM-nxH"/>
-                    <connections>
-                        <outlet property="here" destination="j8M-mm-oam" id="FlP-fF-SOQ"/>
-                    </connections>
+                    <navigationItem key="navigationItem" title="Home" id="3hl-HM-nxH"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

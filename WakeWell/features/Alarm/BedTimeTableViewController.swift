@@ -1,60 +1,47 @@
 //
-//  AlarmTableViewController.swift
+//  BedTimeTableViewController.swift
 //  WakeWell
 //
-//  Created by geu on 07/02/26.
+//  Created by geu on 10/02/26.
 //
 
 import UIKit
 
-class AlarmTableViewController: UITableViewController, WakeUpTableViewController.DatePickerDelegate, BedTimeTableViewController.DatePickerDelegate {
-    
-    @IBOutlet weak var wakeTimeLabel: UILabel!
-    @IBOutlet weak var bedTimeLabel: UILabel!
-    
+class BedTimeTableViewController: UITableViewController {
+        
+    @IBOutlet weak var datePicker: UIDatePicker!
     override func viewDidLoad() {
         super.viewDidLoad()
+
     }
-    
+
     // MARK: - Table view data source
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 2
+    protocol DatePickerDelegate: AnyObject {
+        func didSelectBedTime(_ time: String)
+    }
+    weak var delegate: DatePickerDelegate?
+
+    
+    func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
         
+        return formatter.string(from: date)
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let nav = segue.destination as? UINavigationController,
-           let destinationVC = nav.topViewController as? WakeUpTableViewController {
-            destinationVC.delegate = self
-        }
-        else if let destinationVC = segue.destination as? WakeUpTableViewController {
-            destinationVC.delegate = self
-        }
-        else if let nav = segue.destination as? UINavigationController,
-           let destinationVC = nav.topViewController as? BedTimeTableViewController {
-            destinationVC.delegate = self
-        }
-        else if let destinationVC = segue.destination as? BedTimeTableViewController {
-            destinationVC.delegate = self
-        }
+    @IBAction func savePressed(_ sender: UIBarButtonItem) {
+            let timeString = formatTime(datePicker.date)
+            delegate?.didSelectBedTime(timeString)
+            dismiss(animated: true)
     }
-    
-    func didSelectWakeTime(_ time: String) {
-        print("Data Recieved: \(time)")
-        wakeTimeLabel.text = time
-    }
-    
-    func didSelectBedTime(_ time: String) {
-        print("Data Recieved: \(time)")
-        bedTimeLabel.text = time
-    }
-}
 
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -110,3 +97,5 @@ class AlarmTableViewController: UITableViewController, WakeUpTableViewController
         // Pass the selected object to the new view controller.
     }
     */
+    
+}

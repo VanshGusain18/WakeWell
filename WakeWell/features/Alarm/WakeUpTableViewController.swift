@@ -50,7 +50,7 @@ class WakeUpTableViewController: UITableViewController {
             }
         }
     protocol DatePickerDelegate: AnyObject {
-        func didSelectTime(_ time: String)
+        func didSelectWakeTime(_ time: String)
     }
     weak var delegate: DatePickerDelegate?
 
@@ -63,7 +63,7 @@ class WakeUpTableViewController: UITableViewController {
     }
     @IBAction func savePressed(_ sender: UIBarButtonItem) {
             let timeString = formatTime(datePicker.date)
-            delegate?.didSelectTime(timeString)
+            delegate?.didSelectWakeTime(timeString)
             dismiss(animated: true)
     }
     

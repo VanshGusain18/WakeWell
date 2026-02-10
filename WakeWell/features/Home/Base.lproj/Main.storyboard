@@ -32,6 +32,15 @@
                                     <segue destination="lfl-Oe-Lp1" kind="show" id="bPZ-nw-hLd"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jAc-YV-Zcd">
+                                <rect key="frame" x="160" y="569" width="73" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Sound"/>
+                                <connections>
+                                    <segue destination="dqT-Ao-CdI" kind="show" id="YWY-5n-9sk"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -69,6 +78,16 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="96V-cp-UwH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1853" y="268"/>
+        </scene>
+        <!--sound-->
+        <scene sceneID="WWt-It-OSi">
+            <objects>
+                <viewControllerPlaceholder storyboardIdentifier="sound" storyboardName="Sound" referencedIdentifier="sound" id="dqT-Ao-CdI" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="jnk-6b-fpM"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ENm-bC-wxY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1839" y="385"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="BK2-J3-yrI">

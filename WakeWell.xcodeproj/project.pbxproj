@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D610DCC12F3C54280083F51A /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = D610DCC02F3C54280083F51A /* DGCharts */; };
 		D67C6D8C2F2CCA91004ECCDB /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = D67C6D8B2F2CCA88004ECCDB /* readme.md */; };
-		D6B392B02F3AFFCD00C79823 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = D6B392AF2F3AFFCD00C79823 /* DGCharts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6B392B02F3AFFCD00C79823 /* DGCharts in Frameworks */,
+				D610DCC12F3C54280083F51A /* DGCharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,7 +94,7 @@
 			);
 			name = WakeWell;
 			packageProductDependencies = (
-				D6B392AF2F3AFFCD00C79823 /* DGCharts */,
+				D610DCC02F3C54280083F51A /* DGCharts */,
 			);
 			productName = WakeWell;
 			productReference = D67C6D732F2CC9F4004ECCDB /* WakeWell.app */;
@@ -125,7 +125,7 @@
 			mainGroup = D67C6D6A2F2CC9F4004ECCDB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				D6B392AE2F3AFFCD00C79823 /* XCRemoteSwiftPackageReference "Charts" */,
+				D610DCBF2F3C54280083F51A /* XCRemoteSwiftPackageReference "Charts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D67C6D742F2CC9F4004ECCDB /* Products */;
@@ -370,9 +370,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D6B392AE2F3AFFCD00C79823 /* XCRemoteSwiftPackageReference "Charts" */ = {
+		D610DCBF2F3C54280083F51A /* XCRemoteSwiftPackageReference "Charts" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ChartsOrg/Charts";
+			repositoryURL = "https://github.com/danielgindi/Charts";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.1.0;
@@ -381,9 +381,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		D6B392AF2F3AFFCD00C79823 /* DGCharts */ = {
+		D610DCC02F3C54280083F51A /* DGCharts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D6B392AE2F3AFFCD00C79823 /* XCRemoteSwiftPackageReference "Charts" */;
+			package = D610DCBF2F3C54280083F51A /* XCRemoteSwiftPackageReference "Charts" */;
 			productName = DGCharts;
 		};
 /* End XCSwiftPackageProductDependency section */

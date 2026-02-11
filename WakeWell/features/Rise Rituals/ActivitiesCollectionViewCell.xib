@@ -16,20 +16,32 @@
                 <rect key="frame" x="0.0" y="0.0" width="313" height="200"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UgL-lV-E87">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UgL-lV-E87">
                         <rect key="frame" x="0.0" y="0.0" width="313" height="200"/>
                     </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QfQ-Gd-PE8">
+                        <rect key="frame" x="0.0" y="0.0" width="313" height="200"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.29786531690140844" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
             </view>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <constraints>
+                <constraint firstItem="QfQ-Gd-PE8" firstAttribute="height" secondItem="UgL-lV-E87" secondAttribute="height" id="27h-9N-Tu3"/>
+                <constraint firstAttribute="bottom" secondItem="QfQ-Gd-PE8" secondAttribute="bottom" id="AkX-ml-0n2"/>
                 <constraint firstAttribute="trailing" secondItem="UgL-lV-E87" secondAttribute="trailing" id="Xx8-h3-TKq"/>
                 <constraint firstItem="UgL-lV-E87" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="aYq-oq-w4E"/>
+                <constraint firstItem="QfQ-Gd-PE8" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="pO1-OM-Gao"/>
                 <constraint firstItem="UgL-lV-E87" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="qYz-x7-mkh"/>
                 <constraint firstAttribute="bottom" secondItem="UgL-lV-E87" secondAttribute="bottom" id="syZ-sL-RDH"/>
+                <constraint firstAttribute="trailing" secondItem="QfQ-Gd-PE8" secondAttribute="trailing" id="yOc-cW-eW7"/>
             </constraints>
             <size key="customSize" width="313" height="200"/>
             <connections>
+                <outlet property="imageName" destination="QfQ-Gd-PE8" id="mhF-JC-Bxd"/>
                 <outlet property="imageView" destination="UgL-lV-E87" id="WMq-gf-bWo"/>
             </connections>
             <point key="canvasLocation" x="-61.832061068702288" y="206.33802816901411"/>

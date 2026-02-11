@@ -11,10 +11,10 @@ class ActivitiesCollectionViewCell: UICollectionViewCell {
 
     @IBOutlet weak var imageView: UIImageView!
     
+    @IBOutlet weak var imageName: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        //overlayView.alpha = 0
         self.contentView.layer.cornerRadius = 20
         self.contentView.layer.cornerCurve = .continuous
         self.contentView.clipsToBounds = true
@@ -22,5 +22,7 @@ class ActivitiesCollectionViewCell: UICollectionViewCell {
     func configure(ritual: Ritual)
     {
         self.imageView.image = UIImage(named: ritual.imagePath)
+        imageName.text = ritual.name
+        imageName.layer.cornerRadius = 20
     }
 }

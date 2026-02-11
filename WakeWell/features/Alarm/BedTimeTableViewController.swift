@@ -8,11 +8,10 @@
 import UIKit
 
 class BedTimeTableViewController: UITableViewController {
-        
+    
     @IBOutlet weak var datePicker: UIDatePicker!
     override func viewDidLoad() {
         super.viewDidLoad()
-
     }
 
     // MARK: - Table view data source

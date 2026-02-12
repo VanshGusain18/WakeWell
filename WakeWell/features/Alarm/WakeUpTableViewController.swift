@@ -13,10 +13,11 @@ class WakeUpTableViewController: UITableViewController {
     @IBOutlet weak var timeWindowCell: UITableViewCell!
     @IBOutlet weak var alarmToneCell: UITableViewCell!
     @IBOutlet weak var datePicker: UIDatePicker!
-    
+    @IBOutlet weak var timeWindowButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         updateSmartRows(isEnabled: smartAlarmSwitch.isOn)
+        setupTimeWindowMenu()
         self.clearsSelectionOnViewWillAppear = false
     }
 
@@ -67,78 +68,18 @@ class WakeUpTableViewController: UITableViewController {
             dismiss(animated: true)
     }
     
-//    var isTimeWindowCell = false
-//
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if indexPath.section == 1 && indexPath.row == 1 { // Adjust index as needed
-//            isTimeWindowCell.toggle()
-//            
-//            tableView.beginUpdates()
-//            tableView.endUpdates()
-//        }
-//        tableView.deselectRow(at: indexPath, animated: true)
-//    }
-//
-//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        // Check if this is the row containing the Picker
-//        if indexPath.section == 1 && indexPath.row == 2 {
-//            return isTimeWindowCell ? 216 : 0
-//        }
-//        return UITableView.automaticDimension
-//    }
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
+    func setupTimeWindowMenu() {
+        let options = ["15 mins", "30 mins", "45 mins"]
+        
+        let menuChildren = options.map { title in
+            UIAction(title: title, handler: { [weak self] action in
+                self?.timeWindowButton.setTitle(title, for: .normal)
+                print("User selected \(title)")
+            })
+        }
+        
+        timeWindowButton.menu = UIMenu(title: "Select Time Window", children: menuChildren)
+        timeWindowButton.showsMenuAsPrimaryAction = true
+        timeWindowButton.changesSelectionAsPrimaryAction = true
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

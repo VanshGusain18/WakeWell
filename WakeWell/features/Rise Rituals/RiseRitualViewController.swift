@@ -9,6 +9,9 @@ import UIKit
 
 class RiseRitualViewController: UIViewController, UICollectionViewDelegate {
 
+    override func viewDidLayoutSubviews() {
+    }
+    
     @IBOutlet weak var RiseRitualCollectionView: UICollectionView!
     
     var ritualsData = RitualsData()

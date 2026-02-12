@@ -16,7 +16,8 @@ struct Ritual: Codable, Identifiable {
     let category: String
     
     enum CodingKeys: String, CodingKey {
-        case id, name, description, category
+        case id, name, category
+        case description = "description"
         case imagePath = "image_path"
         case scienceReference = "science_reference"
     }

@@ -2,21 +2,6 @@ import UIKit
 
 class StatsTableViewController: UITableViewController {
 
-    // MARK: - Metric Enum
-
-    enum SelectedMetric {
-        case sleepScore
-        case duration
-        case efficiency
-        case architecture
-        case continuity
-        case calmness
-        case consistency
-    }
-
-    var selectedMetric: SelectedMetric = .sleepScore
-    var selectedSegmentIndex = 0
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -47,7 +32,6 @@ class StatsTableViewController: UITableViewController {
 
         let segment = UISegmentedControl(items: ["Week", "Month", "Year"])
         segment.selectedSegmentIndex = 0
-        segment.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
 
         segment.frame = CGRect(
             x: 16,
@@ -69,11 +53,6 @@ class StatsTableViewController: UITableViewController {
         tableView.tableHeaderView = headerView
     }
 
-    @objc private func segmentChanged(_ sender: UISegmentedControl) {
-        selectedSegmentIndex = sender.selectedSegmentIndex
-        reloadChart()
-    }
-
     // MARK: - TableView
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -88,7 +67,7 @@ class StatsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        // SECTION 0 → Chart
+        // SECTION 0 — Sleep Score Chart
         if indexPath.section == 0 {
 
             let cell = tableView.dequeueReusableCell(
@@ -96,35 +75,12 @@ class StatsTableViewController: UITableViewController {
                 for: indexPath
             ) as! SleepScoreChartCell
 
-            switch selectedMetric {
-
-            case .sleepScore:
-                cell.configureForSleepScore()
-
-            case .duration:
-                cell.configureForDuration()
-
-            case .efficiency:
-                cell.configureForEfficiency()
-
-            case .architecture:
-                cell.configureForArchitecture()
-
-            case .continuity:
-                cell.configureForContinuity()
-
-            case .calmness:
-                cell.configureForCalmness()
-
-            case .consistency:
-                cell.configureForConsistency()
-            }
+            cell.configureForWeek()   // your existing method
 
             return cell
         }
 
-        // SECTION 1 → Metric Cards
-
+        // SECTION 1 — Metric Cards
         let cell = tableView.dequeueReusableCell(
             withIdentifier: "StatsMetricRowCell",
             for: indexPath
@@ -137,41 +93,25 @@ class StatsTableViewController: UITableViewController {
                 left: ("Duration", "7h 45m"),
                 right: ("Efficiency", "82%"),
                 onLeftTap: { [weak self] in
-                    self?.selectedMetric = .duration
-                    self?.reloadChart()
+                    self?.openDurationScreen()
                 },
-                onRightTap: { [weak self] in
-                    self?.selectedMetric = .efficiency
-                    self?.reloadChart()
-                }
+                onRightTap: nil   // not clickable
             )
 
         case 1:
             cell.configure(
                 left: ("Architecture", "Good"),
                 right: ("Continuity", "Stable"),
-                onLeftTap: { [weak self] in
-                    self?.selectedMetric = .architecture
-                    self?.reloadChart()
-                },
-                onRightTap: { [weak self] in
-                    self?.selectedMetric = .continuity
-                    self?.reloadChart()
-                }
+                onLeftTap: nil,
+                onRightTap: nil
             )
 
         case 2:
             cell.configure(
                 left: ("Calmness", "High"),
                 right: ("Consistency", "78%"),
-                onLeftTap: { [weak self] in
-                    self?.selectedMetric = .calmness
-                    self?.reloadChart()
-                },
-                onRightTap: { [weak self] in
-                    self?.selectedMetric = .consistency
-                    self?.reloadChart()
-                }
+                onLeftTap: nil,
+                onRightTap: nil
             )
 
         default:
@@ -186,9 +126,10 @@ class StatsTableViewController: UITableViewController {
         return indexPath.section == 0 ? 260 : 110
     }
 
-    // MARK: - Reload Chart
+    // MARK: - Navigation
 
-    private func reloadChart() {
-        tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+    private func openDurationScreen() {
+        let vc = DurationDetailViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

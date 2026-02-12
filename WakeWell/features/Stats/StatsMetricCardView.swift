@@ -57,9 +57,7 @@ class StatsMetricCardView: UIView {
 
     // MARK: - Configure
 
-    func configure(title: String,
-                   value: String,
-                   onTap: (() -> Void)?) {
+    func configure(title: String,value: String,onTap: (() -> Void)?) {
 
         titleLabel.text = title
         valueLabel.text = value

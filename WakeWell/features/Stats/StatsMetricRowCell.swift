@@ -5,8 +5,7 @@ class StatsMetricRowCell: UITableViewCell {
     private let leftCard = StatsMetricCardView()
     private let rightCard = StatsMetricCardView()
 
-    override init(style: UITableViewCell.CellStyle,
-                  reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle,reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }

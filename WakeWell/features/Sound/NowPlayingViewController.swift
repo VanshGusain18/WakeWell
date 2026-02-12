@@ -13,26 +13,56 @@ class NowPlayingViewController: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var playPauseButton: UIButton!
-        private let backgroundImageView = UIImageView()
+   
+    
+    @IBOutlet var previousButton: UIButton!
+    @IBOutlet var nextButton: UIButton!
+    
+    @IBOutlet var progressLabel: UISlider!
+    
+    @IBOutlet var currentTimeLabel: UILabel!
+    
+    @IBOutlet var reaminingTimeLabel: UILabel!
+    private var timer: Timer?
+
+    
+    private let backgroundImageView = UIImageView()
         private let blurView = UIVisualEffectView(
             effect: UIBlurEffect(style: .systemThinMaterialLight)
         )
 
-        override func viewDidLoad() {
-            super.viewDidLoad()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        navigationController?.setNavigationBarHidden(false, animated: false)
 
-            guard let sound = AudioManager.shared.currentSound,
-                  let image = UIImage(named: sound.imageName) else {
-                print("❌ Missing sound or image")
-                return
-            }
-
-            titleLabel.text = sound.title
-
-            setupBackground(image: image)
-            setupMainImage(image)
-            setupPlayPauseButton()
+        guard let sound = AudioManager.shared.currentSound,
+              let image = UIImage(named: sound.imageName) else {
+            print("❌ Missing sound or image")
+            return
         }
+
+        titleLabel.text = sound.title
+        setupBackground(image: image)
+        setupMainImage(image)
+        setupPlayPauseButton()
+        startTimer()
+        progressLabel.minimumTrackTintColor = .systemBlue
+        progressLabel.maximumTrackTintColor = .systemGray4
+        progressLabel.setThumbImage(UIImage(systemName: "circle.fill"), for: .normal)
+//        imageView.layer.shadowColor = UIColor.black.cgColor
+//        imageView.layer.shadowOpacity = 0.25
+//        imageView.layer.shadowRadius = 20
+//        imageView.layer.shadowOffset = CGSize(width: 0, height: 10)
+//        imageView.clipsToBounds = false
+        
+
+    
+        navigationItem.largeTitleDisplayMode = .never
+    }
+
+
+
 
         private func setupBackground(image: UIImage) {
             backgroundImageView.frame = view.bounds
@@ -68,7 +98,53 @@ class NowPlayingViewController: UIViewController {
             updatePlayPauseButton()
         }
 
-        @IBAction func closeTapped(_ sender: UIButton) {
-            dismiss(animated: true)
+    @IBAction func closeTapped(_ sender: UIBarButtonItem) {
+        dismiss(animated: true)
+    }
+    
+    @IBAction func previousTapped(_ sender: UIButton) {
+        AudioManager.shared.playPrevious()
+            refreshUI()
+    }
+    
+    @IBAction func nextTapped(_ sender: UIButton) {
+        AudioManager.shared.playNext()
+           refreshUI()
+    }
+    private func refreshUI() {
+        guard let sound = AudioManager.shared.currentSound,
+              let image = UIImage(named: sound.imageName) else { return }
+
+        titleLabel.text = sound.title
+        imageView.image = image
+        updatePlayPauseButton()
+    }
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            self?.updateProgress()
         }
     }
+
+    private func updateProgress() {
+        let current = AudioManager.shared.currentTime
+        let duration = AudioManager.shared.duration
+        
+        guard duration > 0 else { return }
+        
+        progressLabel.value = Float(current / duration)
+        
+        currentTimeLabel.text = formatTime(current)
+        reaminingTimeLabel.text = "-\(formatTime(duration - current))"
+    }
+    private func formatTime(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+
+    @IBAction func sliderChanged(_ sender: UISlider) {
+        let duration = AudioManager.shared.duration
+            let newTime = Double(sender.value) * duration
+            AudioManager.shared.seek(to: newTime)
+    }
+}

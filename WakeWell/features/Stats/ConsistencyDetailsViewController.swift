@@ -1,15 +1,13 @@
 //
-//  DurationDetailViewController.swift
+//  ConsistencyDetailsViewController.swift
 //  WakeWell
 //
 //  Created by geu on 12/02/26.
 //
 
-
 import UIKit
 import DGCharts
-
-class DurationDetailViewController: UIViewController {
+class ConsistencyDetailsViewController: UIViewController {
 
     private let chartView = BarChartView()
 
@@ -18,7 +16,7 @@ class DurationDetailViewController: UIViewController {
 
         view.backgroundColor = .systemBackground
         
-        title = "Duration Details"
+        title = "Consistency Details"
 
         setupChart()
         setData()
@@ -71,3 +69,4 @@ class DurationDetailViewController: UIViewController {
         chartView.animate(yAxisDuration: 1.2)
     }
 }
+

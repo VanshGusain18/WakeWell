@@ -1,15 +1,13 @@
 //
-//  DurationDetailViewController.swift
+//  ArchitectureDetailsViewController.swift
 //  WakeWell
 //
 //  Created by geu on 12/02/26.
 //
 
-
 import UIKit
 import DGCharts
-
-class DurationDetailViewController: UIViewController {
+class ArchitectureDetailsViewController: UIViewController {
 
     private let chartView = BarChartView()
 
@@ -18,7 +16,7 @@ class DurationDetailViewController: UIViewController {
 
         view.backgroundColor = .systemBackground
         
-        title = "Duration Details"
+        title = "Architecture Details"
 
         setupChart()
         setData()

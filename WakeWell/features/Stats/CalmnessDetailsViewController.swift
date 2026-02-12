@@ -1,15 +1,14 @@
 //
-//  DurationDetailViewController.swift
+//  CalmnessDetailsViewController.swift
 //  WakeWell
 //
 //  Created by geu on 12/02/26.
 //
 
-
 import UIKit
 import DGCharts
 
-class DurationDetailViewController: UIViewController {
+class CalmnessDetailsViewController: UIViewController {
 
     private let chartView = BarChartView()
 
@@ -18,7 +17,7 @@ class DurationDetailViewController: UIViewController {
 
         view.backgroundColor = .systemBackground
         
-        title = "Duration Details"
+        title = "Calmness Details"
 
         setupChart()
         setData()

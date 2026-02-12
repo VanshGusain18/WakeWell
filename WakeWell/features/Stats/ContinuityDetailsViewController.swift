@@ -1,15 +1,13 @@
 //
-//  DurationDetailViewController.swift
+//  ContinuityDetailsViewController.swift
 //  WakeWell
 //
 //  Created by geu on 12/02/26.
 //
 
-
 import UIKit
 import DGCharts
-
-class DurationDetailViewController: UIViewController {
+class ContinuityDetailsViewController: UIViewController {
 
     private let chartView = BarChartView()
 
@@ -18,7 +16,7 @@ class DurationDetailViewController: UIViewController {
 
         view.backgroundColor = .systemBackground
         
-        title = "Duration Details"
+        title = "Continuity Details"
 
         setupChart()
         setData()

@@ -77,6 +77,13 @@ class SoundTableViewController: UITableViewController {
                 imageName: "flower"
                 ),
             Sound(
+                    title: "Flowing Water",
+                    category: .nature,
+                    duration: 600,
+                    fileName: "natureseye-the-old-water-mill-meditation-8005",
+                    imageName: "pexels-sea-1850228"
+                    ),
+            Sound(
                 title: "Xylophone beats",
                 category: .nature,
                 duration: 600,
@@ -98,12 +105,20 @@ class SoundTableViewController: UITableViewController {
                 imageName: "pinecone"
                 ),
             Sound(
-                title: "Water",
-                category: .weather,
+                title: "Spiritual Forest",
+                category: .nature,
                 duration: 600,
-                fileName: "natureseye-the-old-water-mill-meditation-8005",
-                imageName: "pexels-sea-1850228"
+                fileName: "sonican-spiritual-nature-364866",
+                imageName: "stills_by_suki-banff-8329971"
                 ),
+            Sound(
+                    title: "Wind And Bells",
+                    category: .nature,
+                    duration: 600,
+                    fileName: "meditativetiger-sleep-inducing-tibetan-bells-388638",
+                    imageName: "chrisart16-bell-4401148"
+                    ),
+           
             //Weather
             Sound(
                 title: "Rain",
@@ -119,20 +134,7 @@ class SoundTableViewController: UITableViewController {
                 fileName: "grand_project-zen-wind-411951",
                 imageName: "manfredrichter-windmill-7963566"
                 ),
-            Sound(
-                title: "Wind And Bells",
-                category: .weather,
-                duration: 600,
-                fileName: "meditativetiger-sleep-inducing-tibetan-bells-388638",
-                imageName: "chrisart16-bell-4401148"
-                ),
-            Sound(
-                title: "Spiritual Forest",
-                category: .weather,
-                duration: 600,
-                fileName: "sonican-spiritual-nature-364866",
-                imageName: "stills_by_suki-banff-8329971"
-                ),
+            
         Sound(
             title: "Brighter Tomorrow",
             category: .weather,
@@ -266,17 +268,20 @@ class SoundTableViewController: UITableViewController {
         currentlyPlayingFileName = sound.fileName
 
         // Play sound (THIS triggers mini player)
-        AudioManager.shared.play(sound: sound)
+        AudioManager.shared.setPlaylist(
+            sounds: filteredSounds,
+            startIndex: indexPath.row
+        )
+
 
         // Refresh UI highlight
         tableView.reloadData()
 
         // Open Now Playing screen
-        let vc = storyboard?.instantiateViewController(
-            withIdentifier: "NowPlayingVC"
-        ) as! NowPlayingViewController
+        guard let nav = storyboard?.instantiateViewController(withIdentifier: "NowPlayingNav") else { return }
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
 
-        present(vc, animated: true)
     }
 
     // MARK: - Audio

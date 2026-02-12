@@ -6,6 +6,8 @@ final class AudioManager {
 
     private var player: AVAudioPlayer?
     private(set) var currentSound: Sound?
+    private var playlist: [Sound] = []
+    private var currentIndex: Int = 0
 
     private init() {}
 
@@ -31,7 +33,6 @@ final class AudioManager {
 
         do {
             player = try AVAudioPlayer(contentsOf: url)
-            player?.numberOfLoops = -1
             player?.prepareToPlay()
             player?.play()
 
@@ -63,6 +64,46 @@ final class AudioManager {
             name: .audioDidToggle,
             object: nil
         )
+    }
+    func setPlaylist(sounds: [Sound], startIndex: Int) {
+        playlist = sounds
+        currentIndex = startIndex
+        play(sound: playlist[currentIndex])
+    }
+    func playNext() {
+        guard !playlist.isEmpty else { return }
+
+        currentIndex += 1
+
+        if currentIndex >= playlist.count {
+            currentIndex = 0   // 🔁 loop inside category
+        }
+
+        play(sound: playlist[currentIndex])
+    }
+//slider value
+    var duration: TimeInterval {
+        return player?.duration ?? 0
+    }
+
+    var currentTime: TimeInterval {
+        return player?.currentTime ?? 0
+    }
+
+    func seek(to time: TimeInterval) {
+        player?.currentTime = time
+    }
+
+    func playPrevious() {
+        guard !playlist.isEmpty else { return }
+
+        currentIndex -= 1
+
+        if currentIndex < 0 {
+            currentIndex = playlist.count - 1   // 🔁 loop backwards
+        }
+
+        play(sound: playlist[currentIndex])
     }
 
     // MARK: - Stop

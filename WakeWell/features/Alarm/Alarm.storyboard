@@ -161,6 +161,12 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="8Kd-aZ-5P3">
+                                                    <rect key="frame" x="264" y="9" width="114" height="35"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="gray" title="30 mins"/>
+                                                </button>
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -202,6 +208,7 @@
                         <outlet property="alarmToneCell" destination="euN-Ep-fCF" id="Znr-rh-0uz"/>
                         <outlet property="datePicker" destination="txy-mQ-BbC" id="jPE-rW-FA6"/>
                         <outlet property="smartAlarmSwitch" destination="f6P-29-8Bv" id="tWI-9B-kMD"/>
+                        <outlet property="timeWindowButton" destination="8Kd-aZ-5P3" id="fqI-Es-JTG"/>
                         <outlet property="timeWindowCell" destination="V3i-cX-6S4" id="Koc-ZQ-aWz"/>
                     </connections>
                 </tableViewController>

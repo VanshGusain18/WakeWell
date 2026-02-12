@@ -11,7 +11,7 @@
         <!--Sound-->
         <scene sceneID="TNK-Ym-oDS">
             <objects>
-                <tableViewController storyboardIdentifier="sound" title="Sound" useStoryboardIdentifierAsRestorationIdentifier="YES" id="4vG-GP-6sn" customClass="SoundTableViewController" customModule="sounds_tab" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="sound" title="Sound" useStoryboardIdentifierAsRestorationIdentifier="YES" id="4vG-GP-6sn" customClass="SoundTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="tfq-VJ-bVA">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -52,7 +52,7 @@
         <!--Now Playing View Controller-->
         <scene sceneID="6HN-Y2-ZSd">
             <objects>
-                <viewController storyboardIdentifier="NowPlayingVC" id="OHb-22-cr8" customClass="NowPlayingViewController" customModule="sounds_tab" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NowPlayingVC" id="OHb-22-cr8" customClass="NowPlayingViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lkT-zA-Ddm">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -76,19 +76,12 @@
                                 <rect key="frame" x="34" y="187" width="324" height="304"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DuW-To-761">
-                                <rect key="frame" x="16" y="118" width="62" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Back"/>
-                                <connections>
-                                    <action selector="closeTapped:" destination="OHb-22-cr8" eventType="touchUpInside" id="n5k-yj-rly"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ayH-na-PTs"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="imageView" destination="KTY-Mx-fWt" id="4Uz-lK-hv5"/>
                         <outlet property="playPauseButton" destination="HLq-G4-M7g" id="KlO-Zn-BvL"/>

@@ -12,6 +12,7 @@
                 <outlet property="backgroundImage" destination="DNe-Og-kHc" id="X13-eo-SPS"/>
                 <outlet property="descImage" destination="a3U-JT-iD8" id="92V-gY-0LM"/>
                 <outlet property="descLabel" destination="nOe-uG-IV3" id="Blk-vc-Rop"/>
+                <outlet property="scienceLabel" destination="Wrp-69-667" id="h1M-4i-t2n"/>
                 <outlet property="startButton" destination="NpX-7s-7Lb" id="UVo-dm-HTg"/>
                 <outlet property="titleLabel" destination="bTs-jJ-FDY" id="DFP-sc-SLH"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -57,6 +58,13 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="play.fill" catalog="system" title=" Start"/>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wrp-69-667">
+                                <rect key="frame" x="20" y="626" width="353" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <constraints>
                             <constraint firstItem="nOe-uG-IV3" firstAttribute="top" secondItem="bTs-jJ-FDY" secondAttribute="bottom" constant="30" id="3Lx-c9-BHh"/>

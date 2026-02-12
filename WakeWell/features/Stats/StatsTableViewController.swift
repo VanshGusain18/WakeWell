@@ -8,23 +8,17 @@ class StatsTableViewController: UITableViewController {
         registerCells()
         setupSegmentControl()
         
-        tableView.separatorStyle = .none
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+
     }
     
     // MARK: - Cell Registration
     private func registerCells() {
-        tableView.register(
-            UINib(nibName: "SleepScoreChartCell", bundle: nil),
-            forCellReuseIdentifier: "SleepScoreChartCell"
-        )
+        tableView.register(UINib(nibName:"SleepScoreChartCell", bundle: nil),forCellReuseIdentifier:"SleepScoreChartCell" )
         
-        tableView.register(
-            UINib(nibName: "StatsMetricCardCell", bundle: nil),
-            forCellReuseIdentifier: "StatsMetricCardCell"
-        )
+        tableView.register(UINib(nibName:"StatsMetricCardCell", bundle: nil),forCellReuseIdentifier: "StatsMetricCardCell")
     }
     
-    // MARK: - Segment Control
     private func setupSegmentControl() {
         let segment = UISegmentedControl(items: ["Week", "Month", "Year"])
         segment.selectedSegmentIndex = 0
@@ -52,6 +46,7 @@ class StatsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+
         // SECTION 0 — Sleep Score Chart
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(
@@ -75,6 +70,7 @@ class StatsTableViewController: UITableViewController {
         let metric = metrics[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "StatsMetricCardCell", for: indexPath) as! StatsMetricCardCell
         
+
         // Assign onTap closures for each card
         switch metric.title {
         case "Duration":
@@ -110,7 +106,7 @@ class StatsTableViewController: UITableViewController {
     
     // MARK: - TableView Delegate
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return indexPath.section == 0 ? 260 : 110
+        return indexPath.section == 0 ? 260 : 120
     }
     
     // MARK: - Navigation / Actions

@@ -20,6 +20,10 @@ class StatsMetricCardCell: UITableViewCell {
         let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
         cardView.addGestureRecognizer(tap)
         cardView.isUserInteractionEnabled = true
+        cardView.layer.cornerRadius = 16
+        cardView.layer.borderWidth = 1
+        cardView.layer.borderColor = UIColor.black.cgColor
+
     }
 
     func configure(title: String, value: String, onTap: (() -> Void)? = nil) {
@@ -38,4 +42,5 @@ class StatsMetricCardCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+
 }

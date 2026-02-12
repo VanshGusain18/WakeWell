@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D610DD8F2F3C5D070083F51A /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = D610DD8E2F3C5D070083F51A /* DGCharts */; };
 		D67C6D8C2F2CCA91004ECCDB /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = D67C6D8B2F2CCA88004ECCDB /* readme.md */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D610DD8F2F3C5D070083F51A /* DGCharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +94,7 @@
 			);
 			name = WakeWell;
 			packageProductDependencies = (
+				D610DD8E2F3C5D070083F51A /* DGCharts */,
 			);
 			productName = WakeWell;
 			productReference = D67C6D732F2CC9F4004ECCDB /* WakeWell.app */;
@@ -121,6 +124,9 @@
 			);
 			mainGroup = D67C6D6A2F2CC9F4004ECCDB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D610DD8D2F3C5D070083F51A /* XCRemoteSwiftPackageReference "Charts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D67C6D742F2CC9F4004ECCDB /* Products */;
 			projectDirPath = "";
@@ -362,6 +368,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D610DD8D2F3C5D070083F51A /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChartsOrg/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D610DD8E2F3C5D070083F51A /* DGCharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D610DD8D2F3C5D070083F51A /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = DGCharts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D67C6D6B2F2CC9F4004ECCDB /* Project object */;
 }

@@ -1,58 +1,74 @@
-//
-//  StatsMetricCardView.swift
-//  WakeWell
-//
-//  Created by geu on 11/02/26.
-//
 import UIKit
 
 class StatsMetricCardView: UIView {
 
+    // MARK: - UI
+
     private let titleLabel = UILabel()
     private let valueLabel = UILabel()
 
+    private var tapAction: (() -> Void)?
+
+    // MARK: - Init
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
+        setupUI()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setup()
+        setupUI()
     }
 
-    private func setup() {
-        backgroundColor = .systemBackground
-        layer.cornerRadius = 12
-        layer.borderWidth = 1
-        layer.borderColor = UIColor.systemGray4.cgColor
+    // MARK: - Setup
+
+    private func setupUI() {
+
+        backgroundColor = .secondarySystemBackground
+        layer.cornerRadius = 18
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.06
+        layer.shadowOffset = CGSize(width: 0, height: 4)
+        layer.shadowRadius = 8
 
         titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        titleLabel.textColor = .secondaryLabel
-
         valueLabel.font = .systemFont(ofSize: 20, weight: .bold)
-        valueLabel.textColor = .label
-
-        addSubview(titleLabel)
-        addSubview(valueLabel)
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         valueLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+        addSubview(titleLabel)
+        addSubview(valueLabel)
 
-            valueLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            valueLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            valueLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            valueLabel.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -12)
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+
+            valueLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            valueLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor)
         ])
+
+        // Tap
+        addGestureRecognizer(
+            UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        )
     }
 
-    func configure(title: String, value: String) {
+    // MARK: - Configure
+
+    func configure(title: String,
+                   value: String,
+                   onTap: (() -> Void)?) {
+
         titleLabel.text = title
         valueLabel.text = value
+        tapAction = onTap
+    }
+
+    // MARK: - Action
+
+    @objc private func handleTap() {
+        tapAction?()
     }
 }

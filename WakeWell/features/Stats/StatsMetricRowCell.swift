@@ -1,9 +1,3 @@
-//
-//  StatsMetricRowCell.swift
-//  WakeWell
-//
-//  Created by geu on 10/02/26.
-//
 import UIKit
 
 class StatsMetricRowCell: UITableViewCell {
@@ -11,39 +5,61 @@ class StatsMetricRowCell: UITableViewCell {
     private let leftCard = StatsMetricCardView()
     private let rightCard = StatsMetricCardView()
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle,
+                  reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupUI()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setup()
+        setupUI()
     }
 
-    private func setup() {
-        contentView.addSubview(leftCard)
-        contentView.addSubview(rightCard)
+    private func setupUI() {
+
+        selectionStyle = .none
+        backgroundColor = .clear
 
         leftCard.translatesAutoresizingMaskIntoConstraints = false
         rightCard.translatesAutoresizingMaskIntoConstraints = false
 
+        contentView.addSubview(leftCard)
+        contentView.addSubview(rightCard)
+
         NSLayoutConstraint.activate([
+
             leftCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            leftCard.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            leftCard.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            leftCard.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            leftCard.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            leftCard.trailingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: -8),
 
-            rightCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            rightCard.topAnchor.constraint(equalTo: leftCard.topAnchor),
-            rightCard.bottomAnchor.constraint(equalTo: leftCard.bottomAnchor),
-
-            leftCard.trailingAnchor.constraint(equalTo: rightCard.leadingAnchor, constant: -16),
-            leftCard.widthAnchor.constraint(equalTo: rightCard.widthAnchor)
+            rightCard.leadingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 8),
+            rightCard.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            rightCard.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            rightCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
     }
 
-    func configure(left: (String, String), right: (String, String)) {
-        leftCard.configure(title: left.0, value: left.1)
-        rightCard.configure(title: right.0, value: right.1)
+    // MARK: - Configure
+
+    func configure(
+        left: (title: String, value: String),
+        right: (title: String, value: String),
+        onLeftTap: (() -> Void)?,
+        onRightTap: (() -> Void)?
+    ) {
+
+        leftCard.configure(
+            title: left.title,
+            value: left.value,
+            onTap: onLeftTap
+        )
+
+        rightCard.configure(
+            title: right.title,
+            value: right.value,
+            onTap: onRightTap
+        )
     }
 }

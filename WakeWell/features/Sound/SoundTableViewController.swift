@@ -268,17 +268,20 @@ class SoundTableViewController: UITableViewController {
         currentlyPlayingFileName = sound.fileName
 
         // Play sound (THIS triggers mini player)
-        AudioManager.shared.play(sound: sound)
+        AudioManager.shared.setPlaylist(
+            sounds: filteredSounds,
+            startIndex: indexPath.row
+        )
+
 
         // Refresh UI highlight
         tableView.reloadData()
 
         // Open Now Playing screen
-        let vc = storyboard?.instantiateViewController(
-            withIdentifier: "NowPlayingVC"
-        ) as! NowPlayingViewController
+        guard let nav = storyboard?.instantiateViewController(withIdentifier: "NowPlayingNav") else { return }
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
 
-        present(vc, animated: true)
     }
 
     // MARK: - Audio

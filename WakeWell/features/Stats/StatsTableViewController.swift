@@ -13,24 +13,29 @@ class StatsTableViewController: UITableViewController {
         loadSleepData()
     }
     
-    // MARK: - Load Data
     
     private func loadSleepData() {
-        let stats = SleepStats(
-            duration: 8.2,
-            efficiency: 87,
-            architecture: 4.0,
-            consistency: 3.5,
-            calmness: 4.2,
-            continuity: 3.9
+
+        let rawStats = SleepStatsAggregator.aggregate()
+
+        let roundedStats = SleepStats(
+            duration: round(rawStats.duration),
+            efficiency: round(rawStats.efficiency),
+            architecture: round(rawStats.architecture),
+            consistency: round(rawStats.consistency),
+            calmness: round(rawStats.calmness),
+            continuity: round(rawStats.continuity)
         )
-        
-        self.sleepStats = stats
-        self.metrics = SleepStatsMapper.mapToMetrics(from: stats)
+
+        self.sleepStats = roundedStats
+        self.metrics = SleepStatsMapper.mapToMetrics(from: roundedStats)
+
         tableView.reloadData()
     }
+
+
+
     
-    // MARK: - Cell Registration
     
     private func registerCells() {
         tableView.register(
@@ -43,8 +48,6 @@ class StatsTableViewController: UITableViewController {
             forCellReuseIdentifier: "StatsMetricCardCell"
         )
     }
-    
-    // MARK: - Segment Control
     
     private func setupSegmentControl() {
         let segment = UISegmentedControl(items: ["Week", "Month", "Year"])
@@ -62,7 +65,6 @@ class StatsTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    // MARK: - TableView DataSource
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
@@ -79,7 +81,6 @@ class StatsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        // SECTION 0 → Chart Cell
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: "SleepScoreChartCell",
@@ -90,7 +91,6 @@ class StatsTableViewController: UITableViewController {
             return cell
         }
         
-        // SECTION 1 → Metric Cards
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: "StatsMetricCardCell",
             for: indexPath
@@ -120,61 +120,21 @@ class StatsTableViewController: UITableViewController {
         return cell
     }
     
-    // MARK: - Row Height
+    
     
     override func tableView(_ tableView: UITableView,
                             heightForRowAt indexPath: IndexPath) -> CGFloat {
         return indexPath.section == 0 ? 260 : 120
     }
     
-    // MARK: - Metric Tap Handler
     
     private func handleTap(type: SleepMetricType) {
-        switch type {
-        case .duration:
-            openDurationScreen()
-        case .efficiency:
-            openEfficiencyScreen()
-        case .architecture:
-            openArchitectureScreen()
-        case .continuity:
-            openContinuityScreen()
-        case .calmness:
-            openCalmnessScreen()
-        case .consistency:
-            openConsistencyScreen()
-        }
+        openMetricScreen(type)
     }
     
-    // MARK: - Navigation
     
-    private func openDurationScreen() {
-        let vc = DurationDetailViewController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func openEfficiencyScreen() {
-        let vc = EfficiencyDetailsViewController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func openArchitectureScreen() {
-        let vc = ArchitectureDetailsViewController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func openContinuityScreen() {
-        let vc = ContinuityDetailsViewController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func openCalmnessScreen() {
-        let vc = CalmnessDetailsViewController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func openConsistencyScreen() {
-        let vc = ConsistencyDetailsViewController()
+    private func openMetricScreen(_ metric: SleepMetricType) {
+        let vc = BaseMetricChartViewController(metricType: metric)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

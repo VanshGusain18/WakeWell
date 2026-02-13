@@ -37,3 +37,42 @@ enum SleepMetricType {
         }
     }
 }
+struct MetricValue {
+    let raw: Double
+
+    var chartValue: Double {
+        raw
+    }
+}
+struct MetricData {
+    let day: String
+    let value: MetricValue
+}
+
+final class SleepStatsAggregator {
+
+    static func aggregate() -> SleepStats {
+
+        let duration = average(.duration)
+        let efficiency = average(.efficiency)
+        let architecture = average(.architecture)
+        let consistency = average(.consistency)
+        let calmness = average(.calmness)
+        let continuity = average(.continuity)
+
+        return SleepStats(
+            duration: duration,
+            efficiency: efficiency,
+            architecture: architecture,
+            consistency: consistency,
+            calmness: calmness,
+            continuity: continuity
+        )
+    }
+
+    private static func average(_ metric: SleepMetricType) -> Double {
+        let data = MetricDataProvider.weeklyData(for: metric)
+        let values = data.map { $0.value.raw }
+        return values.reduce(0, +) / Double(values.count)
+    }
+}

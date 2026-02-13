@@ -2,22 +2,49 @@ import UIKit
 
 class StatsTableViewController: UITableViewController {
     
+    private var sleepStats: SleepStats?
+    private var metrics: [SleepMetric] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         registerCells()
         setupSegmentControl()
-        
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-
+        loadSleepData()
+    }
+    
+    // MARK: - Load Data
+    
+    private func loadSleepData() {
+        let stats = SleepStats(
+            duration: 8.2,
+            efficiency: 87,
+            architecture: 4.0,
+            consistency: 3.5,
+            calmness: 4.2,
+            continuity: 3.9
+        )
+        
+        self.sleepStats = stats
+        self.metrics = SleepStatsMapper.mapToMetrics(from: stats)
+        tableView.reloadData()
     }
     
     // MARK: - Cell Registration
+    
     private func registerCells() {
-        tableView.register(UINib(nibName:"SleepScoreChartCell", bundle: nil),forCellReuseIdentifier:"SleepScoreChartCell" )
+        tableView.register(
+            UINib(nibName: "SleepScoreChartCell", bundle: nil),
+            forCellReuseIdentifier: "SleepScoreChartCell"
+        )
         
-        tableView.register(UINib(nibName:"StatsMetricCardCell", bundle: nil),forCellReuseIdentifier: "StatsMetricCardCell")
+        tableView.register(
+            UINib(nibName: "StatsMetricCardCell", bundle: nil),
+            forCellReuseIdentifier: "StatsMetricCardCell"
+        )
     }
+    
+    // MARK: - Segment Control
     
     private func setupSegmentControl() {
         let segment = UISegmentedControl(items: ["Week", "Month", "Year"])
@@ -36,80 +63,91 @@ class StatsTableViewController: UITableViewController {
     }
     
     // MARK: - TableView DataSource
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 1 : 6 // 1 chart row, 6 metric rows
+    override func tableView(_ tableView: UITableView,
+                            numberOfRowsInSection section: Int) -> Int {
+        
+        if section == 0 { return 1 }
+        
+        return Int(ceil(Double(metrics.count) / 2.0))
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView,
+                            cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-
-        // SECTION 0 — Sleep Score Chart
+        // SECTION 0 → Chart Cell
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: "SleepScoreChartCell",
                 for: indexPath
             ) as! SleepScoreChartCell
+            
             cell.configureForWeek()
             return cell
         }
         
-        // SECTION 1 — Metric Cards
-        let metrics: [(title: String, value: String)] = [
-            ("Duration", "7h 45m"),
-            ("Efficiency", "82%"),
-            ("Architecture", "Good"),
-            ("Continuity", "Stable"),
-            ("Calmness", "High"),
-            ("Consistency", "78%")
-        ]
-        
-        let metric = metrics[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "StatsMetricCardCell", for: indexPath) as! StatsMetricCardCell
-        
-
-        // Assign onTap closures for each card
-        switch metric.title {
-        case "Duration":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openDurationScreen()
-            })
-        case "Efficiency":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openEfficiencyScreen()
-            })
-        case "Architecture":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openArchitectureScreen()
-            })
-        case "Continuity":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openContinuityScreen()
-            })
-        case "Calmness":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openCalmnessScreen()
-            })
-        case "Consistency":
-            cell.configure(title: metric.title, value: metric.value, onTap: { [weak self] in
-                self?.openConsistencyScreen()
-            })
-        default:
-            cell.configure(title: metric.title, value: metric.value, onTap: nil)
+        // SECTION 1 → Metric Cards
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: "StatsMetricCardCell",
+            for: indexPath
+        ) as? StatsMetricCardCell else {
+            return UITableViewCell()
         }
+        
+        let leftIndex = indexPath.row * 2
+        let rightIndex = leftIndex + 1
+        
+        let leftMetric = metrics[leftIndex]
+        let rightMetric = rightIndex < metrics.count ? metrics[rightIndex] : nil
+        
+        cell.configure(
+            leftTitle: leftMetric.type.title,
+            leftValue: leftMetric.displayValue,
+            rightTitle: rightMetric?.type.title,
+            rightValue: rightMetric?.displayValue,
+            leftAction: { [weak self] in
+                self?.handleTap(type: leftMetric.type)
+            },
+            rightAction: rightMetric != nil ? { [weak self] in
+                self?.handleTap(type: rightMetric!.type)
+            } : nil
+        )
         
         return cell
     }
     
-    // MARK: - TableView Delegate
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    // MARK: - Row Height
+    
+    override func tableView(_ tableView: UITableView,
+                            heightForRowAt indexPath: IndexPath) -> CGFloat {
         return indexPath.section == 0 ? 260 : 120
     }
     
-    // MARK: - Navigation / Actions
+    // MARK: - Metric Tap Handler
+    
+    private func handleTap(type: SleepMetricType) {
+        switch type {
+        case .duration:
+            openDurationScreen()
+        case .efficiency:
+            openEfficiencyScreen()
+        case .architecture:
+            openArchitectureScreen()
+        case .continuity:
+            openContinuityScreen()
+        case .calmness:
+            openCalmnessScreen()
+        case .consistency:
+            openConsistencyScreen()
+        }
+    }
+    
+    // MARK: - Navigation
+    
     private func openDurationScreen() {
         let vc = DurationDetailViewController()
         navigationController?.pushViewController(vc, animated: true)

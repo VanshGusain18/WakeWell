@@ -10,15 +10,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="126" id="KGk-i7-Jjw" customClass="StatsMetricCardCell" customModule="WakeWell" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="284" height="126"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="351" id="KGk-i7-Jjw" customClass="StatsMetricCardCell" customModule="WakeWell" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="517" height="351"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="284" height="126"/>
+                <rect key="frame" x="0.0" y="0.0" width="517" height="351"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view clipsSubviews="YES" contentMode="right" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iSt-yh-A86">
-                        <rect key="frame" x="27" y="11" width="174" height="99"/>
+                        <rect key="frame" x="16" y="11" width="173" height="99"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ux9-Nq-0Te">
@@ -43,15 +43,39 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
+                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ekH-8d-KIV">
+                        <rect key="frame" x="215" y="11" width="173" height="99"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FUv-ri-8ja">
+                                <rect key="frame" x="3" y="9" width="160" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PsP-tF-mOz">
+                                <rect key="frame" x="3" y="31" width="160" height="58"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="tertiarySystemFillColor"/>
+                    </view>
                 </subviews>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="cardView" destination="iSt-yh-A86" id="1DL-ji-dQK"/>
-                <outlet property="titleLabel" destination="Ux9-Nq-0Te" id="wxJ-Ns-jqm"/>
-                <outlet property="valueLabel" destination="diT-Ld-xe8" id="iwW-S3-hj9"/>
+                <outlet property="leftCardView" destination="iSt-yh-A86" id="1DL-ji-dQK"/>
+                <outlet property="leftTitleLabel" destination="Ux9-Nq-0Te" id="wxJ-Ns-jqm"/>
+                <outlet property="leftValueLabel" destination="diT-Ld-xe8" id="iwW-S3-hj9"/>
+                <outlet property="rightCardView" destination="ekH-8d-KIV" id="u3w-2r-lAF"/>
+                <outlet property="rightTitleView" destination="FUv-ri-8ja" id="wSs-xu-C7c"/>
+                <outlet property="rightValueView" destination="PsP-tF-mOz" id="1jo-7c-0CF"/>
             </connections>
-            <point key="canvasLocation" x="6.1068702290076331" y="-5.6338028169014089"/>
+            <point key="canvasLocation" x="183.96946564885496" y="-84.859154929577471"/>
         </tableViewCell>
     </objects>
     <resources>

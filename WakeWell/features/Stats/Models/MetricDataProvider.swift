@@ -13,7 +13,7 @@ final class MetricDataProvider {
                 MetricData(day: "Wed", value: MetricValue(raw: 5.8)),
                 MetricData(day: "Thu", value: MetricValue(raw: 8.0)),
                 MetricData(day: "Fri", value: MetricValue(raw: 6.9)),
-                MetricData(day: "Sat", value: MetricValue(raw: 7.5)),
+                MetricData(day: "Sat", value: MetricValue(raw: 4.5)),
                 MetricData(day: "Sun", value: MetricValue(raw: 8.3))
             ]
 
@@ -23,7 +23,7 @@ final class MetricDataProvider {
                 MetricData(day: "Tue", value: MetricValue(raw: 88)),
                 MetricData(day: "Wed", value: MetricValue(raw: 82)),
                 MetricData(day: "Thu", value: MetricValue(raw: 90)),
-                MetricData(day: "Fri", value: MetricValue(raw: 87)),
+                MetricData(day: "Fri", value: MetricValue(raw: 79)),
                 MetricData(day: "Sat", value: MetricValue(raw: 92)),
                 MetricData(day: "Sun", value: MetricValue(raw: 94))
             ]
@@ -36,7 +36,7 @@ final class MetricDataProvider {
                 MetricData(day: "Thu", value: MetricValue(raw: 75)),
                 MetricData(day: "Fri", value: MetricValue(raw: 72)),
                 MetricData(day: "Sat", value: MetricValue(raw: 78)),
-                MetricData(day: "Sun", value: MetricValue(raw: 80))
+                MetricData(day: "Sun", value: MetricValue(raw: 68))
             ]
 
         case .continuity:
@@ -45,7 +45,7 @@ final class MetricDataProvider {
                 MetricData(day: "Tue", value: MetricValue(raw: 82)),
                 MetricData(day: "Wed", value: MetricValue(raw: 78)),
                 MetricData(day: "Thu", value: MetricValue(raw: 85)),
-                MetricData(day: "Fri", value: MetricValue(raw: 83)),
+                MetricData(day: "Fri", value: MetricValue(raw: 63)),
                 MetricData(day: "Sat", value: MetricValue(raw: 88)),
                 MetricData(day: "Sun", value: MetricValue(raw: 90))
             ]
@@ -55,7 +55,7 @@ final class MetricDataProvider {
                 MetricData(day: "Mon", value: MetricValue(raw: 72)),
                 MetricData(day: "Tue", value: MetricValue(raw: 68)),
                 MetricData(day: "Wed", value: MetricValue(raw: 70)),
-                MetricData(day: "Thu", value: MetricValue(raw: 78)),
+                MetricData(day: "Thu", value: MetricValue(raw: 57)),
                 MetricData(day: "Fri", value: MetricValue(raw: 74)),
                 MetricData(day: "Sat", value: MetricValue(raw: 80)),
                 MetricData(day: "Sun", value: MetricValue(raw: 82))
@@ -65,7 +65,7 @@ final class MetricDataProvider {
             return [
                 MetricData(day: "Mon", value: MetricValue(raw: 60)),
                 MetricData(day: "Tue", value: MetricValue(raw: 65)),
-                MetricData(day: "Wed", value: MetricValue(raw: 62)),
+                MetricData(day: "Wed", value: MetricValue(raw: 42)),
                 MetricData(day: "Thu", value: MetricValue(raw: 68)),
                 MetricData(day: "Fri", value: MetricValue(raw: 70)),
                 MetricData(day: "Sat", value: MetricValue(raw: 75)),

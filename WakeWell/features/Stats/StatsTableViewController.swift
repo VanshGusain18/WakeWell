@@ -2,17 +2,22 @@ import UIKit
 
 class StatsTableViewController: UITableViewController {
     
+
+    @IBOutlet weak var timeRangeSegment: UISegmentedControl!
     private var sleepStats: SleepStats?
     private var metrics: [SleepMetric] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         registerCells()
-        setupSegmentControl()
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         loadSleepData()
     }
-    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.tableHeaderView?.frame.size.height = 48
+    }
+
     
     private func loadSleepData() {
 
@@ -33,10 +38,6 @@ class StatsTableViewController: UITableViewController {
         tableView.reloadData()
     }
 
-
-
-    
-    
     private func registerCells() {
         tableView.register(
             UINib(nibName: "SleepScoreChartCell", bundle: nil),
@@ -48,24 +49,19 @@ class StatsTableViewController: UITableViewController {
             forCellReuseIdentifier: "StatsMetricCardCell"
         )
     }
-    
-    private func setupSegmentControl() {
-        let segment = UISegmentedControl(items: ["Week", "Month", "Year"])
-        segment.selectedSegmentIndex = 0
-        segment.frame = CGRect(x: 16, y: 8, width: view.frame.width - 32, height: 32)
-        
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 48))
-        headerView.addSubview(segment)
-        tableView.tableHeaderView = headerView
-        
-        segment.addTarget(self, action: #selector(segmentChanged(_:)), for: .valueChanged)
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        switch sender.selectedSegmentIndex {
+        case 0:
+            print("Week")
+        case 1:
+            print("Month")
+        case 2:
+            print("Year")
+        default:
+            break
+        }
     }
-    
-    @objc private func segmentChanged(_ sender: UISegmentedControl) {
-        tableView.reloadData()
-    }
-    
-    
+ 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }

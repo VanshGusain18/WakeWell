@@ -17,9 +17,8 @@
                 <rect key="frame" x="0.0" y="0.0" width="517" height="351"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view clipsSubviews="YES" contentMode="right" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iSt-yh-A86">
+                    <view clipsSubviews="YES" contentMode="right" translatesAutoresizingMaskIntoConstraints="NO" id="iSt-yh-A86">
                         <rect key="frame" x="16" y="11" width="173" height="99"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ux9-Nq-0Te">
                                 <rect key="frame" x="7" y="9" width="160" height="20"/>
@@ -37,15 +36,18 @@
                             </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="tertiarySystemFillColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="173" id="UyZ-VY-CnS"/>
+                            <constraint firstAttribute="height" constant="99" id="lQm-Nv-EOj"/>
+                        </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="cardView.cornerRadius">
                                 <integer key="value" value="55"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
-                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ekH-8d-KIV">
-                        <rect key="frame" x="215" y="11" width="173" height="99"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ekH-8d-KIV">
+                        <rect key="frame" x="318" y="11" width="173" height="99"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FUv-ri-8ja">
                                 <rect key="frame" x="3" y="9" width="160" height="20"/>
@@ -63,8 +65,18 @@
                             </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="tertiarySystemFillColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="173" id="3gE-Pv-thX"/>
+                            <constraint firstAttribute="height" constant="99" id="zH9-wu-AFe"/>
+                        </constraints>
                     </view>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="ekH-8d-KIV" secondAttribute="trailing" constant="26" id="4gM-8U-jje"/>
+                    <constraint firstItem="iSt-yh-A86" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="11" id="W2V-NX-wZQ"/>
+                    <constraint firstItem="ekH-8d-KIV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="11" id="Yyd-2f-dzB"/>
+                    <constraint firstItem="iSt-yh-A86" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="dcX-na-9EA"/>
+                </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>

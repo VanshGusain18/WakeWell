@@ -3,7 +3,7 @@ import DGCharts
 
 final class BaseMetricChartViewController: UIViewController {
 
-    private let chartView = BarChartView()
+    private var chartView: ChartViewBase!
     private let metricType: SleepMetricType
 
     init(metricType: SleepMetricType) {
@@ -20,12 +20,20 @@ final class BaseMetricChartViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = metricType.title
 
-        setupChart()
-        loadData()
+        setupChartView()
+        loadChartData()
     }
 
-  
-    private func setupChart() {
+    private func setupChartView() {
+
+        switch metricType {
+        case .duration:
+            chartView = LineChartView()
+
+        default:
+            chartView = BarChartView()
+        }
+
         view.addSubview(chartView)
         chartView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -38,41 +46,91 @@ final class BaseMetricChartViewController: UIViewController {
 
         chartView.chartDescription.enabled = false
         chartView.legend.enabled = false
-        chartView.rightAxis.enabled = false
-
-        chartView.leftAxis.axisMinimum = 0
-        chartView.leftAxis.drawGridLinesEnabled = true
-
-        chartView.xAxis.labelPosition = .bottom
-        chartView.xAxis.drawGridLinesEnabled = false
-        chartView.xAxis.granularity = 1
     }
-
-
-    private func loadData() {
+    private func loadChartData() {
 
         let metricData = MetricDataProvider.weeklyData(for: metricType)
 
         let entries = metricData.enumerated().map {
-            BarChartDataEntry(
+            ChartDataEntry(
                 x: Double($0.offset),
                 y: $0.element.value.chartValue
             )
         }
+        guard let lineChart = chartView as? LineChartView else { return }
 
-        let dataSet = BarChartDataSet(entries: entries, label: metricType.title)
-        dataSet.colors = [.systemBlue]
-        dataSet.valueFont = .systemFont(ofSize: 11, weight: .medium)
+        let dataSet = LineChartDataSet(entries: entries, label: "")
 
-        let data = BarChartData(dataSet: dataSet)
-        data.barWidth = 0.6
+        dataSet.mode = .cubicBezier
+        dataSet.lineWidth = 2.5
+        dataSet.setColor(.systemIndigo)
 
-        chartView.data = data
+        dataSet.drawCirclesEnabled = true
+        dataSet.circleRadius = 4
+        dataSet.circleColors = [.systemIndigo]
+        dataSet.circleHoleColor = .white
+        dataSet.drawValuesEnabled = false
 
-        chartView.xAxis.valueFormatter = IndexAxisValueFormatter(
+        dataSet.drawFilledEnabled = false
+        let zoneEntries = entries.map {
+            ChartDataEntry(x: $0.x, y: 9)
+        }
+        let average = entries.map { $0.y }.reduce(0, +) / Double(entries.count)
+        let zoneDataSet = LineChartDataSet(entries: zoneEntries, label: "")
+
+        zoneDataSet.drawCirclesEnabled = false
+        zoneDataSet.drawValuesEnabled = false
+        zoneDataSet.lineWidth = 0
+        zoneDataSet.setColor(.clear)
+
+        zoneDataSet.drawFilledEnabled = true
+        zoneDataSet.fillColor = UIColor.systemGreen.withAlphaComponent(0.15)
+
+        // This tells it to fill down to 7
+        zoneDataSet.fillFormatter = DefaultFillFormatter { _, _ in
+            return 7
+        }
+        let data = LineChartData(dataSets: [zoneDataSet, dataSet])
+
+        lineChart.data = data
+
+
+        lineChart.leftAxis.removeAllLimitLines()
+
+        let lower = ChartLimitLine(limit: 7)
+        let upper = ChartLimitLine(limit: 9)
+
+        lower.lineWidth = 0
+        upper.lineWidth = 0
+
+        lineChart.leftAxis.addLimitLine(lower)
+        lineChart.leftAxis.addLimitLine(upper)
+
+        lineChart.leftAxis.drawLimitLinesBehindDataEnabled = true
+        
+
+        let averageLine = ChartLimitLine(limit: average, label: "Avg")
+        averageLine.lineColor = .systemOrange
+        averageLine.lineWidth = 2
+        averageLine.lineDashLengths = [6, 4]
+        averageLine.labelPosition = .rightTop
+
+        lineChart.leftAxis.addLimitLine(averageLine)
+
+        lineChart.chartDescription.enabled = false
+        lineChart.legend.enabled = false
+        lineChart.rightAxis.enabled = false
+
+        lineChart.leftAxis.axisMinimum = 0
+        lineChart.leftAxis.axisMaximum = 12
+        lineChart.leftAxis.gridColor = UIColor.systemGray5
+
+        lineChart.xAxis.labelPosition = .bottom
+        lineChart.xAxis.drawGridLinesEnabled = false
+        lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(
             values: metricData.map { $0.day }
         )
 
-        chartView.animate(yAxisDuration: 1.1)
+        lineChart.animate(xAxisDuration: 0.8)
     }
 }

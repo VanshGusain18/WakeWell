@@ -57,6 +57,15 @@
                                     <segue destination="lqo-Lp-Coy" kind="show" id="Vxq-DF-FXF"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vus-Rz-Udh">
+                                <rect key="frame" x="161" y="655" width="70" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Home"/>
+                                <connections>
+                                    <segue destination="coc-yx-zpn" kind="show" id="KUe-n9-gKu"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -78,7 +87,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uBv-1g-0Zj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1761.0687022900763" y="143.66197183098592"/>
+            <point key="canvasLocation" x="1815" y="-63"/>
         </scene>
         <!--rise-->
         <scene sceneID="WWT-mv-A3c">
@@ -88,7 +97,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="96V-cp-UwH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1853" y="268"/>
+            <point key="canvasLocation" x="1906" y="61"/>
         </scene>
         <!--sound-->
         <scene sceneID="WWt-It-OSi">
@@ -98,7 +107,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ENm-bC-wxY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1839" y="385"/>
+            <point key="canvasLocation" x="1892" y="178"/>
         </scene>
         <!--stats-->
         <scene sceneID="m7V-Xq-eoF">
@@ -108,7 +117,17 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Z9a-O4-vRJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1810" y="488"/>
+            <point key="canvasLocation" x="1863" y="281"/>
+        </scene>
+        <!--home-->
+        <scene sceneID="BNR-Kw-nIS">
+            <objects>
+                <viewControllerPlaceholder storyboardIdentifier="home" storyboardName="Home" referencedIdentifier="home" id="coc-yx-zpn" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="XiL-Ee-nrq"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GgT-EX-dzY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1830" y="360"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="BK2-J3-yrI">

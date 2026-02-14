@@ -130,7 +130,22 @@ class StatsTableViewController: UITableViewController {
     
     
     private func openMetricScreen(_ metric: SleepMetricType) {
-        let vc = BaseMetricChartViewController(metricType: metric)
-        navigationController?.pushViewController(vc, animated: true)
+
+        switch metric {
+
+        case .duration:
+            let vc = DurationDetailsViewController(metricType: metric)
+            navigationController?.pushViewController(vc, animated: true)
+
+        case .efficiency:
+            let vc = EfficiencyDetailsViewController()
+            navigationController?.pushViewController(vc, animated: true)
+
+        default:
+            break
+        }
     }
+
+
+
 }

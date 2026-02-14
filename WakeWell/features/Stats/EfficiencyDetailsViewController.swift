@@ -1,71 +1,104 @@
-//
-//  EfficiencyDetailsViewController.swift
-//  WakeWell
-//
-//  Created by geu on 12/02/26.
-//
-
 import UIKit
 import DGCharts
+
 class EfficiencyDetailsViewController: UIViewController {
 
-    private let chartView = BarChartView()
 
+    @IBOutlet weak var barChartView: BarChartView!
+    
+    private let metricType: SleepMetricType = .efficiency
+   
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
-        
-        title = "Efficiency Details"
-
-        setupChart()
-        setData()
+        configureChart()
+        loadEfficiencyChartData()
     }
 
-    private func setupChart() {
+    // MARK: - Chart Setup
 
-        view.addSubview(chartView)
-        chartView.translatesAutoresizingMaskIntoConstraints = false
+    private func configureChart() {
 
-        NSLayoutConstraint.activate([
-            chartView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            chartView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            chartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            chartView.heightAnchor.constraint(equalToConstant: 350)
-        ])
+        barChartView.chartDescription.enabled = false
+        barChartView.rightAxis.enabled = false
+        barChartView.legend.enabled = true
 
-        chartView.chartDescription.enabled = false
-        chartView.legend.enabled = false
-        chartView.rightAxis.enabled = false
-        chartView.leftAxis.axisMinimum = 0
+        barChartView.leftAxis.axisMinimum = 0
+        barChartView.leftAxis.gridColor = UIColor.systemGray5
 
-        chartView.xAxis.labelPosition = .bottom
-        chartView.xAxis.drawGridLinesEnabled = false
+        barChartView.xAxis.labelPosition = .bottom
+        barChartView.xAxis.drawGridLinesEnabled = false
+
+        barChartView.animate(yAxisDuration: 0.8)
     }
 
-    private func setData() {
 
-        // Example sleep duration data (in hours)
-        let durations = [6.5, 7.2, 5.8, 8.0, 6.9, 7.5, 8.3]
+    private func loadEfficiencyChartData() {
 
-        let entries = durations.enumerated().map {
-            BarChartDataEntry(x: Double($0.offset), y: $0.element)
+        let metricData = EfficiencyDataProvider.weeklyData()
+
+        var timeInBedEntries: [BarChartDataEntry] = []
+        var sleepStartEntries: [BarChartDataEntry] = []
+
+        let overlapOffset = 0.15   // 👈 controls overlap amount
+
+        for (index, item) in metricData.enumerated() {
+
+            let baseX = Double(index)
+
+            // Slightly shift bars
+            timeInBedEntries.append(
+                BarChartDataEntry(
+                    x: baseX - overlapOffset,
+                    y: item.timeInBed
+                )
+            )
+
+            sleepStartEntries.append(
+                BarChartDataEntry(
+                    x: baseX + overlapOffset,
+                    y: item.sleepStart
+                )
+            )
         }
 
-        let dataSet = BarChartDataSet(entries: entries, label: "Sleep Duration")
-        
-        dataSet.colors = [.systemBlue]
-
-        let data = BarChartData(dataSet: dataSet)
-        data.barWidth = 0.6
-
-        chartView.data = data
-
-        // X-axis labels
-        chartView.xAxis.valueFormatter = IndexAxisValueFormatter(
-            values: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let timeInBedSet = BarChartDataSet(
+            entries: timeInBedEntries,
+            label: "Time in Bed"
         )
+        timeInBedSet.setColor(.systemIndigo.withAlphaComponent(0.6))
+        timeInBedSet.drawValuesEnabled = false
 
-        chartView.animate(yAxisDuration: 1.2)
+        let sleepStartSet = BarChartDataSet(
+            entries: sleepStartEntries,
+            label: "Sleep Start"
+        )
+        sleepStartSet.setColor(.systemTeal)
+        sleepStartSet.drawValuesEnabled = false
+
+        let data = BarChartData(dataSets: [timeInBedSet, sleepStartSet])
+
+        data.barWidth = 0.45   // 👈 wider bars = nicer overlap
+
+        barChartView.data = data
+
+        // Axis setup
+        barChartView.xAxis.axisMinimum = -0.5
+        barChartView.xAxis.axisMaximum = Double(metricData.count) - 0.5
+        barChartView.xAxis.granularity = 1
+        barChartView.xAxis.labelPosition = .bottom
+        barChartView.xAxis.drawGridLinesEnabled = false
+
+        barChartView.xAxis.valueFormatter =
+            IndexAxisValueFormatter(
+                values: metricData.map { $0.day }
+            )
+
+        barChartView.animate(yAxisDuration: 0.8)
     }
+
+
+
 }
+
+

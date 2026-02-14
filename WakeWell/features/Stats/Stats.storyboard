@@ -29,7 +29,23 @@
                             <outlet property="delegate" destination="JyK-hG-KWU" id="8e2-BI-fQN"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="Nhw-CK-PdR"/>
+                    <navigationItem key="navigationItem" id="Nhw-CK-PdR">
+                        <nil key="title"/>
+                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="kha-Rx-BcD">
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <segments>
+                                <segment title="Weeks"/>
+                                <segment title="Months"/>
+                                <segment title="Years"/>
+                            </segments>
+                            <connections>
+                                <action selector="segmentChanged:" destination="JyK-hG-KWU" eventType="valueChanged" id="c7X-1H-O82"/>
+                            </connections>
+                        </segmentedControl>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="timeRangeSegment" destination="kha-Rx-BcD" id="2n2-qT-Y1V"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lAa-X0-fOM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

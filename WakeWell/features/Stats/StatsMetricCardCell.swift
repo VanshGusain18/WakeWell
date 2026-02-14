@@ -8,28 +8,64 @@
 import UIKit
 
 class StatsMetricCardCell: UITableViewCell {
-    @IBOutlet weak var cardView: UIView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var valueLabel: UILabel!
+    @IBOutlet weak var leftCardView: UIView!
+    @IBOutlet weak var leftTitleLabel: UILabel!
+    @IBOutlet weak var leftValueLabel: UILabel!
+    @IBOutlet weak var rightCardView: UIView!
+    @IBOutlet weak var rightTitleView: UILabel!
+    @IBOutlet weak var rightValueView: UILabel!
     
-    var onTap: (() -> Void)?
+    var leftTapAction: (() -> Void)?
+    var rightTapAction: (() -> Void)?
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
-        cardView.addGestureRecognizer(tap)
-        cardView.isUserInteractionEnabled = true
+        // Left Card Styling
+        leftCardView.layer.cornerRadius = 16
+        leftCardView.layer.borderWidth = 1
+        leftCardView.layer.borderColor = UIColor.black.cgColor
+        leftCardView.isUserInteractionEnabled = true
+
+        // Right Card Styling
+        rightCardView.layer.cornerRadius = 16
+        rightCardView.layer.borderWidth = 1
+        rightCardView.layer.borderColor = UIColor.black.cgColor
+        rightCardView.isUserInteractionEnabled = true
+
+        // Left Tap
+        let leftTap = UITapGestureRecognizer(target: self, action: #selector(leftCardTapped))
+        leftCardView.addGestureRecognizer(leftTap)
+
+        // Right Tap
+        let rightTap = UITapGestureRecognizer(target: self, action: #selector(rightCardTapped))
+        rightCardView.addGestureRecognizer(rightTap)
     }
 
-    func configure(title: String, value: String, onTap: (() -> Void)? = nil) {
-        titleLabel.text = title
-        valueLabel.text = value
-        self.onTap = onTap
+    func configure(
+        leftTitle: String,
+        leftValue: String,
+        rightTitle: String?,
+        rightValue: String?,
+        leftAction: (() -> Void)? = nil,
+        rightAction: (() -> Void)? = nil
+    ) {
+        leftTitleLabel.text = leftTitle
+        leftValueLabel.text = leftValue
+        
+        rightTitleView.text = rightTitle
+        rightValueView.text = rightValue
+        
+        self.leftTapAction = leftAction
+        self.rightTapAction = rightAction
     }
 
-    @objc private func cardTapped() {
-        onTap?()
+    @objc private func leftCardTapped() {
+        leftTapAction?()
+    }
+
+    @objc private func rightCardTapped() {
+        rightTapAction?()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -38,4 +74,5 @@ class StatsMetricCardCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+
 }

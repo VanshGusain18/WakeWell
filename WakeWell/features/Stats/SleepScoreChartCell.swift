@@ -46,21 +46,17 @@ class SleepScoreChartCell: UITableViewCell {
 
         let dataSet = LineChartDataSet(entries: entries, label: "")
 
-        // 🎨 Line Styling
         dataSet.mode = .cubicBezier
         dataSet.lineWidth = 3
         dataSet.setColor(.systemIndigo)
 
-        // 🔵 Circle Styling
         dataSet.circleRadius = 5
         dataSet.setCircleColor(.systemIndigo)
         dataSet.circleHoleColor = .systemBackground
         dataSet.circleHoleRadius = 2.5
 
-        // ✨ Remove value text above points
         dataSet.drawValuesEnabled = false
 
-        // 🌈 Gradient Fill Under Line
         let gradientColors = [
             UIColor.systemIndigo.withAlphaComponent(0.4).cgColor,
             UIColor.clear.cgColor
@@ -78,12 +74,10 @@ class SleepScoreChartCell: UITableViewCell {
         let data = LineChartData(dataSet: dataSet)
         chartView.data = data
 
-        // 📅 X Axis Labels
         chartView.xAxis.valueFormatter = IndexAxisValueFormatter(
             values: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         )
 
-        // 🚀 Smooth animation
         chartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
     }
 }

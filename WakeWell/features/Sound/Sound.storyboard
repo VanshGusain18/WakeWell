@@ -121,7 +121,7 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="gWW-8U-i0M">
-                        <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.down" catalog="system" id="zhR-0l-wFT">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.left" catalog="system" id="zhR-0l-wFT">
                             <connections>
                                 <action selector="closeTapped:" destination="OHb-22-cr8" id="ZHZ-OU-Cgb"/>
                             </connections>
@@ -162,7 +162,6 @@
         <!--Navigation Controller-->
         <scene sceneID="X0i-0b-zJl">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Qln-tt-8UB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController storyboardIdentifier="NowPlayingNav" automaticallyAdjustsScrollViewInsets="NO" id="puy-2d-AKF" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="XaS-jZ-92N">
@@ -174,13 +173,14 @@
                         <segue destination="OHb-22-cr8" kind="relationship" relationship="rootViewController" id="KJ6-gI-8Dw"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Qln-tt-8UB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1605" y="93"/>
         </scene>
     </scenes>
     <resources>
         <image name="backward.fill" catalog="system" width="128" height="76"/>
-        <image name="chevron.down" catalog="system" width="128" height="70"/>
+        <image name="chevron.left" catalog="system" width="97" height="128"/>
         <image name="forward.fill" catalog="system" width="128" height="76"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>
         <systemColor name="systemBackgroundColor">

@@ -27,7 +27,7 @@ final class AudioManager {
             forResource: sound.fileName,
             withExtension: "mp3"
         ) else {
-            print("❌ Sound not found")
+            print("Sound not found")
             return
         }
 
@@ -38,14 +38,14 @@ final class AudioManager {
 
             currentSound = sound
 
-            // 🔔 Notify Mini Player
+            // Notify Mini Player
             NotificationCenter.default.post(
                 name: .audioDidStart,
                 object: nil
             )
 
         } catch {
-            print("❌ Audio error:", error)
+            print("Audio error:", error)
         }
     }
 
@@ -59,7 +59,7 @@ final class AudioManager {
             player.play()
         }
 
-        // 🔔 Notify Mini Player
+        // Notify Mini Player
         NotificationCenter.default.post(
             name: .audioDidToggle,
             object: nil

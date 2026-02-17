@@ -14,11 +14,8 @@ class CalmnessDetailsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         view.backgroundColor = .systemBackground
-        
         title = "Calmness Details"
-
         setupChart()
         setData()
     }

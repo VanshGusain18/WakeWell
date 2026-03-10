@@ -10,9 +10,11 @@ class HomeViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         registerCells()
-        
+
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.estimatedItemSize = .zero
+            layout.minimumLineSpacing = 16
+            layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         }
     }
 
@@ -48,8 +50,9 @@ extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        if indexPath.item == 0 {
+        switch indexPath.item {
 
+        case 0:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "alarm_cell",
                 for: indexPath
@@ -60,10 +63,8 @@ extension HomeViewController: UICollectionViewDataSource {
 
             cell.configure(with: viewModel)
             return cell
-        }
 
-        else if indexPath.item == 1 {
-
+        case 1:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_ring_cell",
                 for: indexPath
@@ -73,12 +74,9 @@ extension HomeViewController: UICollectionViewDataSource {
             let viewModel = SleepRingViewModel(model: model)
 
             cell.configure(with: viewModel)
-
             return cell
-        }
 
-        else {
-
+        default:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
                 for: indexPath
@@ -97,14 +95,16 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         let width = collectionView.bounds.width - 32
 
-        if indexPath.item == 0 {
+        switch indexPath.item {
+
+        case 0:
             return CGSize(width: width, height: 120)
-        }
-        else if indexPath.item == 1 {
+
+        case 1:
             return CGSize(width: width, height: 230)
-        }
-        else {
-            return CGSize(width: width, height: 180)
+
+        default:
+            return CGSize(width: width, height: 200)
         }
     }
 }

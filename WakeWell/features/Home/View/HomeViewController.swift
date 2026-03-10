@@ -14,7 +14,6 @@ class HomeViewController: UIViewController {
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.estimatedItemSize = .zero
         }
-
     }
 
     private func registerCells() {
@@ -22,9 +21,15 @@ class HomeViewController: UIViewController {
             UINib(nibName: "AlarmCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "alarm_cell"
         )
+
         collectionView.register(
             UINib(nibName: "SleepRingCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "sleep_ring_cell"
+        )
+
+        collectionView.register(
+            UINib(nibName: "SleepMetricsGridCollectionViewCell", bundle: nil),
+            forCellWithReuseIdentifier: "sleep_metrics_cell"
         )
     }
 }
@@ -37,7 +42,7 @@ extension HomeViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return 2
+        return 3
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -57,21 +62,31 @@ extension HomeViewController: UICollectionViewDataSource {
             return cell
         }
 
-        else {
+        else if indexPath.item == 1 {
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_ring_cell",
                 for: indexPath
             ) as! SleepRingCollectionViewCell
 
-            let model = SleepRingModel(score: 82, subtitle: "Great sleep")
+            let model = SleepRingModel(score: 82, subtitle: "Good sleep")
             let viewModel = SleepRingViewModel(model: model)
 
             cell.configure(with: viewModel)
+
+            return cell
+        }
+
+        else {
+
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "sleep_metrics_cell",
+                for: indexPath
+            ) as! SleepMetricsGridCollectionViewCell
+
             return cell
         }
     }
-
 }
 
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
@@ -84,9 +99,12 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         if indexPath.item == 0 {
             return CGSize(width: width, height: 120)
-        } else {
+        }
+        else if indexPath.item == 1 {
             return CGSize(width: width, height: 230)
+        }
+        else {
+            return CGSize(width: width, height: 180)
         }
     }
 }
-

@@ -37,6 +37,10 @@ class HomeViewController: UIViewController {
             UINib(nibName: "GroggySliderCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "groggy_slider_cell"
         )
+        collectionView.register(
+            UINib(nibName: "MorningNotesCollectionViewCell", bundle: nil),
+            forCellWithReuseIdentifier: "morning_notes_cell"
+        )
     }
 }
 
@@ -48,7 +52,7 @@ extension HomeViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -88,11 +92,19 @@ extension HomeViewController: UICollectionViewDataSource {
 
             return cell
             
-        default:
+        case 3:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "groggy_slider_cell",
                 for: indexPath
             ) as! GroggySliderCollectionViewCell
+
+            return cell
+            
+        default:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "morning_notes_cell",
+                for: indexPath
+            ) as! MorningNotesCollectionViewCell
 
             return cell
         }
@@ -118,8 +130,11 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         case 2:
             return CGSize(width: width, height: 200)
         
-        default:
+        case 3:
             return CGSize(width: width, height: 140)
+            
+        default:
+            return CGSize(width: width, height: 160)
         }
     }
 }

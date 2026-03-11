@@ -33,6 +33,10 @@ class HomeViewController: UIViewController {
             UINib(nibName: "SleepMetricsGridCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "sleep_metrics_cell"
         )
+        collectionView.register(
+            UINib(nibName: "GroggySliderCollectionViewCell", bundle: nil),
+            forCellWithReuseIdentifier: "groggy_slider_cell"
+        )
     }
 }
 
@@ -44,7 +48,7 @@ extension HomeViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return 4
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -76,11 +80,19 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: viewModel)
             return cell
 
-        default:
+        case 2:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
                 for: indexPath
             ) as! SleepMetricsGridCollectionViewCell
+
+            return cell
+            
+        default:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "groggy_slider_cell",
+                for: indexPath
+            ) as! GroggySliderCollectionViewCell
 
             return cell
         }
@@ -103,8 +115,11 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         case 1:
             return CGSize(width: width, height: 230)
 
-        default:
+        case 2:
             return CGSize(width: width, height: 200)
+        
+        default:
+            return CGSize(width: width, height: 140)
         }
     }
 }

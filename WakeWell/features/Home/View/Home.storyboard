@@ -62,8 +62,8 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="zMu-nv-zVU" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="qyW-iz-sa3">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="qyW-iz-sa3">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>

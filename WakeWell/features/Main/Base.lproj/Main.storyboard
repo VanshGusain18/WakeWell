@@ -32,6 +32,7 @@
         <scene sceneID="WWt-It-OSi">
             <objects>
                 <viewControllerPlaceholder storyboardIdentifier="sound" storyboardName="Sound" referencedIdentifier="sound" id="dqT-Ao-CdI" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="juE-1B-m4X"/>
                     <navigationItem key="navigationItem" id="jnk-6b-fpM"/>
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ENm-bC-wxY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -63,6 +64,7 @@
                         <segue destination="9zz-RQ-VkM" kind="relationship" relationship="viewControllers" id="jat-zZ-kFi"/>
                         <segue destination="lqo-Lp-Coy" kind="relationship" relationship="viewControllers" id="G7T-y3-luG"/>
                         <segue destination="lfl-Oe-Lp1" kind="relationship" relationship="viewControllers" id="fZb-mJ-bdv"/>
+                        <segue destination="dqT-Ao-CdI" kind="relationship" relationship="viewControllers" id="bMG-Bz-s4O"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QMr-fu-O2q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

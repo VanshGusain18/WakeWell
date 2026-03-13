@@ -29,9 +29,11 @@
                             <outlet property="delegate" destination="JyK-hG-KWU" id="8e2-BI-fQN"/>
                         </connections>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Stats" image="chart.bar.fill" catalog="system" id="7lq-7l-0xG"/>
                     <navigationItem key="navigationItem" id="Nhw-CK-PdR">
                         <nil key="title"/>
                         <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="kha-Rx-BcD">
+                            <rect key="frame" x="0.0" y="0.0" width="210" height="48"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <segments>
                                 <segment title="Weeks"/>
@@ -49,7 +51,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lAa-X0-fOM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1562.5954198473282" y="73.943661971830991"/>
+            <point key="canvasLocation" x="2489.3129770992364" y="73.943661971830991"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="QKz-xc-gmT">
@@ -62,12 +64,33 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="JyK-hG-KWU" kind="relationship" relationship="rootViewController" id="uB2-cJ-eym"/>
+                        <segue destination="ts2-OV-Bon" kind="relationship" relationship="rootViewController" id="uB2-cJ-eym"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lKA-NL-jDg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="635.87786259541986" y="73.943661971830991"/>
         </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="5sx-DK-Afb">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="ts2-OV-Bon" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="rGn-8i-eyB"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Gpj-P2-MOP">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="JyK-hG-KWU" kind="relationship" relationship="viewControllers" id="lOG-a6-ROi"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="stN-Bd-wWP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1562.5954198473282" y="73.943661971830991"/>
+        </scene>
     </scenes>
+    <resources>
+        <image name="chart.bar.fill" catalog="system" width="128" height="90"/>
+    </resources>
 </document>

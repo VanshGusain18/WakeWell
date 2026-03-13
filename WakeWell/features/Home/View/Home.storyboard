@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="FR1-Hr-aTD">
-                                <rect key="frame" x="0.0" y="172" width="393" height="612"/>
+                                <rect key="frame" x="0.0" y="172" width="393" height="563"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="pCu-MO-OFa">
                                     <size key="itemSize" width="128" height="128"/>
@@ -47,6 +47,7 @@
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="FR1-Hr-aTD" secondAttribute="trailing" id="jwR-sR-Tbu"/>
                         </constraints>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="evb-e1-h2V"/>
                     <navigationItem key="navigationItem" id="yNW-37-5As"/>
                     <connections>
                         <outlet property="collectionView" destination="FR1-Hr-aTD" id="0mi-05-Efa"/>
@@ -54,7 +55,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="991.60305343511448" y="39.436619718309863"/>
+            <point key="canvasLocation" x="1918.3206106870227" y="39.436619718309863"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="bes-dq-U4B">
@@ -67,15 +68,34 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="QKS-ff-dT2"/>
+                        <segue destination="nfs-G4-PtA" kind="relationship" relationship="rootViewController" id="QKS-ff-dT2"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Gxb-13-EU6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="64.885496183206101" y="39.436619718309863"/>
         </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="VLM-3I-hxW">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="nfs-G4-PtA" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="Obr-ap-0aa"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="4Lb-xb-Aiv">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="viewControllers" id="jC2-KS-c2m"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hxL-N3-lDe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="991.60305343511448" y="39.436619718309863"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="house.fill" catalog="system" width="128" height="104"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

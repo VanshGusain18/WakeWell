@@ -80,6 +80,7 @@
                             <outlet property="delegate" destination="boV-PQ-lQ1" id="lcd-lz-q4D"/>
                         </connections>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Alarm" image="alarm.fill" catalog="system" id="gfq-CO-GNX"/>
                     <navigationItem key="navigationItem" title="Alarm" id="PXc-3p-mPd"/>
                     <connections>
                         <outlet property="bedTimeLabel" destination="tBt-n7-IVj" id="xUy-fU-src"/>
@@ -88,7 +89,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="E8C-V7-BrG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1235.8778625954199" y="159.85915492957747"/>
+            <point key="canvasLocation" x="2162.5954198473282" y="159.85915492957747"/>
         </scene>
         <!--Alarm Screen-->
         <scene sceneID="JJ3-Xn-x8a">
@@ -214,7 +215,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qcg-Wg-jz7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2932.06106870229" y="159.85915492957747"/>
+            <point key="canvasLocation" x="3858.7786259541981" y="159.85915492957747"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="mB7-Pa-8nS">
@@ -225,7 +226,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="boV-PQ-lQ1" kind="relationship" relationship="rootViewController" id="FzA-Om-Imf"/>
+                        <segue destination="HP2-fO-VRg" kind="relationship" relationship="rootViewController" id="FzA-Om-Imf"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TPr-Gz-J5y" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -248,7 +249,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZeT-C3-UKB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2013" y="160"/>
+            <point key="canvasLocation" x="2939.6946564885493" y="159.85915492957747"/>
         </scene>
         <!--Bed Time Table View Controller-->
         <scene sceneID="1W3-Kj-0fQ">
@@ -341,8 +342,27 @@
             </objects>
             <point key="canvasLocation" x="2013" y="873"/>
         </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="gqV-1J-S99">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="HP2-fO-VRg" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="QgC-AM-91r"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="wTH-yf-ykB">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="boV-PQ-lQ1" kind="relationship" relationship="viewControllers" id="8BZ-bb-h3F"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hPl-Rg-N5e" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1235.8778625954199" y="159.85915492957747"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="alarm.fill" catalog="system" width="123" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

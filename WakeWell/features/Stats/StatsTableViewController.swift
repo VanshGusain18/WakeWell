@@ -22,11 +22,20 @@ class StatsTableViewController: UITableViewController {
     private func loadSleepData() {
 
         let rawStats = SleepStatsAggregator.aggregate()
-
+        
+        let architecture = SleepArchitecture.sampleData()
+        let deepSleepPercent = architecture.deepSleep
+        
+        let avgDuration = SleepDurationModel.getAverageSleepDuration()
+        
+        let avgEfficiency = EfficiencyModel.getAverageEfficiency()
+        
+        let avgconsitency = SleepConsistency.consistencyInsight()
+        
         let roundedStats = SleepStats(
-            duration: round(rawStats.duration),
-            efficiency: round(rawStats.efficiency),
-            architecture: round(rawStats.architecture),
+            duration: round(avgDuration),
+            efficiency: round(avgEfficiency),
+            architecture: round(deepSleepPercent),
             consistency: round(rawStats.consistency),
             calmness: round(rawStats.calmness),
             continuity: round(rawStats.continuity)
@@ -134,15 +143,38 @@ class StatsTableViewController: UITableViewController {
         switch metric {
 
         case .duration:
-            let vc = DurationDetailsViewController(metricType: metric)
+            let vc = DurationDetailsViewController(nibName : "DurationDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
 
         case .efficiency:
-            let vc = EfficiencyDetailsViewController()
+            let vc = EfficiencyDetailsViewController(
+            nibName : "EfficiencyDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
-
-        default:
-            break
+            
+        case .continuity:
+            let vc = ContinuityDetailsViewController(
+                nibName: "ContinuityDetailsViewController",
+                bundle: nil
+            )
+            navigationController?.pushViewController(vc, animated: true)
+        case .calmness:
+            let vc = CalmnessDetailsViewController(
+                nibName: "CalmnessDetailsViewController",
+                bundle: nil
+            )
+            navigationController?.pushViewController(vc, animated: true)
+        case .architecture:
+            let vc = ArchitectureDetailsViewController(
+                nibName: "ArchitectureDetailsViewController",
+                bundle: nil
+            )
+            navigationController?.pushViewController(vc, animated: true)
+        case .consistency:
+            let vc = ConsistencyDetailsViewController(
+                nibName: "ConsistencyDetailsViewController",
+                bundle: nil
+            )
+            navigationController?.pushViewController(vc, animated: true)
         }
     }
 

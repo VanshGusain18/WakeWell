@@ -1,0 +1,16 @@
+{
+  "sensor": "CMAccelerometerData",
+  "sampling_rate": "50Hz",
+  "samples": [
+    {
+      "timestamp": 1741673700.01,
+      "acceleration": { "x": 0.012, "y": -0.981, "z": 0.054 },
+      "state": "still"
+    },
+    {
+      "timestamp": 1741673700.03,
+      "acceleration": { "x": 0.045, "y": -0.920, "z": 0.110 },
+      "state": "micro_movement"
+    }
+  ]
+}

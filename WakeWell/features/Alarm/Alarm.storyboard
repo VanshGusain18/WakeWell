@@ -10,7 +10,7 @@
         <!--Alarm-->
         <scene sceneID="4ED-ew-1ma">
             <objects>
-                <tableViewController storyboardIdentifier="alarm" title="Alarm" useStoryboardIdentifierAsRestorationIdentifier="YES" id="boV-PQ-lQ1" customClass="AlarmTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="alarm" useStoryboardIdentifierAsRestorationIdentifier="YES" id="boV-PQ-lQ1" customClass="AlarmTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="Ibg-gG-UWy">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -18,7 +18,7 @@
                         <sections>
                             <tableViewSection id="EnN-xA-TnI">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="0E0-uz-bGH">
+                                    <tableViewCell clipsSubviews="YES" alpha="0.10000000000000001" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="0E0-uz-bGH">
                                         <rect key="frame" x="0.0" y="18" width="393" height="51"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0E0-uz-bGH" id="Okm-Wp-zCN">
@@ -40,12 +40,14 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <segue destination="wHc-Df-yFw" kind="presentation" id="prl-Im-bK1"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="xCb-fH-Pxt">
+                                    <tableViewCell clipsSubviews="YES" alpha="0.10000000000000001" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="xCb-fH-Pxt">
                                         <rect key="frame" x="0.0" y="69" width="393" height="51"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xCb-fH-Pxt" id="mT7-oS-i5b">
@@ -68,6 +70,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <segue destination="5CD-EB-k5u" kind="presentation" id="dsX-pZ-ike"/>
                                         </connections>
@@ -80,7 +83,7 @@
                             <outlet property="delegate" destination="boV-PQ-lQ1" id="lcd-lz-q4D"/>
                         </connections>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Alarm" image="alarm.fill" catalog="system" id="gfq-CO-GNX"/>
+                    <tabBarItem key="tabBarItem" title="Alarm" image="alarm.fill" catalog="system" id="Hzy-l3-NPW"/>
                     <navigationItem key="navigationItem" title="Alarm" id="PXc-3p-mPd"/>
                     <connections>
                         <outlet property="bedTimeLabel" destination="tBt-n7-IVj" id="xUy-fU-src"/>
@@ -185,6 +188,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GNL-aM-Ez1">
+                                                    <rect key="frame" x="286" y="15" width="68" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -208,6 +218,7 @@
                     <connections>
                         <outlet property="alarmToneCell" destination="euN-Ep-fCF" id="Znr-rh-0uz"/>
                         <outlet property="datePicker" destination="txy-mQ-BbC" id="jPE-rW-FA6"/>
+                        <outlet property="selectedSoundLabel" destination="GNL-aM-Ez1" id="EoN-VU-HDX"/>
                         <outlet property="smartAlarmSwitch" destination="f6P-29-8Bv" id="tWI-9B-kMD"/>
                         <outlet property="timeWindowButton" destination="8Kd-aZ-5P3" id="fqI-Es-JTG"/>
                         <outlet property="timeWindowCell" destination="V3i-cX-6S4" id="Koc-ZQ-aWz"/>
@@ -221,12 +232,12 @@
         <scene sceneID="mB7-Pa-8nS">
             <objects>
                 <navigationController id="xEG-HO-E98" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="POg-2E-6Ph">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="POg-2E-6Ph">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="HP2-fO-VRg" kind="relationship" relationship="rootViewController" id="FzA-Om-Imf"/>
+                        <segue destination="48L-2G-KW3" kind="relationship" relationship="rootViewController" id="FzA-Om-Imf"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TPr-Gz-J5y" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -343,20 +354,20 @@
             <point key="canvasLocation" x="2013" y="873"/>
         </scene>
         <!--Tab Bar Controller-->
-        <scene sceneID="gqV-1J-S99">
+        <scene sceneID="77d-4l-w95">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="HP2-fO-VRg" sceneMemberID="viewController">
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="48L-2G-KW3" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" id="QgC-AM-91r"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="wTH-yf-ykB">
+                    <navigationItem key="navigationItem" id="E0h-V6-pZx"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="PqL-ZP-9c2">
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="boV-PQ-lQ1" kind="relationship" relationship="viewControllers" id="8BZ-bb-h3F"/>
+                        <segue destination="boV-PQ-lQ1" kind="relationship" relationship="viewControllers" id="F4Q-7F-Vbt"/>
                     </connections>
                 </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="hPl-Rg-N5e" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ruJ-NS-YwC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1235.8778625954199" y="159.85915492957747"/>
         </scene>

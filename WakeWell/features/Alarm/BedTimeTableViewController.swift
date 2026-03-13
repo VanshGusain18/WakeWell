@@ -7,11 +7,18 @@
 
 import UIKit
 
+protocol BedTimeDelegate: AnyObject {
+    func didSelectBedTime(_ time: String)
+}
+
 class BedTimeTableViewController: UITableViewController {
     
     @IBOutlet weak var datePicker: UIDatePicker!
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let savedDate = UserDefaults.standard.object(forKey: "UserWakeTime") as? Date {
+                datePicker.date = savedDate
+        }
     }
 
     // MARK: - Table view data source
@@ -23,11 +30,9 @@ class BedTimeTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
+
     
-    protocol DatePickerDelegate: AnyObject {
-        func didSelectBedTime(_ time: String)
-    }
-    weak var delegate: DatePickerDelegate?
+    weak var delegate: BedTimeDelegate?
 
     
     func formatTime(_ date: Date) -> String {
@@ -37,9 +42,49 @@ class BedTimeTableViewController: UITableViewController {
         return formatter.string(from: date)
     }
     @IBAction func savePressed(_ sender: UIBarButtonItem) {
-            let timeString = formatTime(datePicker.date)
-            delegate?.didSelectBedTime(timeString)
-            dismiss(animated: true)
+        let selectedBedTime = datePicker.date
+        
+        // 1. Fetch the already saved Wake Time to calculate total sleep
+        let savedWakeDate = UserDefaults.standard.object(forKey: "UserWakeTime") as? Date
+        
+        // 2. Format times for the alert
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        let bedTimeString = formatter.string(from: selectedBedTime)
+        
+        var message = "Your wind-down reminder is set for \(bedTimeString)."
+        
+        // 3. Optional: Add a "Sleep Duration" calculation if Wake Time exists
+        if let wakeDate = savedWakeDate {
+            // Simple logic to calculate hours between (handles overnight)
+            var components = Calendar.current.dateComponents([.hour, .minute], from: selectedBedTime, to: wakeDate)
+            if components.hour ?? 0 < 0 { components.hour? += 24 }
+            
+            message += "\n\nThis gives you about \(components.hour ?? 0)h \(components.minute ?? 0)m of sleep before your morning rituals."
+        }
+
+        // 4. Show the Alert
+        let alert = UIAlertController(title: "Confirm Bedtime", message: message, preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
+            self.finalizeBedTimeSave(date: selectedBedTime)
+        }
+        
+        let editAction = UIAlertAction(title: "Edit", style: .cancel, handler: nil)
+        
+        alert.addAction(confirmAction)
+        alert.addAction(editAction)
+        
+        present(alert, animated: true)
+    }
+
+    private func finalizeBedTimeSave(date: Date) {
+        // Save to permanent storage
+        UserDefaults.standard.set(date, forKey: "UserBedTime")
+        
+        let timeString = formatTime(date)
+        delegate?.didSelectBedTime(timeString)
+        dismiss(animated: true)
     }
 
     /*

@@ -46,8 +46,8 @@
                             <constraint firstItem="Eix-DM-8IR" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="jMD-Ad-guN"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Rise" image="sunrise.fill" catalog="system" id="qEB-Gj-gvy"/>
-                    <navigationItem key="navigationItem" id="yxS-S8-vEN"/>
+                    <tabBarItem key="tabBarItem" title="Rise" image="sunrise.fill" catalog="system" id="n1H-dz-I4u"/>
+                    <navigationItem key="navigationItem" title="Rise Rituals" id="yxS-S8-vEN"/>
                     <connections>
                         <outlet property="RiseRitualCollectionView" destination="Eix-DM-8IR" id="FWD-Kw-8uw"/>
                     </connections>
@@ -61,13 +61,13 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="vwN-L9-L1g" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="XvG-HL-gCW">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="XvG-HL-gCW">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="32c-pw-WZi" kind="relationship" relationship="rootViewController" id="L5R-ce-olA"/>
+                        <segue destination="OtX-Dh-nSy" kind="relationship" relationship="rootViewController" id="L5R-ce-olA"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sbi-AS-AQJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -75,20 +75,20 @@
             <point key="canvasLocation" x="138.1679389312977" y="130.98591549295776"/>
         </scene>
         <!--Tab Bar Controller-->
-        <scene sceneID="XbM-Kc-Ocb">
+        <scene sceneID="3VT-hi-cPo">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="32c-pw-WZi" sceneMemberID="viewController">
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="OtX-Dh-nSy" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" id="WaD-qd-Zw0"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="MlJ-Ns-RLL">
+                    <navigationItem key="navigationItem" id="6Pl-fQ-AVf"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="pq4-6A-dMq">
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="viewControllers" id="uSF-82-Ypt"/>
+                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="viewControllers" id="ehp-WU-CUb"/>
                     </connections>
                 </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="evH-bM-vDG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ca7-tm-q5e" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1064.885496183206" y="130.98591549295776"/>
         </scene>

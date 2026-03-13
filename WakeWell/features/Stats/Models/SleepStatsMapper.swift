@@ -18,7 +18,7 @@ struct SleepStatsMapper {
                         displayValue: "\(stats.efficiency)%"),
             
             SleepMetric(type: .architecture,
-                        displayValue: "\(stats.architecture)"),
+                        displayValue: "\(stats.architecture)%"),
             
             SleepMetric(type: .consistency,
                         displayValue: "\(stats.consistency)"),

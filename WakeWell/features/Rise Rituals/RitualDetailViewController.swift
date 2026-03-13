@@ -16,6 +16,8 @@ class RitualDetailViewController: UIViewController {
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var descLabel: UILabel!
     @IBOutlet weak var scienceLabel: UILabel!
+    @IBOutlet weak var scienceStackView: UIStackView!
+    @IBOutlet weak var chevronImageView: UIImageView!
     
     var ritual: Ritual?
     
@@ -23,6 +25,19 @@ class RitualDetailViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         prepareAnimation()
+        //let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleScienceReference))
+        //scienceStackView.addGestureRecognizer(tapGesture)
+        scienceStackView.isUserInteractionEnabled = true
+
+//        @objc func toggleScienceReference() {
+//            let isExpanding = scienceLabel.isHidden
+//
+//            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+//                self.scienceLabel.isHidden = !isExpanding
+//                self.chevronImageView.transform = isExpanding ? CGAffineTransform(rotationAngle: .pi) : .identity
+//                self.view.layoutIfNeeded()
+//            }
+//        }
     }
     
     func setupUI() {

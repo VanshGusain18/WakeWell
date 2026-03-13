@@ -41,6 +41,10 @@ class HomeViewController: UIViewController {
             UINib(nibName: "MorningNotesCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "morning_notes_cell"
         )
+        collectionView.register(
+            UINib(nibName: "SleepSoundsCollectionViewCell", bundle: nil),
+            forCellWithReuseIdentifier: "sleep_sounds_cell"
+        )
     }
 }
 
@@ -52,7 +56,7 @@ extension HomeViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return 6
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -100,11 +104,18 @@ extension HomeViewController: UICollectionViewDataSource {
 
             return cell
             
-        default:
+        case 4:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "morning_notes_cell",
                 for: indexPath
             ) as! MorningNotesCollectionViewCell
+
+            return cell
+        default:
+            let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "sleep_sounds_cell",
+                    for: indexPath
+                ) as! SleepSoundsCollectionViewCell
 
             return cell
         }
@@ -133,8 +144,11 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         case 3:
             return CGSize(width: width, height: 140)
             
-        default:
+        case 4:
             return CGSize(width: width, height: 160)
+            
+        default:
+            return CGSize(width: width, height: 70)
         }
     }
 }

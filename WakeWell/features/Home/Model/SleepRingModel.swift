@@ -2,5 +2,5 @@ import Foundation
 
 struct SleepRingModel {
     let score: Int
-    let subtitle: String   
+    let subtitle: String
 }

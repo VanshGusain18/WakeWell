@@ -21,6 +21,7 @@
 		D67C6D852F2CC9F4004ECCDB /* Exceptions for "WakeWell" folder in "WakeWell" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				features/Home/Model/MorningNoteModel.swift,
 				Info.plist,
 			);
 			target = D67C6D722F2CC9F4004ECCDB /* WakeWell */;

@@ -32,7 +32,6 @@ class MorningNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         layer.masksToBounds = false
 
         textView.delegate = self
-        textView.text = "Write how you feel today..."
         textView.textColor = .secondaryLabel
     }
 
@@ -67,5 +66,10 @@ class MorningNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
             textView.textColor = .secondaryLabel
         }
     }
-
+    
+    func configure(with viewModel: MorningNotesViewModel) {
+        titleLabel.text = viewModel.title
+        textView.text = viewModel.placeholderText
+        textView.textColor = .secondaryLabel
+    }
 }

@@ -35,7 +35,6 @@ class GroggySliderCollectionViewCell: UICollectionViewCell {
 
         groggySlider.minimumValue = 0
         groggySlider.maximumValue = 10
-        groggySlider.value = 5
     }
 
     private func applyStyling() {
@@ -52,5 +51,12 @@ class GroggySliderCollectionViewCell: UICollectionViewCell {
             roundedRect: bounds,
             cornerRadius: 24
         ).cgPath
+    }
+    
+    func configure(with viewModel: GroggySliderViewModel) {
+        titleLabel.text = viewModel.title
+        leftLabel.text = viewModel.leftLabel
+        rightLabel.text = viewModel.rightLabel
+        groggySlider.value = viewModel.value
     }
 }

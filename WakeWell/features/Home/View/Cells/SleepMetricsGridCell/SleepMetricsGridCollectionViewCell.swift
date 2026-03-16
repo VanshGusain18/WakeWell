@@ -58,4 +58,10 @@ class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
     }
+    
+    func configure(with viewModel: SleepMetricsViewModel) {
+        durationTitleLabel.text = viewModel.durationTitle
+        durationScoreLabel.text = viewModel.durationScore
+        durationTrendLabel.text = viewModel.durationTrend
+    }
 }

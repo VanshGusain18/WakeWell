@@ -4,6 +4,8 @@ class HomeViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
 
+    private let viewModel = HomeViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -56,67 +58,74 @@ extension HomeViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return viewModel.cardCount
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        switch indexPath.item {
+        let card = viewModel.cards[indexPath.item]
 
-        case 0:
+        switch card {
+
+        case .alarm(let alarmVM):
+
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "alarm_cell",
                 for: indexPath
             ) as! AlarmCollectionViewCell
 
-            let model = AlarmModel(time: Date().addingTimeInterval(3600 * 8))
-            let viewModel = AlarmViewModel(model: model)
-
-            cell.configure(with: viewModel)
+            cell.configure(with: alarmVM)
             return cell
 
-        case 1:
+        case .sleepRing(let ringVM):
+
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_ring_cell",
                 for: indexPath
             ) as! SleepRingCollectionViewCell
 
-            let model = SleepRingModel(score: 82, subtitle: "Good sleep")
-            let viewModel = SleepRingViewModel(model: model)
-
-            cell.configure(with: viewModel)
+            cell.configure(with: ringVM)
             return cell
 
-        case 2:
+        case .metrics(let vm):
+
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
                 for: indexPath
             ) as! SleepMetricsGridCollectionViewCell
 
+            cell.configure(with: vm)
             return cell
-            
-        case 3:
+
+        case .groggy(let vm):
+
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "groggy_slider_cell",
                 for: indexPath
             ) as! GroggySliderCollectionViewCell
 
+            cell.configure(with: vm)
             return cell
-            
-        case 4:
+
+        case .notes(let vm):
+
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "morning_notes_cell",
                 for: indexPath
             ) as! MorningNotesCollectionViewCell
 
+            cell.configure(with: vm)
             return cell
-        default:
-            let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: "sleep_sounds_cell",
-                    for: indexPath
-                ) as! SleepSoundsCollectionViewCell
 
+        case .sounds(let vm):
+
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "sleep_sounds_cell",
+                for: indexPath
+            ) as! SleepSoundsCollectionViewCell
+
+            cell.configure(with: vm)
             return cell
         }
     }

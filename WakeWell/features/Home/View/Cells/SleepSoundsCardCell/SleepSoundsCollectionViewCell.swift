@@ -47,5 +47,8 @@ class SleepSoundsCollectionViewCell: UICollectionViewCell {
             cornerRadius: 24
         ).cgPath
     }
-
+    
+    func configure(with viewModel: SleepSoundsViewModel) {
+        titleLabel.text = viewModel.title
+    }
 }

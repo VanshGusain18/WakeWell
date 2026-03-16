@@ -138,25 +138,26 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
 
         let width = collectionView.bounds.width - 32
+        let card = viewModel.cards[indexPath.item]
 
-        switch indexPath.item {
+        switch card {
 
-        case 0:
+        case .alarm:
             return CGSize(width: width, height: 120)
 
-        case 1:
+        case .sleepRing:
             return CGSize(width: width, height: 230)
 
-        case 2:
+        case .metrics:
             return CGSize(width: width, height: 200)
-        
-        case 3:
+
+        case .groggy:
             return CGSize(width: width, height: 140)
-            
-        case 4:
+
+        case .notes:
             return CGSize(width: width, height: 160)
-            
-        default:
+
+        case .sounds:
             return CGSize(width: width, height: 70)
         }
     }

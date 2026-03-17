@@ -295,14 +295,29 @@
             </constraints>
             <size key="customSize" width="660" height="247"/>
             <connections>
+                <outlet property="architectureScoreLabel" destination="SHU-Lm-0KX" id="oFh-32-ahZ"/>
+                <outlet property="architectureTitleLabel" destination="dBq-Bk-J32" id="xWK-Hk-hfl"/>
+                <outlet property="architectureTrendLabel" destination="rVC-GU-CQh" id="TyE-uh-cMN"/>
                 <outlet property="architectureView" destination="ZlD-Dv-xh1" id="Czm-PO-MUn"/>
+                <outlet property="calmnessScoreLabel" destination="g6g-nT-2dQ" id="UWv-8o-AW2"/>
+                <outlet property="calmnessTitleLabel" destination="gIw-na-70K" id="tlJ-wb-cnZ"/>
+                <outlet property="calmnessTrendLabel" destination="VWT-Xc-X0o" id="5E1-Pg-Di3"/>
                 <outlet property="calmnessView" destination="psW-S5-oWq" id="Z3h-OD-N1N"/>
+                <outlet property="consistencyScoreLabel" destination="V3b-xY-Kfd" id="98v-6F-lgj"/>
+                <outlet property="consistencyTitleLabel" destination="QbQ-cY-rgV" id="ePm-Ur-nA8"/>
+                <outlet property="consistencyTrendLabel" destination="gmC-yi-Po3" id="Pgb-8L-t2g"/>
                 <outlet property="consistencyView" destination="ejC-8m-eKV" id="L9e-4c-GMO"/>
+                <outlet property="continuityScoreLabel" destination="qL1-6g-600" id="L2I-d0-uoC"/>
+                <outlet property="continuityTitleLabel" destination="WJd-VN-xPA" id="iIg-KW-ycv"/>
+                <outlet property="continuityTrendLabel" destination="Un0-2Q-Fv0" id="WZp-aD-wjS"/>
                 <outlet property="continuityView" destination="nqn-ji-WHN" id="Dg1-3P-CkD"/>
                 <outlet property="durationScoreLabel" destination="DXk-em-hQY" id="4FZ-lT-uCz"/>
                 <outlet property="durationTitleLabel" destination="o3Q-HB-Vwd" id="3HN-fs-lII"/>
-                <outlet property="durationTrendLabel" destination="nNV-VO-J7J" id="g75-Uo-Ypb"/>
+                <outlet property="durationTrendLabel" destination="nNV-VO-J7J" id="5ax-ts-MvE"/>
                 <outlet property="durationView" destination="sIy-J0-fru" id="aez-ie-6Sc"/>
+                <outlet property="efficiencyScoreLabel" destination="lWv-El-8Ta" id="XRD-54-j5h"/>
+                <outlet property="efficiencyTitleLabel" destination="Ivd-fv-hxI" id="apL-bX-GHp"/>
+                <outlet property="efficiencyTrendLabel" destination="hGp-7A-kGe" id="Ya0-7a-5XL"/>
                 <outlet property="efficiencyView" destination="jwx-4o-W5Q" id="ukm-BT-1PE"/>
             </connections>
             <point key="canvasLocation" x="271.75572519083971" y="219.36619718309859"/>

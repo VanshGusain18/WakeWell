@@ -2,10 +2,37 @@ import UIKit
 
 class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
 
+    // MARK: - Duration
     @IBOutlet weak var durationTitleLabel: UILabel!
     @IBOutlet weak var durationScoreLabel: UILabel!
     @IBOutlet weak var durationTrendLabel: UILabel!
 
+    // MARK: - Efficiency
+    @IBOutlet weak var efficiencyTitleLabel: UILabel!
+    @IBOutlet weak var efficiencyScoreLabel: UILabel!
+    @IBOutlet weak var efficiencyTrendLabel: UILabel!
+
+    // MARK: - Architecture
+    @IBOutlet weak var architectureTitleLabel: UILabel!
+    @IBOutlet weak var architectureScoreLabel: UILabel!
+    @IBOutlet weak var architectureTrendLabel: UILabel!
+
+    // MARK: - Continuity
+    @IBOutlet weak var continuityTitleLabel: UILabel!
+    @IBOutlet weak var continuityScoreLabel: UILabel!
+    @IBOutlet weak var continuityTrendLabel: UILabel!
+
+    // MARK: - Calmness
+    @IBOutlet weak var calmnessTitleLabel: UILabel!
+    @IBOutlet weak var calmnessScoreLabel: UILabel!
+    @IBOutlet weak var calmnessTrendLabel: UILabel!
+
+    // MARK: - Consistency
+    @IBOutlet weak var consistencyTitleLabel: UILabel!
+    @IBOutlet weak var consistencyScoreLabel: UILabel!
+    @IBOutlet weak var consistencyTrendLabel: UILabel!
+
+    // MARK: - Views
     @IBOutlet weak var durationView: UIView!
     @IBOutlet weak var efficiencyView: UIView!
     @IBOutlet weak var architectureView: UIView!
@@ -58,10 +85,37 @@ class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
     }
-    
+
+    // MARK: - Configure
+
     func configure(with viewModel: SleepMetricsViewModel) {
-        durationTitleLabel.text = viewModel.durationTitle
-        durationScoreLabel.text = viewModel.durationScore
-        durationTrendLabel.text = viewModel.durationTrend
+
+        let m = viewModel.metrics
+
+        guard m.count >= 6 else { return }
+
+        durationTitleLabel.text = m[0].title
+        durationScoreLabel.text = m[0].valueText
+        durationTrendLabel.text = m[0].trendText
+
+        efficiencyTitleLabel.text = m[1].title
+        efficiencyScoreLabel.text = m[1].valueText
+        efficiencyTrendLabel.text = m[1].trendText
+
+        architectureTitleLabel.text = m[2].title
+        architectureScoreLabel.text = m[2].valueText
+        architectureTrendLabel.text = m[2].trendText
+
+        continuityTitleLabel.text = m[3].title
+        continuityScoreLabel.text = m[3].valueText
+        continuityTrendLabel.text = m[3].trendText
+
+        calmnessTitleLabel.text = m[4].title
+        calmnessScoreLabel.text = m[4].valueText
+        calmnessTrendLabel.text = m[4].trendText
+
+        consistencyTitleLabel.text = m[5].title
+        consistencyScoreLabel.text = m[5].valueText
+        consistencyTrendLabel.text = m[5].trendText
     }
 }

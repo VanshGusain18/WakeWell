@@ -1,7 +1,13 @@
 import Foundation
 
+struct SleepMetricItem {
+    let title: String
+    let score: Int
+    let maxScore: Int
+    let trend: String
+}
+
 struct SleepMetricsModel {
-    let duration: String
-    let consistency: String
-    let efficiency: String
+    let sleepScore: Int
+    let metrics: [SleepMetricItem]
 }

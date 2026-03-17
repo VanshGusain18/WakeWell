@@ -16,9 +16,15 @@ class HomeViewModel {
         )
 
         let metricsModel = SleepMetricsModel(
-            duration: "7h 45m",
-            consistency: "Good",
-            efficiency: "92%"
+            sleepScore: 78,
+            metrics: [
+                SleepMetricItem(title: "Duration", score: 16, maxScore: 20, trend: "↑ 15m"),
+                SleepMetricItem(title: "Efficiency", score: 12, maxScore: 15, trend: "↑ 2%"),
+                SleepMetricItem(title: "Architecture", score: 18, maxScore: 25, trend: "↓ 1"),
+                SleepMetricItem(title: "Continuity", score: 13, maxScore: 15, trend: "↑ 1"),
+                SleepMetricItem(title: "Calmness", score: 11, maxScore: 15, trend: "↓ 2"),
+                SleepMetricItem(title: "Consistency", score: 8, maxScore: 10, trend: "↑ 1")
+            ]
         )
 
         let groggyModel = GroggyModel(value: 5)

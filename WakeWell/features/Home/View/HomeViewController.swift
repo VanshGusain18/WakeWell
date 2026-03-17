@@ -68,63 +68,69 @@ extension HomeViewController: UICollectionViewDataSource {
 
         switch card {
 
-        case .alarm(let alarmVM):
+        case .alarm(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "alarm_cell",
                 for: indexPath
             ) as! AlarmCollectionViewCell
 
-            cell.configure(with: alarmVM)
+            let vm = AlarmViewModel(model: model)
+            cell.configure(with: vm)
             return cell
 
-        case .sleepRing(let ringVM):
+        case .sleepRing(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_ring_cell",
                 for: indexPath
             ) as! SleepRingCollectionViewCell
 
-            cell.configure(with: ringVM)
+            let vm = SleepRingViewModel(model: model)
+            cell.configure(with: vm)
             return cell
 
-        case .metrics(let vm):
+        case .metrics(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
                 for: indexPath
             ) as! SleepMetricsGridCollectionViewCell
 
+            let vm = SleepMetricsViewModel(model: model)
             cell.configure(with: vm)
             return cell
 
-        case .groggy(let vm):
+        case .groggy(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "groggy_slider_cell",
                 for: indexPath
             ) as! GroggySliderCollectionViewCell
 
+            let vm = GroggySliderViewModel(model: model)
             cell.configure(with: vm)
             return cell
 
-        case .notes(let vm):
+        case .notes(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "morning_notes_cell",
                 for: indexPath
             ) as! MorningNotesCollectionViewCell
 
+            let vm = MorningNotesViewModel(model: model)
             cell.configure(with: vm)
             return cell
 
-        case .sounds(let vm):
+        case .sounds(let model):
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_sounds_cell",
                 for: indexPath
             ) as! SleepSoundsCollectionViewCell
 
+            let vm = SleepSoundsViewModel(model: model)
             cell.configure(with: vm)
             return cell
         }

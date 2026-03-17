@@ -7,10 +7,10 @@ struct GroggySliderViewModel {
     let rightLabel: String
     let value: Float
 
-    init() {
+    init(model: GroggyModel) {
         title = "How groggy do you feel?"
         leftLabel = "Fresh"
         rightLabel = "Very Groggy"
-        value = 5
+        value = model.value
     }
 }

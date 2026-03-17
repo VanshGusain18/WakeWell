@@ -1,9 +1,3 @@
-//
-//  MorningNotesCollectionViewCell.swift
-//  WakeWell
-//
-//  Created by geu on 11/03/26.
-//
 
 import UIKit
 

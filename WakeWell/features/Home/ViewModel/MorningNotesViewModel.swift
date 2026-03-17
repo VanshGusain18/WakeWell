@@ -4,9 +4,11 @@ struct MorningNotesViewModel {
 
     let title: String
     let placeholderText: String
+    let text: String
 
-    init() {
+    init(model: MorningNoteModel) {
         title = "Morning Notes"
         placeholderText = "Write how you feel today..."
+        text = model.text
     }
 }

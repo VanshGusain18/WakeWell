@@ -6,9 +6,9 @@ struct SleepMetricsViewModel {
     let durationScore: String
     let durationTrend: String
 
-    init() {
+    init(model: SleepMetricsModel) {
         durationTitle = "Duration"
-        durationScore = "7h 45m"
+        durationScore = model.duration
         durationTrend = "↑ 15m"
     }
 }

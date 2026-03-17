@@ -2,39 +2,43 @@ import Foundation
 
 class HomeViewModel {
 
-    let alarmViewModel: AlarmViewModel
-    let sleepRingViewModel: SleepRingViewModel
-    let metricsViewModel: SleepMetricsViewModel
-    let groggyViewModel: GroggySliderViewModel
-    let notesViewModel: MorningNotesViewModel
-    let soundsViewModel: SleepSoundsViewModel
-    
-    let cards: [HomeCard]
+    let cards: [HomeCardModel]
 
     init() {
 
         let alarmModel = AlarmModel(
             time: Date().addingTimeInterval(3600 * 8)
         )
-        alarmViewModel = AlarmViewModel(model: alarmModel)
 
         let sleepRingModel = SleepRingModel(
             score: 82,
             subtitle: "Good sleep"
         )
-        sleepRingViewModel = SleepRingViewModel(model: sleepRingModel)
-        metricsViewModel = SleepMetricsViewModel()
-        groggyViewModel = GroggySliderViewModel()
-        notesViewModel = MorningNotesViewModel()
-        soundsViewModel = SleepSoundsViewModel()
-        
+
+        let metricsModel = SleepMetricsModel(
+            duration: "7h 45m",
+            consistency: "Good",
+            efficiency: "92%"
+        )
+
+        let groggyModel = GroggyModel(value: 5)
+
+        let notesModel = MorningNoteModel(
+            text: "",
+            date: Date()
+        )
+
+        let soundsModel = SleepSoundModel(
+            title: "Sleep Sounds"
+        )
+
         cards = [
-            .alarm(alarmViewModel),
-            .sleepRing(sleepRingViewModel),
-            .metrics(metricsViewModel),
-            .groggy(groggyViewModel),
-            .notes(notesViewModel),
-            .sounds(soundsViewModel)
+            .alarm(alarmModel),
+            .sleepRing(sleepRingModel),
+            .metrics(metricsModel),
+            .groggy(groggyModel),
+            .notes(notesModel),
+            .sounds(soundsModel)
         ]
     }
 

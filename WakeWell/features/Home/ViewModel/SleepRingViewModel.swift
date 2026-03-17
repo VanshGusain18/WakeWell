@@ -1,29 +1,15 @@
-//
-//  SleepRingViewModel.swift
-//  WakeWell
-//
-//  Created by geu on 13/02/26.
-//
-
 import Foundation
+import UIKit
 
 struct SleepRingViewModel {
 
-    private let model: SleepRingModel
+    let scoreText: String
+    let subtitleText: String
+    let progress: CGFloat
 
     init(model: SleepRingModel) {
-        self.model = model
-    }
-
-    var scoreText: String {
-        return "\(model.score)"
-    }
-
-    var subtitleText: String {
-        return model.subtitle
-    }
-
-    var progress: CGFloat {
-        return CGFloat(model.score) / 100
+        self.scoreText = "\(model.score)"
+        self.subtitleText = model.subtitle
+        self.progress = CGFloat(model.score) / 100
     }
 }

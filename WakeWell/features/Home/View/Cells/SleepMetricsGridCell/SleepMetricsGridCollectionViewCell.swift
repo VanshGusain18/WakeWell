@@ -91,31 +91,36 @@ class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
     func configure(with viewModel: SleepMetricsViewModel) {
 
         let m = viewModel.metrics
-
         guard m.count >= 6 else { return }
 
         durationTitleLabel.text = m[0].title
         durationScoreLabel.text = m[0].valueText
         durationTrendLabel.text = m[0].trendText
+        durationTrendLabel.textColor = m[0].trendColor
 
         efficiencyTitleLabel.text = m[1].title
         efficiencyScoreLabel.text = m[1].valueText
         efficiencyTrendLabel.text = m[1].trendText
+        efficiencyTrendLabel.textColor = m[1].trendColor
 
         architectureTitleLabel.text = m[2].title
         architectureScoreLabel.text = m[2].valueText
         architectureTrendLabel.text = m[2].trendText
+        architectureTrendLabel.textColor = m[2].trendColor
 
         continuityTitleLabel.text = m[3].title
         continuityScoreLabel.text = m[3].valueText
         continuityTrendLabel.text = m[3].trendText
+        continuityTrendLabel.textColor = m[3].trendColor
 
         calmnessTitleLabel.text = m[4].title
         calmnessScoreLabel.text = m[4].valueText
         calmnessTrendLabel.text = m[4].trendText
+        calmnessTrendLabel.textColor = m[4].trendColor
 
         consistencyTitleLabel.text = m[5].title
         consistencyScoreLabel.text = m[5].valueText
         consistencyTrendLabel.text = m[5].trendText
+        consistencyTrendLabel.textColor = m[5].trendColor
     }
 }

@@ -18,12 +18,12 @@ class HomeViewModel {
         let metricsModel = SleepMetricsModel(
             sleepScore: 78,
             metrics: [
-                SleepMetricItem(title: "Duration", score: 16, maxScore: 20, trend: "↑ 15m"),
-                SleepMetricItem(title: "Efficiency", score: 12, maxScore: 15, trend: "↑ 2%"),
-                SleepMetricItem(title: "Architecture", score: 18, maxScore: 25, trend: "↓ 1"),
-                SleepMetricItem(title: "Continuity", score: 13, maxScore: 15, trend: "↑ 1"),
-                SleepMetricItem(title: "Calmness", score: 11, maxScore: 15, trend: "↓ 2"),
-                SleepMetricItem(title: "Consistency", score: 8, maxScore: 10, trend: "↑ 1")
+                SleepMetricItem(title: "Duration", score: 16, maxScore: 20, trendPercent: 5),
+                SleepMetricItem(title: "Efficiency", score: 12, maxScore: 15, trendPercent: 3),
+                SleepMetricItem(title: "Architecture", score: 18, maxScore: 25, trendPercent: -2),
+                SleepMetricItem(title: "Continuity", score: 13, maxScore: 15, trendPercent: 1),
+                SleepMetricItem(title: "Calmness", score: 11, maxScore: 15, trendPercent: -4),
+                SleepMetricItem(title: "Consistency", score: 8, maxScore: 10, trendPercent: 2)
             ]
         )
 

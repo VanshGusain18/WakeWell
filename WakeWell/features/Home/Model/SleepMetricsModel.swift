@@ -4,7 +4,7 @@ struct SleepMetricItem {
     let title: String
     let score: Int
     let maxScore: Int
-    let trend: String
+    let trendPercent: Int    
 }
 
 struct SleepMetricsModel {

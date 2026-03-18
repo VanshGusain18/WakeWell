@@ -112,7 +112,7 @@ class SoundTableViewController: UITableViewController {
 
         // Play sound via AudioManager
         AudioManager.shared.setPlaylist(
-            sounds: filteredSounds,
+            filteredSounds,
             startIndex: indexPath.row
         )
 

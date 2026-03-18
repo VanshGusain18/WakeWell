@@ -6,19 +6,29 @@ final class AudioManager {
 
     private var player: AVAudioPlayer?
     private(set) var currentSound: Sound?
+
     private var playlist: [Sound] = []
     private var currentIndex: Int = 0
 
     private init() {}
 
+    // MARK: - Playback State
     var isPlaying: Bool {
         return player?.isPlaying ?? false
     }
 
-    // MARK: - Play Sound
+    var duration: TimeInterval {
+        return player?.duration ?? 0
+    }
+
+    var currentTime: TimeInterval {
+        return player?.currentTime ?? 0
+    }
+
+    // MARK: - Play Single Sound
     func play(sound: Sound) {
 
-        // If same sound is already playing, do nothing
+        // Avoid restarting same sound
         if currentSound?.fileName == sound.fileName, isPlaying {
             return
         }
@@ -27,7 +37,7 @@ final class AudioManager {
             forResource: sound.fileName,
             withExtension: "mp3"
         ) else {
-            print("Sound not found")
+            print(" Sound not found")
             return
         }
 
@@ -38,14 +48,8 @@ final class AudioManager {
 
             currentSound = sound
 
-            // Notify Mini Player
-            NotificationCenter.default.post(
-                name: .audioDidStart,
-                object: nil
-            )
-
         } catch {
-            print("Audio error:", error)
+            print(" Audio error:", error)
         }
     }
 
@@ -58,52 +62,34 @@ final class AudioManager {
         } else {
             player.play()
         }
-
-        // Notify Mini Player
-        NotificationCenter.default.post(
-            name: .audioDidToggle,
-            object: nil
-        )
     }
-    func setPlaylist(sounds: [Sound], startIndex: Int) {
+
+    // MARK: - Playlist
+    func setPlaylist(_ sounds: [Sound], startIndex: Int = 0) {
+        guard !sounds.isEmpty else { return }
+
         playlist = sounds
         currentIndex = startIndex
         play(sound: playlist[currentIndex])
     }
+
     func playNext() {
         guard !playlist.isEmpty else { return }
 
-        currentIndex += 1
-
-        if currentIndex >= playlist.count {
-            currentIndex = 0   // 🔁 loop inside category
-        }
-
+        currentIndex = (currentIndex + 1) % playlist.count
         play(sound: playlist[currentIndex])
-    }
-//slider value
-    var duration: TimeInterval {
-        return player?.duration ?? 0
-    }
-
-    var currentTime: TimeInterval {
-        return player?.currentTime ?? 0
-    }
-
-    func seek(to time: TimeInterval) {
-        player?.currentTime = time
     }
 
     func playPrevious() {
         guard !playlist.isEmpty else { return }
 
-        currentIndex -= 1
-
-        if currentIndex < 0 {
-            currentIndex = playlist.count - 1   // 🔁 loop backwards
-        }
-
+        currentIndex = (currentIndex - 1 + playlist.count) % playlist.count
         play(sound: playlist[currentIndex])
+    }
+
+    // MARK: - Seek
+    func seek(to time: TimeInterval) {
+        player?.currentTime = time
     }
 
     // MARK: - Stop
@@ -111,21 +97,10 @@ final class AudioManager {
         player?.stop()
         player = nil
         currentSound = nil
-
-        // 🔔 Notify Mini Player
-        NotificationCenter.default.post(
-            name: .audioDidStop,
-            object: nil
-        )
     }
 
+    // MARK: - Helper
     func isPlaying(sound: Sound) -> Bool {
         return currentSound?.fileName == sound.fileName && isPlaying
     }
-}
-
-extension Notification.Name {
-    static let audioDidStart = Notification.Name("audioDidStart")
-    static let audioDidToggle = Notification.Name("audioDidToggle")
-    static let audioDidStop = Notification.Name("audioDidStop")
 }

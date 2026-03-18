@@ -152,8 +152,7 @@ extension RiseRitualViewController: UICollectionViewDataSource {
         }
         return layout
     }
-    
-    // MARK: - Compositional Layout Sections
+
 
     func generateSquareSection() -> NSCollectionLayoutSection {
         //Define Item

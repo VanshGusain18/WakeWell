@@ -12,7 +12,6 @@ class SectionHeaderView: UICollectionReusableView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
     func configure(withTitle title: String) {
         headerLabel.text = title

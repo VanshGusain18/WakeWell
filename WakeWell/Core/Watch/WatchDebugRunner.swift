@@ -4,28 +4,23 @@ final class WatchDebugRunner {
 
     static func run() {
 
-        print("🚀 STARTING WATCH BACKEND TEST\n")
+        print("🚀 TESTING DATABASE FETCH\n")
 
-        WatchDataManager.shared.syncData {
+        if let session = DatabaseManager.shared.fetchLatestSession() {
 
-            print("\n📊 FINAL RESULT:")
+            print("✅ DATA FROM DB:\n")
 
-            if let data = WatchDataManager.shared.latestData {
+            print("Sleep ID: \(session.id)")
+            print("Bedtime: \(session.bedtimeStart)")
+            print("Wake: \(session.wakeTime)")
+            print("Asleep Minutes: \(session.asleepMinutes)")
+            print("Efficiency: \(session.efficiency)")
+            print("HRV: \(session.hrv)")
 
-                print("Sleep Score: \(data.sleepScore)")
-                print("Duration: \(data.duration)")
-                print("Efficiency: \(data.efficiency)")
-                print("Architecture: \(data.architecture)")
-                print("Continuity: \(data.continuity)")
-                print("Calmness: \(data.calmness)")
-                print("Consistency: \(data.consistency)")
-                print("Timestamp: \(data.timestamp)")
-
-            } else {
-                print("❌ No data received")
-            }
-
-            print("\n✅ WATCH BACKEND PIPELINE WORKING\n")
+        } else {
+            print("❌ No session found")
         }
+
+        print("\n🏁 END TEST\n")
     }
 }

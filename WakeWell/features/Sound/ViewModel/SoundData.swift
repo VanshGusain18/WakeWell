@@ -50,7 +50,7 @@ var allSounds: [Sound] = [
         imageName: "rus-burkhanov-building-4803602"
         ),
     Sound(
-        title: "Vibing relaxing music",
+        title: "Relaxing music",
         category: .ambient,
         duration: 600,
         fileName: "vibehorn-relax-lofi-beat-461489",

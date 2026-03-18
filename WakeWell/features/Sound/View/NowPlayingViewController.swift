@@ -33,7 +33,8 @@ class NowPlayingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped(_:)))
+        progressLabel.addGestureRecognizer(tapGesture)
         navigationController?.setNavigationBarHidden(false, animated: false)
 
         guard let sound = AudioManager.shared.currentSound,
@@ -139,5 +140,15 @@ class NowPlayingViewController: UIViewController {
         let duration = AudioManager.shared.duration
             let newTime = Double(sender.value) * duration
             AudioManager.shared.seek(to: newTime)
+    }
+    @objc func sliderTapped(_ gesture: UITapGestureRecognizer) {
+        let location = gesture.location(in: progressLabel)
+        let percentage = location.x / progressLabel.bounds.width
+
+        let duration = AudioManager.shared.duration
+        let newTime = Double(percentage) * duration
+
+        progressLabel.setValue(Float(percentage), animated: true)
+        AudioManager.shared.seek(to: newTime)
     }
 }

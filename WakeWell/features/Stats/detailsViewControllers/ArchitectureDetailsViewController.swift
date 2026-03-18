@@ -9,64 +9,79 @@ import UIKit
 import DGCharts
 
 class ArchitectureDetailsViewController: UIViewController {
-
-    @IBOutlet weak var pieChartView: PieChartView!
-
+    
+    @IBOutlet weak var barChartView: BarChartView!
+    
     @IBOutlet weak var deepLabel: UILabel!
     @IBOutlet weak var remLabel: UILabel!
     @IBOutlet weak var lightLabel: UILabel!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        title = "Architecture"
+        let avg = SleepArchitectureDataProvider.getAllAverages()
+        deepLabel.text  = String(format: "Average Deep Sleep : %.0f% %", avg.deep)
+        remLabel.text   = String(format: "Average Rem Sleep : %.0f% %", avg.rem)
+        lightLabel.text = String(format: "Average Light Sleep : %.0f% %", avg.light)
 
         setupChart()
-        loadData()
+        loadWeeklyData()
     }
     private func setupChart() {
-
-        pieChartView.holeRadiusPercent = 0.4
-        pieChartView.transparentCircleRadiusPercent = 0.45
-
-        pieChartView.usePercentValuesEnabled = true
-
-        pieChartView.entryLabelFont = .systemFont(ofSize: 12)
-        pieChartView.entryLabelColor = .label
-
-        pieChartView.legend.enabled = false
-
-        pieChartView.animate(yAxisDuration: 1.0)
+        
+        barChartView.chartDescription.enabled = false
+        barChartView.rightAxis.enabled = false
+        
+        let yAxis = barChartView.leftAxis
+        yAxis.axisMinimum = 0
+        yAxis.axisMaximum = 100
+        
+        barChartView.xAxis.labelPosition = .bottom
+        barChartView.xAxis.drawGridLinesEnabled = false
+        
+        barChartView.legend.enabled = true
+        
+        barChartView.animate(yAxisDuration: 1.0)
     }
-    private func loadData() {
-
-        let architecture = SleepArchitecture.sampleData()
-
-        deepLabel.text = "Deep Sleep   \(Int(architecture.deepSleep))%"
-        remLabel.text = "REM Sleep    \(Int(architecture.remSleep))%"
-        lightLabel.text = "Light Sleep  \(Int(architecture.lightSleep))%"
-
-        let entries = [
-            PieChartDataEntry(value: architecture.deepSleep, label: "Deep"),
-            PieChartDataEntry(value: architecture.remSleep, label: "REM"),
-            PieChartDataEntry(value: architecture.lightSleep, label: "Light")
-        ]
-
-        let dataSet = PieChartDataSet(entries: entries)
-
+    private func loadWeeklyData() {
+        
+        let data = SleepArchitectureDataProvider.getWeeklyData()
+        let durationData = SleepDurationModel.getWeeklySleepDuration()
+        
+        var entries: [BarChartDataEntry] = []
+        
+        for (index, dayData) in data.enumerated() {
+            
+            let totalHours = durationData[index].hoursSlept
+            
+            let deepHours  = totalHours * (dayData.deep / 100.0)
+            let remHours   = totalHours * (dayData.rem / 100.0)
+            let lightHours = totalHours * (dayData.light / 100.0)
+            
+            let values = [deepHours, remHours, lightHours]
+            
+            let entry = BarChartDataEntry(x: Double(index), yValues: values)
+            entries.append(entry)
+        }
+        
+        let dataSet = BarChartDataSet(entries: entries, label: "")
+        
         dataSet.colors = [
-            .systemIndigo,
-            .systemPurple,
-            .systemTeal
+            UIColor(red: 0.0, green: 0.2, blue: 0.8, alpha: 1.0),  
+            UIColor(red: 0.2, green: 0.5, blue: 1.0, alpha: 1.0),
+            UIColor(red: 0.6, green: 0.8, blue: 1.0, alpha: 1.0)
         ]
-
-        dataSet.sliceSpace = 3
-
-        let data = PieChartData(dataSet: dataSet)
-
-        let formatter = DefaultValueFormatter(decimals: 0)
-        data.setValueFormatter(formatter)
-
-        pieChartView.data = data
+        
+        dataSet.stackLabels = ["Deep", "REM", "Light"]
+        
+        let chartData = BarChartData(dataSet: dataSet)
+        chartData.setDrawValues(false)
+        
+        barChartView.data = chartData
+        
+        let days = data.map { $0.day }
+        barChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: days)
+        
+        let maxSleep = durationData.map { $0.hoursSlept }.max() ?? 10
+        barChartView.leftAxis.axisMaximum = maxSleep + 1
     }
 }

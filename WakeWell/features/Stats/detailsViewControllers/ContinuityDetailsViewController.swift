@@ -7,73 +7,79 @@ final class ContinuityDetailsViewController: UIViewController {
     @IBOutlet weak var awakeningsValueLabel: UILabel!
     @IBOutlet weak var longestBlockLabel: UILabel!
 
-    @IBOutlet weak var awakeningsNumberCard: UIView!
-    
-    @IBOutlet weak var longestSleepBlockCard: UIView!
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        title = "Sleep Continuity"
-        awakeningsNumberCard.layer.cornerRadius = 16
-        awakeningsNumberCard.layer.borderWidth = 1
-        awakeningsNumberCard.layer.borderColor = UIColor.black.cgColor
-        longestSleepBlockCard.layer.cornerRadius = 16
-        longestSleepBlockCard.layer.borderWidth = 1
-        longestSleepBlockCard.layer.borderColor = UIColor.black.cgColor
-        configureChart()
-        loadContinuityData()
-    }
-
-    // MARK: Chart Setup
-
-    private func configureChart() {
-
-        chartView.chartDescription.enabled = false
-        chartView.legend.enabled = false
-        chartView.rightAxis.enabled = false
-
-        chartView.leftAxis.axisMinimum = 0
-        chartView.leftAxis.axisMaximum = 8
-        chartView.leftAxis.gridColor = .systemGray5
-
-        chartView.xAxis.labelPosition = .bottom
-        chartView.xAxis.drawGridLinesEnabled = false
-    }
-
-    // MARK: Load Data
-
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            styleChart(chartView)
+            loadContinuityData()
+        }
     private func loadContinuityData() {
-
         let stats = SleepContinuityAnalyzer.analyzeWeek()
 
-        // Graph entries
         let entries = stats.awakeningsPerNight.enumerated().map {
             ChartDataEntry(x: Double($0.offset), y: Double($0.element))
         }
 
         let dataSet = LineChartDataSet(entries: entries, label: "")
-        dataSet.mode = .cubicBezier
-        dataSet.lineWidth = 2.5
-        dataSet.setColor(.systemPurple)
-
-        dataSet.drawCirclesEnabled = true
-        dataSet.circleRadius = 4
-        dataSet.circleColors = [.systemPurple]
-        dataSet.circleHoleColor = .white
-        dataSet.drawValuesEnabled = false
+        configureDataSet(dataSet)
 
         chartView.data = LineChartData(dataSet: dataSet)
+        
+        // Match the X-Axis configuration from Duration Screen
+        chartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: stats.days)
+        chartView.xAxis.granularity = 1
+        chartView.xAxis.granularityEnabled = true
+        chartView.xAxis.axisMinimum = 0
+        chartView.xAxis.axisMaximum = Double(stats.days.count - 1)
 
-        chartView.xAxis.valueFormatter =
-            IndexAxisValueFormatter(values: stats.days)
+        awakeningsValueLabel.text = String(format: "Average Awakenings: %.1f", stats.averageAwakenings)
+        longestBlockLabel.text = "Longest Sleep Block: \(stats.longestSleepBlock) hrs"
 
-        chartView.animate(xAxisDuration: 0.8)
+        chartView.layoutIfNeeded()
+        chartView.animate(xAxisDuration: 0.0, yAxisDuration: 1.0, easingOption: .easeOutCubic)
+    }
 
-        // Metrics
+    private func styleChart(_ chart: LineChartView) {
+        chart.chartDescription.enabled = false
+        chart.legend.enabled = false
+        chart.rightAxis.enabled = false
+        chart.dragEnabled = false
+        chart.pinchZoomEnabled = false
+        chart.doubleTapToZoomEnabled = false
+        chart.setScaleEnabled(false)
 
-        awakeningsValueLabel.text =
-            String(format: "%.1f awakenings", stats.averageAwakenings)
+        let xAxis = chart.xAxis
+        xAxis.labelPosition = .bottom
+        xAxis.drawGridLinesEnabled = false
+        xAxis.labelTextColor = .secondaryLabel
+        xAxis.granularity = 1
 
-        longestBlockLabel.text =
-            "\(stats.longestSleepBlock) hrs"
+        let leftAxis = chart.leftAxis
+        leftAxis.labelTextColor = .secondaryLabel
+        leftAxis.axisMinimum = 0
+        leftAxis.axisMaximum = 8 // Scaled for awakenings
+        leftAxis.drawGridLinesEnabled = true
+        leftAxis.gridColor = UIColor.systemGray5
+        leftAxis.labelCount = 6
+    }
+
+    private func configureDataSet(_ dataSet: LineChartDataSet) {
+        dataSet.mode = .cubicBezier
+        dataSet.lineWidth = 3
+        dataSet.setColor(.systemBlue)
+        dataSet.circleRadius = 5
+        dataSet.setCircleColor(.systemBlue)
+        dataSet.circleHoleColor = .systemBackground
+        dataSet.circleHoleRadius = 2.5
+        dataSet.drawValuesEnabled = false
+        dataSet.drawFilledEnabled = true
+
+        let gradientColors = [
+            UIColor.systemBlue.withAlphaComponent(0.3).cgColor,
+            UIColor.clear.cgColor
+        ] as CFArray
+        
+        if let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: nil) {
+            dataSet.fill = LinearGradientFill(gradient: gradient, angle: 90)
+        }
     }
 }

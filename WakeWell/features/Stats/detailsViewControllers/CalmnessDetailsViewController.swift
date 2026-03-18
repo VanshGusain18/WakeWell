@@ -17,28 +17,19 @@ class CalmnessDetailsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Calmness"
-        averageMovement.text = "Average Movement Score: \(String(format: "%.2f", SleepCalmnessAnalyzer.analyzeWeek().averageMovement))"
-        averageRestlessScore.text = "Average Restlessness Score:\(String(format: "%.2f", SleepCalmnessAnalyzer.analyzeWeek().averageRestlessnessScore))"
-        loadMovementGraph()
-        loadRestlessnessTrend()
-    }
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    private func loadMovementGraph() {
-
-        styleChart(movementChartView)
 
         let stats = SleepCalmnessAnalyzer.analyzeWeek()
+
+        averageMovement.text = "Average Movement Score: \(String(format: "%.2f", stats.averageMovement))"
+        averageRestlessScore.text = "Average Restlessness Score: \(String(format: "%.2f", stats.averageRestlessnessScore))"
+
+        loadMovementGraph(stats: stats)
+        loadRestlessnessTrend(stats: stats)
+    }
+//movement chart
+    private func loadMovementGraph(stats: CalmnessStats) {
+
+        styleChart(movementChartView)
 
         let entries = stats.movementPerNight.enumerated().map {
             ChartDataEntry(x: Double($0.offset), y: $0.element)
@@ -47,44 +38,46 @@ class CalmnessDetailsViewController: UIViewController {
         let dataSet = LineChartDataSet(entries: entries, label: "")
 
         dataSet.mode = .cubicBezier
-        dataSet.lineWidth = 2.5
-        dataSet.setColor(.systemTeal)
+        dataSet.lineWidth = 3
+        dataSet.setColor(.systemBlue)
 
-        dataSet.drawCirclesEnabled = true
-        dataSet.circleRadius = 4
-        dataSet.circleColors = [.systemTeal]
-        dataSet.circleHoleColor = .white
+        dataSet.circleRadius = 5
+        dataSet.setCircleColor(.systemBlue)
+        dataSet.circleHoleColor = .systemBackground
+        dataSet.circleHoleRadius = 2.5
 
         dataSet.drawValuesEnabled = false
         dataSet.drawFilledEnabled = true
 
         let gradientColors = [
-            UIColor.systemTeal.withAlphaComponent(0.3).cgColor,
+            UIColor.systemBlue.withAlphaComponent(0.3).cgColor,
             UIColor.clear.cgColor
         ] as CFArray
 
-        let gradient = CGGradient(colorsSpace: nil, colors: gradientColors, locations: nil)!
+        let gradient = CGGradient(
+            colorsSpace: CGColorSpaceCreateDeviceRGB(),
+            colors: gradientColors,
+            locations: nil
+        )!
 
         dataSet.fill = LinearGradientFill(gradient: gradient, angle: 90)
 
         movementChartView.data = LineChartData(dataSet: dataSet)
-        movementChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: stats.days)
+
+        movementChartView.xAxis.valueFormatter =
+            IndexAxisValueFormatter(values: stats.days)
 
         movementChartView.xAxis.granularity = 1
         movementChartView.xAxis.granularityEnabled = true
         movementChartView.xAxis.axisMinimum = 0
         movementChartView.xAxis.axisMaximum = Double(stats.days.count - 1)
 
-        movementChartView.xAxis.valueFormatter =
-            IndexAxisValueFormatter(values: stats.days)
-
-        movementChartView.animate(xAxisDuration: 1.0)
+        movementChartView.animate(xAxisDuration: 0.0,yAxisDuration: 1.0,easingOption: .easeOutCubic)
     }
-    private func loadRestlessnessTrend() {
+//restless chart
+    private func loadRestlessnessTrend(stats: CalmnessStats) {
 
         styleChart(restlessnessChartView)
-
-        let stats = SleepCalmnessAnalyzer.analyzeWeek()
 
         let entries = stats.restlessnessScoreTrend.enumerated().map {
             ChartDataEntry(x: Double($0.offset), y: $0.element)
@@ -93,23 +86,27 @@ class CalmnessDetailsViewController: UIViewController {
         let dataSet = LineChartDataSet(entries: entries, label: "")
 
         dataSet.mode = .cubicBezier
-        dataSet.lineWidth = 2.5
-        dataSet.setColor(.systemOrange)
+        dataSet.lineWidth = 3
+        dataSet.setColor(.systemBlue)
 
-        dataSet.drawCirclesEnabled = true
-        dataSet.circleRadius = 4
-        dataSet.circleColors = [.systemOrange]
-        dataSet.circleHoleColor = .white
+        dataSet.circleRadius = 5
+        dataSet.setCircleColor(.systemBlue)
+        dataSet.circleHoleColor = .systemBackground
+        dataSet.circleHoleRadius = 2.5
 
         dataSet.drawValuesEnabled = false
         dataSet.drawFilledEnabled = true
 
         let gradientColors = [
-            UIColor.systemOrange.withAlphaComponent(0.3).cgColor,
+            UIColor.systemBlue.withAlphaComponent(0.3).cgColor,
             UIColor.clear.cgColor
         ] as CFArray
 
-        let gradient = CGGradient(colorsSpace: nil, colors: gradientColors, locations: nil)!
+        let gradient = CGGradient(
+            colorsSpace: CGColorSpaceCreateDeviceRGB(),
+            colors: gradientColors,
+            locations: nil
+        )!
 
         dataSet.fill = LinearGradientFill(gradient: gradient, angle: 90)
 
@@ -118,36 +115,39 @@ class CalmnessDetailsViewController: UIViewController {
         restlessnessChartView.xAxis.valueFormatter =
             IndexAxisValueFormatter(values: stats.days)
 
-        restlessnessChartView.animate(xAxisDuration: 1.0)
+        restlessnessChartView.xAxis.granularity = 1
+        restlessnessChartView.xAxis.granularityEnabled = true
+        restlessnessChartView.xAxis.axisMinimum = 0
+        restlessnessChartView.xAxis.axisMaximum = Double(stats.days.count - 1)
+
+        restlessnessChartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
     }
+//common function to style chart
     private func styleChart(_ chart: LineChartView) {
 
-        chart.backgroundColor = .clear
-        chart.drawGridBackgroundEnabled = false
-        chart.drawBordersEnabled = false
-        
-        chart.dragEnabled = true
-        chart.setScaleEnabled(false)
-        chart.pinchZoomEnabled = false
-        
+        chart.chartDescription.enabled = false
         chart.legend.enabled = false
         chart.rightAxis.enabled = false
-        
-        let leftAxis = chart.leftAxis
-        leftAxis.labelFont = .systemFont(ofSize: 12, weight: .medium)
-        leftAxis.labelTextColor = .systemGray
-        leftAxis.axisLineColor = .systemGray4
-        leftAxis.gridColor = UIColor.systemGray5
-        leftAxis.drawAxisLineEnabled = true
-        
+
+        chart.dragEnabled = false
+        chart.pinchZoomEnabled = false
+        chart.doubleTapToZoomEnabled = false
+        chart.setScaleEnabled(false)
+
+        // X Axis
         let xAxis = chart.xAxis
         xAxis.labelPosition = .bottom
-        xAxis.labelFont = .systemFont(ofSize: 12, weight: .medium)
-        xAxis.labelTextColor = .systemGray
-        xAxis.axisLineColor = .systemGray4
         xAxis.drawGridLinesEnabled = false
-        
-        chart.extraTopOffset = 10
-        chart.extraBottomOffset = 10
+        xAxis.labelTextColor = .secondaryLabel
+        xAxis.granularity = 1
+
+        // Y Axis
+        let leftAxis = chart.leftAxis
+        leftAxis.labelTextColor = .secondaryLabel
+        leftAxis.drawGridLinesEnabled = true
+        leftAxis.gridColor = UIColor.systemGray5
+        leftAxis.labelCount = 6
     }
 }
+
+

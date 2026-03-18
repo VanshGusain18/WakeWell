@@ -139,7 +139,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TCP-8h-f5b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2918.320610687023" y="813.38028169014092"/>
+            <point key="canvasLocation" x="2935" y="813"/>
         </scene>
         <!--Activity Detail View Controller-->
         <scene sceneID="NBd-5h-373">
@@ -243,6 +243,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="d1g-mg-XY2"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="njb-Fg-DbQ">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>

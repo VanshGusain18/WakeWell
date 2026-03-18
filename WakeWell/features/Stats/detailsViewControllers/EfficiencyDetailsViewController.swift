@@ -12,26 +12,19 @@ class EfficiencyDetailsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        titleLabel.text = "Sleep Efficiency"
         descriptionLabel.text = "Sleep efficiency measures how much of your time in bed is actually spent sleeping."
 
         efficiencyData = EfficiencyModel.getWeeklyEfficiency()
-
         setupEfficiencyChart()
         setupSleepVsBedChart()
     }
     func setupEfficiencyChart() {
-
         var entries: [ChartDataEntry] = []
-
         for (index, data) in efficiencyData.enumerated() {
             entries.append(
                 ChartDataEntry(x: Double(index), y: data.efficiency)
             )
         }
-
-        // Dataset
         let dataSet = LineChartDataSet(entries: entries, label: "Efficiency")
 
         dataSet.setColor(.systemBlue)
@@ -41,16 +34,11 @@ class EfficiencyDetailsViewController: UIViewController {
         dataSet.setCircleColor(.systemBlue)
         dataSet.circleRadius = 4
         dataSet.circleHoleRadius = 2
-        dataSet.drawCircleHoleEnabled = true
 
         dataSet.drawValuesEnabled = false
 
-        // Gradient fill
         dataSet.drawFilledEnabled = true
-        let gradientColors = [
-            UIColor.systemBlue.withAlphaComponent(0.4).cgColor,
-            UIColor.clear.cgColor
-        ] as CFArray
+        let gradientColors = [UIColor.systemBlue.withAlphaComponent(0.4).cgColor,UIColor.clear.cgColor] as CFArray
 
         let gradient = CGGradient(colorsSpace: nil, colors: gradientColors, locations: nil)!
         dataSet.fill = LinearGradientFill(gradient: gradient, angle: 90)
@@ -58,7 +46,6 @@ class EfficiencyDetailsViewController: UIViewController {
         let chartData = LineChartData(dataSet: dataSet)
         efficiencyChartView.data = chartData
 
-        // X Axis (Day Labels)
         let days = efficiencyData.map { $0.day }
 
         let xAxis = efficiencyChartView.xAxis
@@ -71,7 +58,6 @@ class EfficiencyDetailsViewController: UIViewController {
         xAxis.axisMinimum = -0.5
         xAxis.axisMaximum = Double(days.count) - 0.5
 
-        // Left Axis
         let leftAxis = efficiencyChartView.leftAxis
         leftAxis.axisMinimum = 0
         leftAxis.axisMaximum = 100
@@ -79,32 +65,18 @@ class EfficiencyDetailsViewController: UIViewController {
         leftAxis.gridColor = .systemGray5
         leftAxis.labelFont = .systemFont(ofSize: 12)
 
-        // Disable right axis
         efficiencyChartView.rightAxis.enabled = false
-
-        // Remove legend
         efficiencyChartView.legend.enabled = false
-
-        // Remove description
         efficiencyChartView.chartDescription.enabled = false
-
-        // Animation
-        efficiencyChartView.animate(xAxisDuration: 1.2)
+        efficiencyChartView.animate(xAxisDuration: 0.0,yAxisDuration: 1.0,easingOption: .easeOutCubic)
     }
     func setupSleepVsBedChart() {
 
         var sleepEntries: [BarChartDataEntry] = []
         var bedEntries: [BarChartDataEntry] = []
-
         for (index, data) in efficiencyData.enumerated() {
-
-            sleepEntries.append(
-                BarChartDataEntry(x: Double(index), y: data.timeAsleep)
-            )
-
-            bedEntries.append(
-                BarChartDataEntry(x: Double(index), y: data.timeInBed)
-            )
+            sleepEntries.append(BarChartDataEntry(x: Double(index), y: data.timeAsleep))
+            bedEntries.append(BarChartDataEntry(x: Double(index), y: data.timeInBed))
         }
 
         let sleepSet = BarChartDataSet(entries: sleepEntries, label: "Sleep")
@@ -119,17 +91,16 @@ class EfficiencyDetailsViewController: UIViewController {
 
         let chartData = BarChartData(dataSets: [sleepSet, bedSet])
 
-        let barWidth = 0.35
+        let barWidth = 0.30
         let groupSpace = 0.25
-        let barSpace = 0.05
+        let barSpace = 0.08
 
         chartData.barWidth = barWidth
 
         sleepVsBedChartView.data = chartData
 
         sleepVsBedChartView.xAxis.axisMinimum = 0
-        sleepVsBedChartView.xAxis.axisMaximum =
-            Double(efficiencyData.count)
+        sleepVsBedChartView.xAxis.axisMaximum = Double(efficiencyData.count)
 
         chartData.groupBars(fromX: 0, groupSpace: groupSpace, barSpace: barSpace)
 
@@ -159,7 +130,6 @@ class EfficiencyDetailsViewController: UIViewController {
         legend.font = .systemFont(ofSize: 12)
 
         sleepVsBedChartView.chartDescription.enabled = false
-
         sleepVsBedChartView.animate(yAxisDuration: 1.2)
     }
 }

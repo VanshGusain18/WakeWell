@@ -12,85 +12,98 @@ class ConsistencyDetailsViewController: UIViewController {
 
     @IBOutlet weak var bedtimeChartView: LineChartView!
     @IBOutlet weak var wakeChartView: LineChartView!
-
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        title = "Consistency"
-
-        setupCharts()
+        styleChart(bedtimeChartView)
+        styleChart(wakeChartView)
         loadConsistencyData()
     }
-    private func setupCharts() {
-        
-        configureChart(chart: bedtimeChartView)
-        configureChart(chart: wakeChartView)
-    }
-
-    private func configureChart(chart: LineChartView) {
-
-        chart.backgroundColor = .clear
-        chart.drawGridBackgroundEnabled = false
-        chart.drawBordersEnabled = false
-        
-        chart.dragEnabled = true
-        chart.setScaleEnabled(false)
-        chart.pinchZoomEnabled = false
-        
-        chart.animate(xAxisDuration: 1.2, easingOption: .easeInOutQuart)
-        
-        chart.legend.enabled = false
-        
-        chart.rightAxis.enabled = false
-        
-        let leftAxis = chart.leftAxis
-        leftAxis.labelFont = .systemFont(ofSize: 12, weight: .medium)
-        leftAxis.labelTextColor = .gray
-        leftAxis.axisLineColor = .lightGray
-        leftAxis.gridColor = UIColor.systemGray5
-        leftAxis.drawAxisLineEnabled = true
-        leftAxis.drawGridLinesEnabled = true
-        
-        let xAxis = chart.xAxis
-        xAxis.labelPosition = .bottom
-        xAxis.labelFont = .systemFont(ofSize: 12, weight: .medium)
-        xAxis.labelTextColor = .gray
-        xAxis.axisLineColor = .lightGray
-        xAxis.gridColor = .clear
-        xAxis.drawGridLinesEnabled = false
-        
-        chart.extraTopOffset = 10
-        chart.extraBottomOffset = 10
-    }
+    
     private func loadConsistencyData() {
-
         let data = SleepConsistency.weeklyData()
-
-        var bedtimeEntries: [ChartDataEntry] = []
-        var wakeEntries: [ChartDataEntry] = []
-
-        for (index, item) in data.enumerated() {
-
-            bedtimeEntries.append(
-                ChartDataEntry(x: Double(index), y: item.bedtime)
-            )
-
-            wakeEntries.append(
-                ChartDataEntry(x: Double(index), y: item.wakeTime)
-            )
+        let days = data.map { $0.day }
+        let bedtimeEntries = data.enumerated().map {
+            ChartDataEntry(x: Double($0.offset), y: $0.element.bedtime)
         }
 
-        let bedtimeSet = LineChartDataSet(entries: bedtimeEntries)
-        bedtimeSet.colors = [.systemPurple]
-        bedtimeSet.circleColors = [.systemPurple]
-        bedtimeSet.lineWidth = 2
+        let wakeEntries = data.enumerated().map {
+            ChartDataEntry(x: Double($0.offset), y: $0.element.wakeTime)
+        }
 
-        let wakeSet = LineChartDataSet(entries: wakeEntries)
-        wakeSet.colors = [.systemTeal]
-        wakeSet.circleColors = [.systemTeal]
-        wakeSet.lineWidth = 2
+        let bedtimeSet = createDataSet(entries: bedtimeEntries, color: .systemBlue)
+
+        let wakeSet = createDataSet(entries: wakeEntries, color: .systemBlue)
 
         bedtimeChartView.data = LineChartData(dataSet: bedtimeSet)
         wakeChartView.data = LineChartData(dataSet: wakeSet)
+
+        bedtimeChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: days)
+        wakeChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: days)
+
+        [bedtimeChartView, wakeChartView].forEach { chart in
+            chart.xAxis.granularity = 1
+            chart.xAxis.axisMinimum = 0
+            chart.xAxis.axisMaximum = Double(days.count - 1)
+
+            chart.animate(xAxisDuration: 0.0, yAxisDuration: 1.0, easingOption: .easeOutCubic)
+        }
+    }
+
+    private func createDataSet(entries: [ChartDataEntry], color: UIColor) -> LineChartDataSet {
+
+        let dataSet = LineChartDataSet(entries: entries, label: "")
+
+        dataSet.mode = .cubicBezier
+        dataSet.lineWidth = 3
+        dataSet.setColor(color)
+
+        dataSet.circleRadius = 5
+        dataSet.setCircleColor(color)
+        dataSet.circleHoleColor = .systemBackground
+        dataSet.circleHoleRadius = 2.5
+
+        dataSet.drawValuesEnabled = false
+        dataSet.drawFilledEnabled = true
+
+        let gradientColors = [
+            color.withAlphaComponent(0.3).cgColor,
+            UIColor.clear.cgColor
+        ] as CFArray
+
+        let gradient = CGGradient(
+            colorsSpace: CGColorSpaceCreateDeviceRGB(),
+            colors: gradientColors,
+            locations: nil
+        )!
+
+        dataSet.fill = LinearGradientFill(gradient: gradient, angle: 90)
+
+        return dataSet
+    }
+
+    // MARK: - Shared Chart Style (MATCHES SleepScoreChartCell)
+    private func styleChart(_ chart: LineChartView) {
+
+        chart.chartDescription.enabled = false
+        chart.legend.enabled = false
+        chart.rightAxis.enabled = false
+
+        chart.dragEnabled = false
+        chart.pinchZoomEnabled = false
+        chart.doubleTapToZoomEnabled = false
+        chart.setScaleEnabled(false)
+
+        let xAxis = chart.xAxis
+        xAxis.labelPosition = .bottom
+        xAxis.drawGridLinesEnabled = false
+        xAxis.labelTextColor = .secondaryLabel
+        xAxis.granularity = 1
+        
+        let leftAxis = chart.leftAxis
+        leftAxis.labelTextColor = .secondaryLabel
+        leftAxis.drawGridLinesEnabled = true
+        leftAxis.gridColor = UIColor.systemGray5
+        leftAxis.labelCount = 6
     }
 }
+

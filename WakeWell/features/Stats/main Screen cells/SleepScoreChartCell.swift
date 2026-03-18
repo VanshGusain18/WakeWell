@@ -1,3 +1,4 @@
+//sleep score chart cell file
 import UIKit
 import DGCharts
 
@@ -19,14 +20,12 @@ class SleepScoreChartCell: UITableViewCell {
         chartView.pinchZoomEnabled = false
         chartView.doubleTapToZoomEnabled = false
 
-        // X Axis styling
         let xAxis = chartView.xAxis
         xAxis.labelPosition = .bottom
         xAxis.drawGridLinesEnabled = false
         xAxis.labelTextColor = .secondaryLabel
         xAxis.granularity = 1
 
-        // Y Axis styling
         let leftAxis = chartView.leftAxis
         leftAxis.labelTextColor = .secondaryLabel
         leftAxis.axisMinimum = 50
@@ -48,17 +47,17 @@ class SleepScoreChartCell: UITableViewCell {
 
         dataSet.mode = .cubicBezier
         dataSet.lineWidth = 3
-        dataSet.setColor(.systemIndigo)
+        dataSet.setColor(.systemBlue)
 
         dataSet.circleRadius = 5
-        dataSet.setCircleColor(.systemIndigo)
+        dataSet.setCircleColor(.systemBlue)
         dataSet.circleHoleColor = .systemBackground
         dataSet.circleHoleRadius = 2.5
 
         dataSet.drawValuesEnabled = false
 
         let gradientColors = [
-            UIColor.systemIndigo.withAlphaComponent(0.4).cgColor,
+            UIColor.systemBlue.withAlphaComponent(0.4).cgColor,
             UIColor.clear.cgColor
         ] as CFArray
 
@@ -81,7 +80,3 @@ class SleepScoreChartCell: UITableViewCell {
         chartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
     }
 }
-
-
-   
-

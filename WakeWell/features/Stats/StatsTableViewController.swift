@@ -1,16 +1,14 @@
+// statstable view controller file
 import UIKit
-
 class StatsTableViewController: UITableViewController {
     
-
     @IBOutlet weak var timeRangeSegment: UISegmentedControl!
     private var sleepStats: SleepStats?
     private var metrics: [SleepMetric] = []
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.separatorStyle = .none
         registerCells()
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         loadSleepData()
     }
     override func viewDidLayoutSubviews() {
@@ -18,45 +16,26 @@ class StatsTableViewController: UITableViewController {
         tableView.tableHeaderView?.frame.size.height = 48
     }
 
-    
     private func loadSleepData() {
-
         let rawStats = SleepStatsAggregator.aggregate()
-        
-        let architecture = SleepArchitecture.sampleData()
-        let deepSleepPercent = architecture.deepSleep
-        
-        let avgDuration = SleepDurationModel.getAverageSleepDuration()
-        
-        let avgEfficiency = EfficiencyModel.getAverageEfficiency()
-        
-        let avgconsitency = SleepConsistency.consistencyInsight()
-        
-        let roundedStats = SleepStats(
-            duration: round(avgDuration),
-            efficiency: round(avgEfficiency),
-            architecture: round(deepSleepPercent),
-            consistency: round(rawStats.consistency),
-            calmness: round(rawStats.calmness),
-            continuity: round(rawStats.continuity)
+        self.sleepStats = SleepStats(
+            duration: rawStats.duration.rounded(),
+            efficiency: rawStats.efficiency.rounded(),
+            architecture: rawStats.architecture.rounded(),
+            consistency: rawStats.consistency.rounded(),
+            calmness: rawStats.calmness.rounded(),
+            continuity: rawStats.continuity.rounded()
         )
-
-        self.sleepStats = roundedStats
-        self.metrics = SleepStatsMapper.mapToMetrics(from: roundedStats)
-
+    
+        if let stats = self.sleepStats {
+            self.metrics = SleepStatsMapper.mapToMetrics(from: stats)
+        }
         tableView.reloadData()
     }
-
     private func registerCells() {
-        tableView.register(
-            UINib(nibName: "SleepScoreChartCell", bundle: nil),
-            forCellReuseIdentifier: "SleepScoreChartCell"
-        )
+        tableView.register(UINib(nibName: "SleepScoreChartCell", bundle: nil),forCellReuseIdentifier: "SleepScoreChartCell")
         
-        tableView.register(
-            UINib(nibName: "StatsMetricCardCell", bundle: nil),
-            forCellReuseIdentifier: "StatsMetricCardCell"
-        )
+        tableView.register(UINib(nibName: "StatsMetricCardCell", bundle: nil),forCellReuseIdentifier: "StatsMetricCardCell")
     }
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
@@ -70,11 +49,9 @@ class StatsTableViewController: UITableViewController {
             break
         }
     }
- 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
-    
     override func tableView(_ tableView: UITableView,
                             numberOfRowsInSection section: Int) -> Int {
         
@@ -82,24 +59,17 @@ class StatsTableViewController: UITableViewController {
         
         return Int(ceil(Double(metrics.count) / 2.0))
     }
-    
     override func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: "SleepScoreChartCell",
-                for: indexPath
-            ) as! SleepScoreChartCell
+            let cell = tableView.dequeueReusableCell(withIdentifier:"SleepScoreChartCell",for:indexPath)as!SleepScoreChartCell
             
             cell.configureForWeek()
             return cell
         }
         
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: "StatsMetricCardCell",
-            for: indexPath
-        ) as? StatsMetricCardCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "StatsMetricCardCell",for: indexPath) as?StatsMetricCardCell else {
             return UITableViewCell()
         }
         
@@ -121,63 +91,39 @@ class StatsTableViewController: UITableViewController {
                 self?.handleTap(type: rightMetric!.type)
             } : nil
         )
-        
         return cell
     }
-    
-    
-    
     override func tableView(_ tableView: UITableView,
                             heightForRowAt indexPath: IndexPath) -> CGFloat {
         return indexPath.section == 0 ? 260 : 120
     }
     
-    
     private func handleTap(type: SleepMetricType) {
         openMetricScreen(type)
     }
     
-    
     private func openMetricScreen(_ metric: SleepMetricType) {
-
         switch metric {
-
         case .duration:
             let vc = DurationDetailsViewController(nibName : "DurationDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
 
         case .efficiency:
-            let vc = EfficiencyDetailsViewController(
-            nibName : "EfficiencyDetailsViewController",bundle: nil)
+            let vc = EfficiencyDetailsViewController(nibName : "EfficiencyDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
             
         case .continuity:
-            let vc = ContinuityDetailsViewController(
-                nibName: "ContinuityDetailsViewController",
-                bundle: nil
-            )
+            let vc = ContinuityDetailsViewController(nibName: "ContinuityDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .calmness:
-            let vc = CalmnessDetailsViewController(
-                nibName: "CalmnessDetailsViewController",
-                bundle: nil
-            )
+            let vc = CalmnessDetailsViewController(nibName: "CalmnessDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .architecture:
-            let vc = ArchitectureDetailsViewController(
-                nibName: "ArchitectureDetailsViewController",
-                bundle: nil
-            )
+            let vc = ArchitectureDetailsViewController(nibName: "ArchitectureDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .consistency:
-            let vc = ConsistencyDetailsViewController(
-                nibName: "ConsistencyDetailsViewController",
-                bundle: nil
-            )
+            let vc = ConsistencyDetailsViewController(nibName: "ConsistencyDetailsViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         }
     }
-
-
-
 }

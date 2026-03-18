@@ -17,7 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         HealthKitManager.shared.requestAuthorization { success in
             print("HealthKit Permission:", success)
+
+            if success {
+                //HealthKitManager.shared.addMockSleepData()
+                HealthKitManager.shared.fetchLastNightSleep()
+            }
         }
+
         
         WatchDebugRunner.run()
         

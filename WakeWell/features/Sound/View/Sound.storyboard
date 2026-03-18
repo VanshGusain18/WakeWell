@@ -28,7 +28,7 @@
                             </tableViewCell>
                         </prototypes>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Sounds" image="headphones" catalog="system" id="9wy-um-M1j"/>
+                    <tabBarItem key="tabBarItem" title="Sound" image="headphones" catalog="system" id="u6Z-sI-N56"/>
                     <navigationItem key="navigationItem" id="kKL-EO-58C">
                         <nil key="title"/>
                         <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="ZzI-3u-nWq">
@@ -122,7 +122,7 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="gWW-8U-i0M">
-                        <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.down" catalog="system" id="zhR-0l-wFT">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.left" catalog="system" id="zhR-0l-wFT">
                             <connections>
                                 <action selector="closeTapped:" destination="OHb-22-cr8" id="ZHZ-OU-Cgb"/>
                             </connections>
@@ -153,7 +153,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="iJ1-74-s9P" kind="relationship" relationship="rootViewController" id="h52-ou-anR"/>
+                        <segue destination="RjB-Mp-xYq" kind="relationship" relationship="rootViewController" id="h52-ou-anR"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="89Y-OR-jPV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -179,27 +179,27 @@
             <point key="canvasLocation" x="2530.5343511450383" y="92.957746478873247"/>
         </scene>
         <!--Tab Bar Controller-->
-        <scene sceneID="EKJ-2F-IKA">
+        <scene sceneID="dpe-7f-k3X">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="iJ1-74-s9P" sceneMemberID="viewController">
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="RjB-Mp-xYq" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" id="KiJ-5S-2Hd"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="wdW-dv-nTp">
+                    <navigationItem key="navigationItem" id="jCb-ks-scF"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="WuO-Sh-z91">
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="4vG-GP-6sn" kind="relationship" relationship="viewControllers" id="3OS-pa-BJ5"/>
+                        <segue destination="4vG-GP-6sn" kind="relationship" relationship="viewControllers" id="k8J-cN-kYr"/>
                     </connections>
                 </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="BgY-aV-wfu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TuZ-fe-N1Z" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="860.30534351145036" y="92.957746478873247"/>
         </scene>
     </scenes>
     <resources>
         <image name="backward.fill" catalog="system" width="128" height="76"/>
-        <image name="chevron.down" catalog="system" width="128" height="70"/>
+        <image name="chevron.left" catalog="system" width="97" height="128"/>
         <image name="forward.fill" catalog="system" width="128" height="76"/>
         <image name="headphones" catalog="system" width="128" height="121"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>

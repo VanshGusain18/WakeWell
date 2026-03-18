@@ -33,12 +33,13 @@ class NowPlayingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped(_:)))
+        progressLabel.addGestureRecognizer(tapGesture)
         navigationController?.setNavigationBarHidden(false, animated: false)
 
         guard let sound = AudioManager.shared.currentSound,
               let image = UIImage(named: sound.imageName) else {
-            print("❌ Missing sound or image")
+            print("Missing sound or image")
             return
         }
 
@@ -50,18 +51,11 @@ class NowPlayingViewController: UIViewController {
         progressLabel.minimumTrackTintColor = .systemBlue
         progressLabel.maximumTrackTintColor = .systemGray4
         progressLabel.setThumbImage(UIImage(systemName: "circle.fill"), for: .normal)
-//        imageView.layer.shadowColor = UIColor.black.cgColor
-//        imageView.layer.shadowOpacity = 0.25
-//        imageView.layer.shadowRadius = 20
-//        imageView.layer.shadowOffset = CGSize(width: 0, height: 10)
-//        imageView.clipsToBounds = false
         
 
     
         navigationItem.largeTitleDisplayMode = .never
     }
-
-
 
 
         private func setupBackground(image: UIImage) {
@@ -146,5 +140,25 @@ class NowPlayingViewController: UIViewController {
         let duration = AudioManager.shared.duration
             let newTime = Double(sender.value) * duration
             AudioManager.shared.seek(to: newTime)
+    }
+    @objc func sliderTapped(_ gesture: UITapGestureRecognizer) {
+        let location = gesture.location(in: progressLabel)
+        let percentage = location.x / progressLabel.bounds.width
+
+        let duration = AudioManager.shared.duration
+        let newTime = Double(percentage) * duration
+
+        progressLabel.setValue(Float(percentage), animated: true)
+        AudioManager.shared.seek(to: newTime)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timer?.invalidate()
+        timer = nil
+    }
+
+    deinit {
+        timer?.invalidate()
     }
 }

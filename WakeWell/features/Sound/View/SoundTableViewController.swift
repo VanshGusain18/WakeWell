@@ -1,8 +1,3 @@
-//
-//  SoundTableViewController.swift
-//  sounds_tab
-//
-
 import UIKit
 import AVFoundation
 
@@ -10,30 +5,41 @@ class SoundTableViewController: UITableViewController {
 
     @IBOutlet weak var segmentView: UISegmentedControl!
 
-    // Data source
     private var allSoundsData: [Sound] = allSounds
     private var filteredSounds: [Sound] = []
 
-    // Track currently playing sound
     private var currentlyPlayingFileName: String?
-
-    // Cache for audio durations
     private var durationCache: [String: TimeInterval] = [:]
+
+    // Mini Player
+    private let miniPlayer = MiniPlayerView()
+    private var miniPlayerTimer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         filteredSounds = allSoundsData
 
-        segmentView.addTarget(self,
+        segmentView?.addTarget(self,
                               action: #selector(segmentChanged(_:)),
                               for: .valueChanged)
 
         setupAudioSession()
         setupBackgroundGradient()
+        setupMiniPlayer()
+
+        miniPlayerTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            self?.updateMiniPlayer()
+        }
+
+        //  MORE SPACE for bigger mini player
+        tableView.contentInset.bottom = 110
+        tableView.verticalScrollIndicatorInsets.bottom = 110
+        tableView.horizontalScrollIndicatorInsets.left = tableView.adjustedContentInset.left
+
     }
 
-    // MARK: - Segmented Control
+   // Segment Control
     @objc func segmentChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0:
@@ -50,7 +56,7 @@ class SoundTableViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    // MARK: - TableView Data Source
+   // TableView Data Source
     override func tableView(_ tableView: UITableView,
                             numberOfRowsInSection section: Int) -> Int {
         return filteredSounds.count
@@ -69,9 +75,9 @@ class SoundTableViewController: UITableViewController {
         cell.textLabel?.text = sound.title
         cell.detailTextLabel?.text = sound.category.rawValue
 
-        // Duration label (right side)
         let durationLabel = UILabel()
         let duration: TimeInterval
+
         if let cached = durationCache[sound.fileName] {
             duration = cached
         } else {
@@ -85,7 +91,6 @@ class SoundTableViewController: UITableViewController {
         durationLabel.sizeToFit()
         cell.accessoryView = durationLabel
 
-        // Highlight currently playing sound
         if sound.fileName == currentlyPlayingFileName {
             cell.backgroundColor = UIColor.systemGray6
             cell.textLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
@@ -99,33 +104,97 @@ class SoundTableViewController: UITableViewController {
         return cell
     }
 
-    // MARK: - TableView Delegate
+    // TableView Delegate
     override func tableView(_ tableView: UITableView,
                             didSelectRowAt indexPath: IndexPath) {
 
         tableView.deselectRow(at: indexPath, animated: true)
 
-        let sound = filteredSounds[indexPath.row]
+        AudioManager.shared.setPlaylist(filteredSounds, startIndex: indexPath.row)
 
-        // Track currently playing sound
-        currentlyPlayingFileName = sound.fileName
-
-        // Play sound via AudioManager
-        AudioManager.shared.setPlaylist(
-            filteredSounds,
-            startIndex: indexPath.row
-        )
-
-        // Refresh UI highlight
         tableView.reloadData()
+        updateMiniPlayer()
 
-        // Open Now Playing screen
         guard let nowPlayingNav = storyboard?.instantiateViewController(withIdentifier: "NowPlayingNav") else { return }
         nowPlayingNav.modalPresentationStyle = .fullScreen
         present(nowPlayingNav, animated: true)
     }
 
-    // MARK: - Audio Setup
+  // Mini Player
+    private func setupMiniPlayer() {
+        miniPlayer.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(miniPlayer)
+
+        //  FORCE FULL WIDTH (this is the missing piece)
+        NSLayoutConstraint.activate([
+            miniPlayer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            miniPlayer.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -32),
+
+            miniPlayer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
+
+            miniPlayer.heightAnchor.constraint(equalToConstant: 72)
+        ])
+
+        
+
+        miniPlayer.isHidden = true
+
+        miniPlayer.playPauseButton.addTarget(self, action: #selector(miniPlayPauseTapped), for: .touchUpInside)
+        miniPlayer.nextButton.addTarget(self, action: #selector(miniNextTapped), for: .touchUpInside)
+        miniPlayer.previousButton.addTarget(self, action: #selector(miniPreviousTapped), for: .touchUpInside)
+        miniPlayer.containerButton.addTarget(self, action: #selector(openNowPlaying), for: .touchUpInside)
+    }
+
+    private func updateMiniPlayer() {
+        guard let sound = AudioManager.shared.currentSound else {
+            miniPlayer.isHidden = true
+            return
+        }
+
+        miniPlayer.isHidden = false
+
+        //  SYNC TABLE STATE
+        if currentlyPlayingFileName != sound.fileName {
+            currentlyPlayingFileName = sound.fileName
+
+            // Update visible rows only
+            if let visibleRows = tableView.indexPathsForVisibleRows {
+                tableView.reloadRows(at: visibleRows, with: .none)
+            }
+        }
+        let image = UIImage(named: sound.imageName)
+
+        miniPlayer.updateUI(
+            title: sound.title,
+            image: image,
+            isPlaying: AudioManager.shared.isPlaying
+        )
+    }
+
+    @objc private func miniPlayPauseTapped() {
+        AudioManager.shared.togglePlayPause()
+        updateMiniPlayer()
+    }
+
+    @objc private func miniNextTapped() {
+        AudioManager.shared.playNext()
+        updateMiniPlayer()
+    }
+
+    @objc private func miniPreviousTapped() {
+        AudioManager.shared.playPrevious()
+        updateMiniPlayer()
+    }
+
+    @objc private func openNowPlaying() {
+        guard let nowPlayingNav = storyboard?.instantiateViewController(withIdentifier: "NowPlayingNav") else { return }
+        nowPlayingNav.modalPresentationStyle = .fullScreen
+        present(nowPlayingNav, animated: true)
+    }
+
+    // Audio Setup
     private func setupAudioSession() {
         do {
             try AVAudioSession.sharedInstance()
@@ -136,20 +205,15 @@ class SoundTableViewController: UITableViewController {
         }
     }
 
-    // MARK: - Helpers
-
-    /// Load actual MP3 duration
     private func loadAudioDuration(for sound: Sound) -> TimeInterval {
         guard let url = Bundle.main.url(forResource: sound.fileName, withExtension: "mp3") else {
-            print(" Sound file not found:", sound.fileName)
-            return TimeInterval(sound.duration) // fallback
+            return TimeInterval(sound.duration)
         }
         do {
             let player = try AVAudioPlayer(contentsOf: url)
             return player.duration
         } catch {
-            print(" Failed to load duration:", error)
-            return TimeInterval(sound.duration) // fallback
+            return TimeInterval(sound.duration)
         }
     }
 
@@ -173,3 +237,5 @@ class SoundTableViewController: UITableViewController {
         tableView.backgroundView = backgroundView
     }
 }
+
+

@@ -12,7 +12,7 @@ final class AudioManager {
 
     private init() {}
 
-    // MARK: - Playback State
+    // Playback State
     var isPlaying: Bool {
         return player?.isPlaying ?? false
     }
@@ -25,7 +25,7 @@ final class AudioManager {
         return player?.currentTime ?? 0
     }
 
-    // MARK: - Play Single Sound
+    // Play Single Sound
     func play(sound: Sound) {
 
         // Avoid restarting same sound
@@ -53,7 +53,7 @@ final class AudioManager {
         }
     }
 
-    // MARK: - Play / Pause
+    // Play / Pause
     func togglePlayPause() {
         guard let player = player else { return }
 
@@ -64,7 +64,7 @@ final class AudioManager {
         }
     }
 
-    // MARK: - Playlist
+  // Playlist
     func setPlaylist(_ sounds: [Sound], startIndex: Int = 0) {
         guard !sounds.isEmpty else { return }
 
@@ -87,19 +87,19 @@ final class AudioManager {
         play(sound: playlist[currentIndex])
     }
 
-    // MARK: - Seek
+  // Seek
     func seek(to time: TimeInterval) {
         player?.currentTime = time
     }
 
-    // MARK: - Stop
+  // Stop
     func stop() {
         player?.stop()
         player = nil
         currentSound = nil
     }
 
-    // MARK: - Helper
+    // Helper
     func isPlaying(sound: Sound) -> Bool {
         return currentSound?.fileName == sound.fileName && isPlaying
     }

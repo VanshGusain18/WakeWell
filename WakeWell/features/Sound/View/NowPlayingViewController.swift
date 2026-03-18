@@ -151,4 +151,14 @@ class NowPlayingViewController: UIViewController {
         progressLabel.setValue(Float(percentage), animated: true)
         AudioManager.shared.seek(to: newTime)
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timer?.invalidate()
+        timer = nil
+    }
+
+    deinit {
+        timer?.invalidate()
+    }
 }

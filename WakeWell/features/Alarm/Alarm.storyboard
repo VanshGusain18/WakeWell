@@ -10,7 +10,7 @@
         <!--Alarm-->
         <scene sceneID="56E-B3-lA6">
             <objects>
-                <tableViewController title="Alarm" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Jqs-wn-HfJ" customClass="AlarmOptionViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController useStoryboardIdentifierAsRestorationIdentifier="YES" id="Jqs-wn-HfJ" customClass="AlarmOptionViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="pY4-GV-KGK">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -70,6 +70,12 @@
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E3D-Vv-vbB">
+                                                            <rect key="frame" x="176" y="426" width="45" height="21"/>
+                                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NXL-jV-X5i" customClass="CircularTimePicker" customModule="WakeWell" customModuleProvider="target">
                                                             <rect key="frame" x="48" y="118" width="300" height="300"/>
                                                             <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
@@ -81,12 +87,6 @@
                                                                 <action selector="pickerChanged:" destination="Jqs-wn-HfJ" eventType="valueChanged" id="GEK-iR-QY1"/>
                                                             </connections>
                                                         </view>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E3D-Vv-vbB">
-                                                            <rect key="frame" x="176" y="426" width="45" height="21"/>
-                                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                                            <nil key="textColor"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
                                                     </subviews>
                                                     <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
                                                     <constraints>
@@ -179,7 +179,7 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="0J4-X9-1uS">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell" id="0J4-X9-1uS">
                                         <rect key="frame" x="20" y="650" width="353" height="51"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0J4-X9-1uS" id="jK9-h6-ahc">
@@ -318,12 +318,19 @@
                             <outlet property="delegate" destination="Jqs-wn-HfJ" id="lXh-NP-ZGt"/>
                         </connections>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Alarm" image="alarm" catalog="system" id="SrC-u5-5Vs"/>
-                    <navigationItem key="navigationItem" title="Alarm" id="Y3b-l0-4Zj"/>
+                    <tabBarItem key="tabBarItem" title="Alarm" image="alarm.fill" catalog="system" id="H0c-cW-VpD"/>
+                    <navigationItem key="navigationItem" title="Alarm" id="Y3b-l0-4Zj">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="Pay-3M-ykO">
+                            <connections>
+                                <action selector="doneTapped:" destination="Jqs-wn-HfJ" id="Kxb-D5-0ao"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="bedTimeToggle" destination="dP8-kR-HZT" id="rrS-dV-iTd"/>
                         <outlet property="bedtimeLabel" destination="Ycl-3v-TNL" id="Qoo-Tt-jZC"/>
                         <outlet property="buttonWindow" destination="gTd-ff-BxK" id="m47-qj-Nl4"/>
+                        <outlet property="doneTapped" destination="Pay-3M-ykO" id="M4a-Qv-Qjd"/>
                         <outlet property="durationLabel" destination="E3D-Vv-vbB" id="1TT-kP-VBB"/>
                         <outlet property="selectedSoundLabel" destination="OVG-pT-SPH" id="tdQ-F7-QKj"/>
                         <outlet property="selectedSoundLabel2" destination="HhJ-my-OM5" id="9j4-G8-rT5"/>
@@ -334,7 +341,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="btL-ZW-M6L" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4628.2442748091598" y="198.59154929577466"/>
+            <point key="canvasLocation" x="4547.3282442748086" y="207.74647887323945"/>
         </scene>
         <!--Sound & Haptics-->
         <scene sceneID="EKi-h7-6Hw">
@@ -538,7 +545,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="s55-HJ-oJA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6426.7175572519081" y="200"/>
+            <point key="canvasLocation" x="6104.5801526717551" y="198.59154929577466"/>
         </scene>
         <!--Haptics-->
         <scene sceneID="iSF-GO-jdp">
@@ -753,7 +760,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rk4-uz-7GB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="8133.5877862595416" y="199.29577464788733"/>
+            <point key="canvasLocation" x="7527.480916030534" y="198.59154929577466"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="DZU-jp-Ni4">
@@ -771,7 +778,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZVk-Fo-UnX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5503.0534351145034" y="200"/>
+            <point key="canvasLocation" x="5368.7022900763359" y="208.45070422535213"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="j7x-2Z-Ci3">
@@ -790,7 +797,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yqw-bu-xEJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7209.9236641221369" y="199.29577464788733"/>
+            <point key="canvasLocation" x="6826.7175572519081" y="198.59154929577466"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="yiW-TY-7S0">
@@ -803,19 +810,19 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="Jqs-wn-HfJ" kind="relationship" relationship="rootViewController" id="17o-jl-Jfa"/>
+                        <segue destination="Jqs-wn-HfJ" kind="relationship" relationship="rootViewController" id="zlh-0w-gyQ"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HOI-5A-jbZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3790" y="199"/>
+            <point key="canvasLocation" x="3611" y="208"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="UHU-xK-c94"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="alarm" catalog="system" width="123" height="128"/>
+        <image name="alarm.fill" catalog="system" width="123" height="128"/>
         <image name="chevron.left" catalog="system" width="97" height="128"/>
         <image name="speaker.wave.1" catalog="system" width="128" height="104"/>
         <image name="speaker.wave.3.fill" catalog="system" width="128" height="84"/>

@@ -23,6 +23,7 @@ class ActivityCardViewCell: UICollectionViewCell {
         setupUI()
     }
     
+    // how will the cell actually look like
     func setupUI() {
         contentView.layer.cornerRadius = 20
         contentView.backgroundColor = .white

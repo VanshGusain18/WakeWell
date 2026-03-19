@@ -5,7 +5,7 @@
 //  Created by geu on 18/03/26.
 //
 
-struct Activity {
+struct Activity : Codable{
     let id: String
     let title: String
     let description: String
@@ -15,13 +15,13 @@ struct Activity {
     let activityType: ActivityType
     let steps: [String]
 }
-enum ActivityType {
+enum ActivityType: String, Codable {
     case timerBased
     case stepBased
     case informational
 }
 
-let activities: [Activity] = [
+var activities: [Activity] = [
     
     Activity(id: "ritual_1", title: "Sunlight Exposure",
              description: "Get 10-15 minutes of direct sunlight to refresh your senses and boost your energy.",

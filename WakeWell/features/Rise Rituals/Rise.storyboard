@@ -60,13 +60,13 @@
         <!--Rise-->
         <scene sceneID="6J1-Nk-gSy">
             <objects>
-                <viewController storyboardIdentifier="rise" title="Rise" useStoryboardIdentifierAsRestorationIdentifier="YES" id="JwB-Vw-4PN" customClass="ActivityDeckViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Rise" useStoryboardIdentifierAsRestorationIdentifier="YES" id="JwB-Vw-4PN" customClass="ActivityDeckViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7ck-GI-1jw">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="MOc-sG-Dfs">
-                                <rect key="frame" x="0.0" y="172" width="393" height="425"/>
+                                <rect key="frame" x="0.0" y="172" width="393" height="474"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rci-pC-eeD">
                                     <size key="itemSize" width="128" height="128"/>
@@ -132,7 +132,7 @@
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Rise" image="sunrise.fill" catalog="system" id="3e0-8C-Pfb"/>
-                    <navigationItem key="navigationItem" title="Select card" id="EFX-pO-KAG"/>
+                    <navigationItem key="navigationItem" title="Rise Rituals" id="EFX-pO-KAG"/>
                     <connections>
                         <outlet property="collectionView" destination="MOc-sG-Dfs" id="0ab-jm-925"/>
                     </connections>
@@ -221,39 +221,20 @@
         <!--Navigation Controller-->
         <scene sceneID="11X-RK-BlX">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="2vJ-mI-4jK" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="rise" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2vJ-mI-4jK" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="5jX-zt-uqT">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="5jX-zt-uqT">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="9JW-hn-P9L" kind="relationship" relationship="rootViewController" id="rpK-0A-PPM"/>
+                        <segue destination="JwB-Vw-4PN" kind="relationship" relationship="rootViewController" id="BPe-v5-vEV"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fil-c8-nPv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1064.885496183206" y="813.38028169014092"/>
-        </scene>
-        <!--Tab Bar Controller-->
-        <scene sceneID="0Cv-jk-Avm">
-            <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="9JW-hn-P9L" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationItem key="navigationItem" id="d1g-mg-XY2"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="njb-Fg-DbQ">
-                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </tabBar>
-                    <connections>
-                        <segue destination="JwB-Vw-4PN" kind="relationship" relationship="viewControllers" id="zOu-ij-29d"/>
-                    </connections>
-                </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="DNZ-BI-u4G" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1991.6030534351144" y="813.38028169014092"/>
+            <point key="canvasLocation" x="1932" y="813"/>
         </scene>
     </scenes>
     <resources>

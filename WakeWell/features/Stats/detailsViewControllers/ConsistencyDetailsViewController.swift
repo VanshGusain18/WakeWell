@@ -44,8 +44,7 @@ class ConsistencyDetailsViewController: UIViewController {
             chart.xAxis.granularity = 1
             chart.xAxis.axisMinimum = 0
             chart.xAxis.axisMaximum = Double(days.count - 1)
-
-            chart.animate(xAxisDuration: 0.0, yAxisDuration: 1.0, easingOption: .easeOutCubic)
+            chart.animate(xAxisDuration: 0.0,yAxisDuration: 1.0,easingOption: .easeOutCubic)
         }
     }
 

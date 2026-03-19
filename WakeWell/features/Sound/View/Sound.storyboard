@@ -16,9 +16,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="iqT-ip-CYM">
+                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="M4L-Kw-oHR">
+                                    <rect key="frame" x="30" y="0.0" width="333" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <segments>
+                                        <segment title="All"/>
+                                        <segment title="Nature"/>
+                                        <segment title="Weather"/>
+                                        <segment title="Ambient"/>
+                                    </segments>
+                                </segmentedControl>
+                            </subviews>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SoundCell" id="gvj-m3-4FA">
-                                <rect key="frame" x="0.0" y="50" width="393" height="51"/>
+                                <rect key="frame" x="0.0" y="94" width="393" height="51"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gvj-m3-4FA" id="m7z-lK-mLv">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="51"/>
@@ -29,25 +46,14 @@
                         </prototypes>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Sound" image="headphones" catalog="system" id="u6Z-sI-N56"/>
-                    <navigationItem key="navigationItem" title="Sounds" id="kKL-EO-58C">
-                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="ZzI-3u-nWq">
-                            <rect key="frame" x="44.333333333333343" y="-2" width="304" height="48"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <segments>
-                                <segment title="All"/>
-                                <segment title="Nature"/>
-                                <segment title="Weather"/>
-                                <segment title="Ambient"/>
-                            </segments>
-                        </segmentedControl>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Sounds" id="kKL-EO-58C"/>
                     <connections>
-                        <outlet property="segmentView" destination="ZzI-3u-nWq" id="F3h-Rk-wHi"/>
+                        <outlet property="segmentView" destination="M4L-Kw-oHR" id="krx-HL-3Xm"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CHT-oK-7mv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1747" y="93"/>
+            <point key="canvasLocation" x="1745.8015267175572" y="92.957746478873247"/>
         </scene>
         <!--Now Playing View Controller-->
         <scene sceneID="6HN-Y2-ZSd">

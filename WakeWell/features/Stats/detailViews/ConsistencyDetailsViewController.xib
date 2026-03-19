@@ -42,20 +42,20 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" id="RkZ-FZ-yul" customClass="LineChartView" customModule="DGCharts">
-                    <rect key="frame" x="16" y="258" width="361" height="250"/>
+                    <rect key="frame" x="33" y="250" width="326" height="230"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <viewLayoutGuide key="safeArea" id="gWm-66-M6J"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Wake-up Chart" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Jgy-te-uhr" userLabel="WakeUp">
-                    <rect key="frame" x="16" y="521" width="369" height="28.666666666666742"/>
+                    <rect key="frame" x="12" y="488" width="369" height="28.666666666666742"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="24"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" id="ZfH-uT-wYl" customClass="LineChartView" customModule="DGCharts">
-                    <rect key="frame" x="16" y="558" width="361" height="250"/>
+                    <rect key="frame" x="33" y="524" width="326" height="230"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <viewLayoutGuide key="safeArea" id="3Dr-ZA-9gY"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>

@@ -5,6 +5,7 @@ class StatsTableViewController: UITableViewController {
     @IBOutlet weak var timeRangeSegment: UISegmentedControl!
     private var sleepStats: SleepStats?
     private var metrics: [SleepMetric] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorStyle = .none
@@ -15,7 +16,6 @@ class StatsTableViewController: UITableViewController {
         super.viewDidLayoutSubviews()
         tableView.tableHeaderView?.frame.size.height = 48
     }
-
     private func loadSleepData() {
         let rawStats = SleepStatsAggregator.aggregate()
         self.sleepStats = SleepStats(

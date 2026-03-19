@@ -120,7 +120,7 @@ class CalmnessDetailsViewController: UIViewController {
         restlessnessChartView.xAxis.axisMinimum = 0
         restlessnessChartView.xAxis.axisMaximum = Double(stats.days.count - 1)
 
-        restlessnessChartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
+        restlessnessChartView.animate(xAxisDuration: 0.0,yAxisDuration: 1.0,easingOption: .easeOutCubic)
     }
 //common function to style chart
     private func styleChart(_ chart: LineChartView) {

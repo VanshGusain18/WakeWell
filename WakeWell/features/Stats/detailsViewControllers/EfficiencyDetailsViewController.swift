@@ -130,7 +130,7 @@ class EfficiencyDetailsViewController: UIViewController {
         legend.font = .systemFont(ofSize: 12)
 
         sleepVsBedChartView.chartDescription.enabled = false
-        sleepVsBedChartView.animate(yAxisDuration: 1.2)
+        sleepVsBedChartView.animate(xAxisDuration: 0.0,yAxisDuration: 1.0,easingOption: .easeOutCubic)
     }
 }
 

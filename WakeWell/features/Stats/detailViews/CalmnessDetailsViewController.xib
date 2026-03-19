@@ -39,19 +39,19 @@ heart rate variability and stress signals.</string>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Ra-3g-Qbi" customClass="LineChartView" customModule="DGCharts">
-                    <rect key="frame" x="16" y="235" width="361" height="252"/>
+                    <rect key="frame" x="33" y="239" width="326" height="230"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" systemColor="tertiarySystemGroupedBackgroundColor"/>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Restlessness Score Trend" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mu1-VZ-TKt">
-                    <rect key="frame" x="16" y="534" width="361" height="24"/>
+                    <rect key="frame" x="16" y="505" width="361" height="24"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="24"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yCn-r3-lmk" customClass="LineChartView" customModule="DGCharts">
-                    <rect key="frame" x="16" y="568" width="361" height="244"/>
+                    <rect key="frame" x="33" y="537" width="326" height="230"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <viewLayoutGuide key="safeArea" id="s2j-i3-1ph"/>
                     <color key="backgroundColor" systemColor="tertiarySystemGroupedBackgroundColor"/>
@@ -64,14 +64,14 @@ heart rate variability and stress signals.</string>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lGG-Lw-cGx" userLabel="Average Label">
-                    <rect key="frame" x="16" y="491" width="361" height="20"/>
+                    <rect key="frame" x="16" y="477" width="361" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nbc-Vr-oGr" userLabel="Average Label">
-                    <rect key="frame" x="16" y="817" width="361" height="20"/>
+                    <rect key="frame" x="16" y="775" width="361" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>

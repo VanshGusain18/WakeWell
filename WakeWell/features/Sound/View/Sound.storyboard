@@ -11,7 +11,7 @@
         <!--Sound-->
         <scene sceneID="TNK-Ym-oDS">
             <objects>
-                <tableViewController storyboardIdentifier="sound" title="Sound" useStoryboardIdentifierAsRestorationIdentifier="YES" id="4vG-GP-6sn" customClass="SoundTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Sound" useStoryboardIdentifierAsRestorationIdentifier="YES" id="4vG-GP-6sn" customClass="SoundTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="tfq-VJ-bVA">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -29,10 +29,9 @@
                         </prototypes>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Sound" image="headphones" catalog="system" id="u6Z-sI-N56"/>
-                    <navigationItem key="navigationItem" id="kKL-EO-58C">
-                        <nil key="title"/>
+                    <navigationItem key="navigationItem" title="Sounds" id="kKL-EO-58C">
                         <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="ZzI-3u-nWq">
-                            <rect key="frame" x="0.0" y="0.0" width="304" height="48"/>
+                            <rect key="frame" x="44.333333333333343" y="-2" width="304" height="48"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <segments>
                                 <segment title="All"/>
@@ -48,7 +47,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CHT-oK-7mv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1787.0229007633586" y="92.957746478873247"/>
+            <point key="canvasLocation" x="1747" y="93"/>
         </scene>
         <!--Now Playing View Controller-->
         <scene sceneID="6HN-Y2-ZSd">
@@ -147,18 +146,18 @@
         <!--Navigation Controller-->
         <scene sceneID="gp6-dN-BSu">
             <objects>
-                <navigationController id="qml-WW-FtW" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="U3P-mB-F0a">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                <navigationController storyboardIdentifier="sound" useStoryboardIdentifierAsRestorationIdentifier="YES" id="qml-WW-FtW" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="U3P-mB-F0a">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="RjB-Mp-xYq" kind="relationship" relationship="rootViewController" id="h52-ou-anR"/>
+                        <segue destination="4vG-GP-6sn" kind="relationship" relationship="rootViewController" id="SWt-an-zLQ"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="89Y-OR-jPV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-45" y="93"/>
+            <point key="canvasLocation" x="917" y="93"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="X0i-0b-zJl">
@@ -177,24 +176,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qln-tt-8UB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2530.5343511450383" y="92.957746478873247"/>
-        </scene>
-        <!--Tab Bar Controller-->
-        <scene sceneID="dpe-7f-k3X">
-            <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="RjB-Mp-xYq" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationItem key="navigationItem" id="jCb-ks-scF"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="WuO-Sh-z91">
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </tabBar>
-                    <connections>
-                        <segue destination="4vG-GP-6sn" kind="relationship" relationship="viewControllers" id="k8J-cN-kYr"/>
-                    </connections>
-                </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="TuZ-fe-N1Z" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="860.30534351145036" y="92.957746478873247"/>
         </scene>
     </scenes>
     <resources>

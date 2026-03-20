@@ -4,11 +4,11 @@ final class WatchDebugRunner {
 
     static func run() {
 
-        print("🚀 TESTING DATABASE FETCH\n")
+        print(" TESTING DATABASE FETCH\n")
 
         if let session = DatabaseManager.shared.fetchLatestSession() {
 
-            print("✅ DATA FROM DB:\n")
+            print(" DATA FROM DB:\n")
 
             print("Sleep ID: \(session.id)")
             print("Bedtime: \(session.bedtimeStart)")
@@ -18,9 +18,9 @@ final class WatchDebugRunner {
             print("HRV: \(session.hrv)")
 
         } else {
-            print("❌ No session found")
+            print("No session found")
         }
 
-        print("\n🏁 END TEST\n")
+        print("\n END TEST\n")
     }
 }

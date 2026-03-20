@@ -123,15 +123,16 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: vm)
             return cell
 
-        case .sounds(let model):
+        case .sounds:
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_sounds_cell",
                 for: indexPath
             ) as! SleepSoundsCollectionViewCell
 
-            let vm = SleepSoundsViewModel(model: model)
+            let vm = SleepSoundsViewModel()
             cell.configure(with: vm)
+
             return cell
         }
     }

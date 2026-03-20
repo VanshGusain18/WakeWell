@@ -14,7 +14,7 @@ class HomeViewModel {
             .metrics(provider.getMetrics()),
             .groggy(provider.getGroggy()),
             .notes(provider.getNote()),
-            .sounds(provider.getSound())
+            .sounds
         ]
     }
 

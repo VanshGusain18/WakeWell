@@ -6,5 +6,5 @@ enum HomeCardModel {
     case metrics(SleepMetricsModel)
     case groggy(GroggyModel)
     case notes(MorningNoteModel)
-    case sounds(SleepSoundModel)
+    case sounds
 }

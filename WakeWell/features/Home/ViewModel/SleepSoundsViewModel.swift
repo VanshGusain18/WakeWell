@@ -4,7 +4,7 @@ struct SleepSoundsViewModel {
 
     let title: String
 
-    init(model: SleepSoundModel) {
-        title = model.title
+    init() {
+        title = "Sleep Sounds"
     }
 }

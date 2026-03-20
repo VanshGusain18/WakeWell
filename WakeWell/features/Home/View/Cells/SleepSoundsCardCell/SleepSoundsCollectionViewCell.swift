@@ -1,10 +1,3 @@
-//
-//  SleepSoundsCollectionViewCell.swift
-//  WakeWell
-//
-//  Created by geu on 12/03/26.
-//
-
 import UIKit
 
 class SleepSoundsCollectionViewCell: UICollectionViewCell {

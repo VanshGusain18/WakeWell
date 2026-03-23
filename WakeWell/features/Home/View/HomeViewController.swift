@@ -11,6 +11,7 @@ class HomeViewController: UIViewController {
 
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.allowsSelection = true
         registerCells()
 
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -166,6 +167,28 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         case .sounds:
             return CGSize(width: width, height: 70)
+        }
+    }
+}
+
+extension HomeViewController: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        let card = viewModel.cards[indexPath.item]
+
+        switch card {
+
+        case .alarm:
+
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "alarm")
+
+            vc.modalPresentationStyle = .automatic
+            present(vc, animated: true)
+
+        default:
+            break
         }
     }
 }

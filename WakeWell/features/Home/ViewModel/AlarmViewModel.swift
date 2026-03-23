@@ -11,7 +11,7 @@ struct AlarmViewModel {
         if let time = model.time {
             title = "Your alarm will ring at"
             timeText = Self.format(time: time)
-            subtitleText = "Have a good night sleep"
+            subtitleText = "Tap to edit"
         } else {
             title = "No alarm set"
             timeText = "--:--"

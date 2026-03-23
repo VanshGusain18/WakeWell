@@ -187,6 +187,14 @@ extension HomeViewController: UICollectionViewDelegate {
             vc.modalPresentationStyle = .automatic
             present(vc, animated: true)
 
+        case .sounds:
+
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "sound")
+
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true)
+
         default:
             break
         }

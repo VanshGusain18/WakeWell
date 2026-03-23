@@ -46,7 +46,13 @@
                         </prototypes>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Sound" image="headphones" catalog="system" id="u6Z-sI-N56"/>
-                    <navigationItem key="navigationItem" title="Sounds" id="kKL-EO-58C"/>
+                    <navigationItem key="navigationItem" title="Sounds" id="kKL-EO-58C">
+                        <barButtonItem key="leftBarButtonItem" image="chevron.left" catalog="system" id="dye-6G-wMX">
+                            <connections>
+                                <action selector="closeTapped:" destination="4vG-GP-6sn" id="9Ls-uT-gZC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="segmentView" destination="M4L-Kw-oHR" id="krx-HL-3Xm"/>
                     </connections>

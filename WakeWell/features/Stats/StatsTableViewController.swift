@@ -105,24 +105,24 @@ class StatsTableViewController: UITableViewController {
     private func openMetricScreen(_ metric: SleepMetricType) {
         switch metric {
         case .duration:
-            let vc = DurationDetailsViewController(nibName : "DurationDetailsViewController",bundle: nil)
+            let vc = DurationTableViewController(nibName : "DurationTableViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
 
         case .efficiency:
-            let vc = EfficiencyDetailsViewController(nibName : "EfficiencyDetailsViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            let vc = EfficiencyTableViewController(nibName: "EfficiencyTableViewController", bundle: nil)
+                    navigationController?.pushViewController(vc, animated: true)
             
         case .continuity:
-            let vc = ContinuityDetailsViewController(nibName: "ContinuityDetailsViewController",bundle: nil)
+            let vc = ContinuityTableViewController(nibName: "ContinuityTableViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .calmness:
-            let vc = CalmnessDetailsViewController(nibName: "CalmnessDetailsViewController",bundle: nil)
+            let vc = CalmnessTableViewController(nibName: "CalmnessTableViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .architecture:
-            let vc = ArchitectureDetailsViewController(nibName: "ArchitectureDetailsViewController",bundle: nil)
+            let vc = ArchitectureTableViewController(nibName: "ArchitectureTableViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         case .consistency:
-            let vc = ConsistencyDetailsViewController(nibName: "ConsistencyDetailsViewController",bundle: nil)
+            let vc = ConsistencyTableViewController(nibName: "ConsistencyTableViewController",bundle: nil)
             navigationController?.pushViewController(vc, animated: true)
         }
     }

@@ -11,6 +11,7 @@ class StatsTableViewController: UITableViewController {
         tableView.separatorStyle = .none
         registerCells()
         loadSleepData()
+        
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -105,25 +106,32 @@ class StatsTableViewController: UITableViewController {
     private func openMetricScreen(_ metric: SleepMetricType) {
         switch metric {
         case .duration:
-            let vc = DurationTableViewController(nibName : "DurationTableViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            let vc = DurationTableViewController(nibName: "DurationTableViewController", bundle: nil)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
 
         case .efficiency:
             let vc = EfficiencyTableViewController(nibName: "EfficiencyTableViewController", bundle: nil)
-                    navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
             
         case .continuity:
             let vc = ContinuityTableViewController(nibName: "ContinuityTableViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
         case .calmness:
             let vc = CalmnessTableViewController(nibName: "CalmnessTableViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
         case .architecture:
             let vc = ArchitectureTableViewController(nibName: "ArchitectureTableViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
         case .consistency:
             let vc = ConsistencyTableViewController(nibName: "ConsistencyTableViewController",bundle: nil)
-            navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
         }
     }
+ 
 }

@@ -5,7 +5,10 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var ringContainerView: UIView!
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
-
+    @IBOutlet weak var chevronImageView: UIImageView!
+    
+    var onChevronTapped: (() -> Void)?
+    
     private let backgroundLayer = CAShapeLayer()
     private let progressLayer = CAShapeLayer()
 
@@ -13,8 +16,34 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         super.awakeFromNib()
         setupUI()
         applyStyling()
+        setupChevron()
+        addChevronTapGesture()
     }
+    
+    private func setupChevron() {
+        chevronImageView.image = UIImage(systemName: "chevron.down")
+        chevronImageView.tintColor = .secondaryLabel
+        chevronImageView.contentMode = .center
+    }
+    
+    private func addChevronTapGesture() {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(chevronTapped))
+            chevronImageView.isUserInteractionEnabled = true
+            chevronImageView.addGestureRecognizer(tap)
+        }
 
+    @objc private func chevronTapped() {
+        onChevronTapped?()
+        
+        // Nice rotation animation
+        let isExpanded = chevronImageView.transform == .identity
+        UIView.animate(withDuration: 0.3) {
+            self.chevronImageView.transform = isExpanded
+            ? CGAffineTransform(rotationAngle: .pi)
+            : .identity
+        }
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         drawRing()

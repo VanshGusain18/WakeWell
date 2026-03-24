@@ -74,6 +74,7 @@
             </constraints>
             <size key="customSize" width="658" height="260"/>
             <connections>
+                <outlet property="chevronImageView" destination="qbN-mU-hrn" id="QpR-tu-Crw"/>
                 <outlet property="ringContainerView" destination="Vo9-KP-chy" id="Ybx-4i-gdl"/>
                 <outlet property="scoreLabel" destination="i1w-AX-ehU" id="1ym-qf-dhK"/>
                 <outlet property="subtitleLabel" destination="IUf-KE-qtz" id="snG-id-w5I"/>

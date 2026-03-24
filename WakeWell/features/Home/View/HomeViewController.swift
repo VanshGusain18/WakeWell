@@ -89,6 +89,10 @@ extension HomeViewController: UICollectionViewDataSource {
 
             let vm = SleepRingViewModel(model: model)
             cell.configure(with: vm)
+            cell.onChevronTapped = { [weak self] in
+                self?.viewModel.toggleMetricsCard()
+                self?.collectionView.reloadData()   // Refresh to show/hide metrics card
+            }
             return cell
 
         case .metrics(let model):

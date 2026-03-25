@@ -8,7 +8,7 @@
 import Foundation
 
 struct SleepSegment {
-    let start: Double   // e.g. minutes from sleep start
+    let start: Double
     let end: Double
     let isAwake: Bool
 }

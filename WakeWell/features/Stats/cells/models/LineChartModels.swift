@@ -15,5 +15,4 @@ struct LineChartDataEntryModel {
 struct LineChartDataSetModel {
     let label: String
     let values: [LineChartDataEntryModel]
-    let color: UIColor
 }

@@ -7,39 +7,27 @@
 import Foundation
 
 final class SleepStatsAggregator {
-    static func aggregate() -> SleepStats {
-        return SleepStats(
-            duration: SleepScoreEngine.calculateScore(for: .duration),
-            efficiency: SleepScoreEngine.calculateScore(for: .efficiency),
-            architecture: SleepScoreEngine.calculateScore(for: .architecture),
-            consistency: SleepScoreEngine.calculateScore(for: .consistency),
-            calmness: SleepScoreEngine.calculateScore(for: .calmness),
-            continuity: SleepScoreEngine.calculateScore(for: .continuity)
+    static func aggregate(for range: StatsTimeRange) -> SleepStats {
+        SleepStats(
+            duration:     SleepScoreEngine.calculateScore(for: .duration,     range: range),
+            efficiency:   SleepScoreEngine.calculateScore(for: .efficiency,   range: range),
+            architecture: SleepScoreEngine.calculateScore(for: .architecture, range: range),
+            consistency:  SleepScoreEngine.calculateScore(for: .consistency,  range: range),
+            calmness:     SleepScoreEngine.calculateScore(for: .calmness,     range: range),
+            continuity:   SleepScoreEngine.calculateScore(for: .continuity,   range: range)
         )
     }
 }
+
 struct SleepStatsMapper {
-    
     static func mapToMetrics(from stats: SleepStats) -> [SleepMetric] {
-        
         return [
-            SleepMetric(type: .duration,
-                        displayValue: "\(stats.duration)"),
-            
-            SleepMetric(type: .efficiency,
-                        displayValue: "\(stats.efficiency)"),
-            
-            SleepMetric(type: .architecture,
-                        displayValue: "\(stats.architecture)"),
-            
-            SleepMetric(type: .consistency,
-                        displayValue: "\(stats.consistency)"),
-            
-            SleepMetric(type: .calmness,
-                        displayValue: "\(stats.calmness)"),
-            
-            SleepMetric(type: .continuity,
-                        displayValue: "\(stats.continuity)")
+            SleepMetric(type: .duration,     displayValue: "\(Int(stats.duration))"),
+            SleepMetric(type: .efficiency,   displayValue: "\(Int(stats.efficiency))"),
+            SleepMetric(type: .architecture, displayValue: "\(Int(stats.architecture))"),
+            SleepMetric(type: .consistency,  displayValue: "\(Int(stats.consistency))"),
+            SleepMetric(type: .calmness,     displayValue: "\(Int(stats.calmness))"),
+            SleepMetric(type: .continuity,   displayValue: "\(Int(stats.continuity))")
         ]
     }
 }

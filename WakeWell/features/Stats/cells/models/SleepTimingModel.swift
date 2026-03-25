@@ -9,6 +9,6 @@ import Foundation
 
 struct SleepTiming {
     let day: String
-    let bedtime: Double   // e.g. hour in 24h (22.5 = 10:30 PM)
+    let bedtime: Double
     let wakeTime: Double
 }

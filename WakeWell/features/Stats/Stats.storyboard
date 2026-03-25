@@ -29,7 +29,7 @@
                                         <segment title="Year"/>
                                     </segments>
                                     <connections>
-                                        <action selector="segmentChanged:" destination="JyK-hG-KWU" eventType="valueChanged" id="dnb-sN-YQi"/>
+                                        <action selector="segmentChanged:" destination="JyK-hG-KWU" eventType="valueChanged" id="gQH-Zg-u69"/>
                                     </connections>
                                 </segmentedControl>
                             </subviews>
@@ -54,7 +54,7 @@
                     <tabBarItem key="tabBarItem" title="Stats" image="chart.bar.fill" catalog="system" id="aWc-1J-quY"/>
                     <navigationItem key="navigationItem" title="Stats" id="Nhw-CK-PdR"/>
                     <connections>
-                        <outlet property="timeRangeSegment" destination="Br4-OX-sC0" id="ujx-1j-wSV"/>
+                        <outlet property="timeRangeSegment" destination="Br4-OX-sC0" id="m9t-J4-LI7"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lAa-X0-fOM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

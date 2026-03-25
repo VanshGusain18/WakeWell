@@ -15,6 +15,5 @@ struct BarChartDataEntryModel {
 
 struct BarChartDataSetModel {
     let label: String
-    let color: UIColor
     let values: [BarChartDataEntryModel]
 }

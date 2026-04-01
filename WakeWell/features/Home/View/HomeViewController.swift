@@ -88,6 +88,7 @@ extension HomeViewController: UICollectionViewDataSource {
             ) as! SleepRingCollectionViewCell
 
             let vm = SleepRingViewModel(model: model)
+
             cell.configure(with: vm)
             cell.onChevronTapped = { [weak self] in
                 self?.viewModel.toggleMetricsCard()

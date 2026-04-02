@@ -14,7 +14,7 @@ final class WatchDataManager {
 
     func syncData(completion: (() -> Void)? = nil) {
 
-        print("🔄 Sync started...")
+        print("Sync started...")
 
         dataSource.fetchLatestData { [weak self] data in
 
@@ -22,7 +22,7 @@ final class WatchDataManager {
 
             self.latestData = data
 
-            print("📦 Data stored in manager: \(String(describing: data))")
+            print("Data stored in manager: \(String(describing: data))")
 
             completion?()
         }

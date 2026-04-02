@@ -6,7 +6,6 @@ final class HealthKitManager {
     static let shared = HealthKitManager()
     private let healthStore = HKHealthStore()
     
-    // MARK: - Permission
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
 
         guard HKHealthStore.isHealthDataAvailable() else {
@@ -34,18 +33,16 @@ final class HealthKitManager {
             }
         }
     }
-    
-    // MARK: - Fetch Sleep
+
     func fetchLastNightSleep() {
         
-        print("🚀 fetchLastNightSleep CALLED")
+        print("fetchLastNightSleep CALLED")
 
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
 
         let calendar = Calendar.current
         let now = Date()
 
-        // FIXED → 2 days range
         let startDate = calendar.date(byAdding: .day, value: -2, to: now)!
 
         let predicate = HKQuery.predicateForSamples(
@@ -62,11 +59,11 @@ final class HealthKitManager {
         ) { _, samples, error in
 
             guard let samples = samples as? [HKCategorySample] else {
-                print("❌ Query failed or no samples")
+                print("Query failed or no samples")
                 return
             }
 
-            print("📊 Total samples:", samples.count)
+            print("Total samples:", samples.count)
 
             for sample in samples {
 
@@ -99,7 +96,6 @@ final class HealthKitManager {
         healthStore.execute(query)
     }
 
-    // MARK: - ADD MOCK DATA (10 DAYS)
     func addMockSleepData() {
 
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
@@ -112,13 +108,11 @@ final class HealthKitManager {
 
             let baseDate = calendar.date(byAdding: .day, value: -i, to: now)!
 
-            // Random bedtime between 10 PM – 12 AM
             let startHour = Int.random(in: 22...23)
             let startMinute = Int.random(in: 0...59)
 
             let sleepStart = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: baseDate)!
 
-            // Total sleep duration: 6–9 hours
             let totalMinutes = Int.random(in: 360...540)
 
             var currentTime = sleepStart
@@ -161,9 +155,9 @@ final class HealthKitManager {
 
         healthStore.save(samples) { success, error in
             if success {
-                print("✅ Realistic mock sleep data added")
+                print("Realistic mock sleep data added")
             } else {
-                print("❌ Error:", error?.localizedDescription ?? "")
+                print("Error:", error?.localizedDescription ?? "")
             }
         }
     }

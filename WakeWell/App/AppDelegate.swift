@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  WakeWell
-//
-//  Created by geu on 30/01/26.
-//
-
 import UIKit
 
 @main
@@ -13,8 +6,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        
+
         HealthKitManager.shared.requestAuthorization { success in
             print("HealthKit Permission:", success)
 

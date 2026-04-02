@@ -50,7 +50,6 @@ struct SleepScoreCalculator {
     }
 
     // MARK: 6. Calmness — HRV + RHR + Movement
-    // Pass population min/max for normalization
     static func calmnessScore(rhr: Double, hrv: Double, movementIndex: Double,
                                rhrMin: Double = 40, rhrMax: Double = 100,
                                hrvMin: Double = 20, hrvMax: Double = 80) -> Double {
@@ -129,13 +128,11 @@ final class MetricDataProvider {
             let data      = SleepConsistencyAnalyzer.getData(for: range)
             let bedtimes  = data.map { $0.bedtime }
             let wakeTimes = data.map { $0.wakeTime }
-            // Consistency is a single score for the whole period, repeated per point so the line chart renders
             let score     = SleepScoreCalculator.consistencyScore(bedtimes: bedtimes, wakeTimes: wakeTimes)
             return data.map { MetricData(day: $0.day, value: MetricValue(raw: score)) }
         }
     }
 
-    // Overall combined score per data point (used by SleepScoreChartCell)
     static func overallScores(for range: StatsTimeRange) -> [MetricData] {
         let allMetrics: [SleepMetricType] = [.duration, .efficiency, .architecture,
                                               .continuity, .calmness, .consistency]
@@ -146,7 +143,6 @@ final class MetricDataProvider {
         return (0..<count).map { index in
             let dayLabel = allData[0][index].day
 
-            // Pull each metric score for this day
             let d   = allData[0][index].value.raw  // duration
             let e   = allData[1][index].value.raw  // efficiency
             let a   = allData[2][index].value.raw  // architecture

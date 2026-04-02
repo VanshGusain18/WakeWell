@@ -1,6 +1,5 @@
 import UIKit
 
-// MARK: - Enums
 enum SelectedHandle {
     case none
     case bed
@@ -9,8 +8,6 @@ enum SelectedHandle {
 
 @IBDesignable
 class CircularTimePicker: UIControl {
-    
-    // MARK: - Properties
     var bedtime: Date {
         return angleToDate(startAngle)
     }
@@ -24,15 +21,13 @@ class CircularTimePicker: UIControl {
     
     private let trackLayer = CAShapeLayer()
     private let progressLayer = CAShapeLayer()
-    private let outerCircleLayer = CAShapeLayer() // Added layer
-    private let bedHandle = CALayer()             // Added handle
-    private let sunHandle = CALayer()             // Added handle
+    private let outerCircleLayer = CAShapeLayer()
+    private let bedHandle = CALayer()
+    private let sunHandle = CALayer()            
     private var selectedHandle: SelectedHandle = .none // Added state
     
     // Flag to ensure labels and ticks are only added once
     private var isConfigured = false
-    
-    // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -62,19 +57,8 @@ class CircularTimePicker: UIControl {
         progressLayer.lineWidth = 40
         progressLayer.lineCap = .round
         layer.addSublayer(progressLayer)
-        
-        // Handle Icons
-        //let bedImage = UIImage(systemName: "bed.double.fill")?.cgImage
-       //bedHandle.contents = bedImage
-        //bedHandle.contentsGravity = .resizeAspect
-        //layer.addSublayer(bedHandle)
-        
-        //let sunImage = UIImage(systemName: "sun.max.fill")?.cgImage
-        //sunHandle.contents = sunImage
-        //sunHandle.contentsGravity = .resizeAspect
-        //layer.addSublayer(sunHandle)
     
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))) // let the user slide the clock
         addGestureRecognizer(pan)
     }
     
@@ -113,13 +97,13 @@ class CircularTimePicker: UIControl {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let radius = (min(bounds.width, bounds.height) / 2) - 30
         
-        // Update the orange progress bar path
+        // Updating the orange progress bar path
         let progressPath = UIBezierPath(arcCenter: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
         progressLayer.path = progressPath.cgPath
         
         // change colours acc to the duration o fsleep hours
         var diff = endAngle - startAngle
-            if diff < 0 { diff += 2 * .pi } // Handle midnight wrap-around
+            if diff < 0 { diff += 2 * .pi }
             
             let durationHours = (diff / (2 * .pi)) * 24
             
@@ -131,15 +115,14 @@ class CircularTimePicker: UIControl {
             } else if (durationHours > 5 && durationHours < 7 ) || (durationHours > 9 && durationHours < 11) {
                 progressLayer.strokeColor = UIColor.systemOrange.cgColor
             }
-        
-        // Update icon positions
+
         bedHandle.position = position(for: startAngle, in: self.bounds, margin: 30)
         sunHandle.position = position(for: endAngle, in: self.bounds, margin: 30)
         
         sendActions(for: .valueChanged)
     }
     
-    //  Interaction
+    //  where the user is able to do the seeking of th epan
     @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
         let location = gesture.location(in: self)
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
@@ -172,7 +155,7 @@ class CircularTimePicker: UIControl {
     }
     
     //  Helper Functions (Math & Formatting)
-    private func angleToDate(_ angle: CGFloat) -> Date {
+    private func angleToDate(_ angle: CGFloat) -> Date { // converting the position into radians and specifying according to the 24 hour clock
         var normalizedAngle = angle + .pi / 2
         if normalizedAngle < 0 { normalizedAngle += 2 * .pi }
         if normalizedAngle > 2 * .pi { normalizedAngle -= 2 * .pi }
@@ -188,7 +171,7 @@ class CircularTimePicker: UIControl {
         return calendar.date(from: components) ?? Date()
     }
 
-    func formatTime(_ date: Date) -> String {
+    func formatTime(_ date: Date) -> String { // representation of the date in time format (only extracting the hours and min)
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         return formatter.string(from: date)
@@ -198,13 +181,13 @@ class CircularTimePicker: UIControl {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let radius = (min(rect.width, rect.height) / 2) - margin
         
-        let x = center.x + radius * cos(angle)
+        let x = center.x + radius * cos(angle) // logic for showing hte time
         let y = center.y + radius * sin(angle)
         
         return CGPoint(x: x, y: y)
     }
-    
-    // MARK: - Subview Generation
+   
+    // making the clock
     private func addClockLabels() {
         let labels = ["12PM", "3PM", "6PM", "9PM", "12AM", "3AM", "6AM", "9AM"]
         

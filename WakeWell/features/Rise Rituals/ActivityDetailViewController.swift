@@ -28,7 +28,7 @@ class ActivityDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let activity = activity else { return }
+       // guard let activity = activity else { return }
         setupUI()
         setupData()
     }
@@ -40,13 +40,14 @@ class ActivityDetailViewController: UIViewController {
         setupCircularTimer()
     }
     
-    func setupData() {
+    func setupData() {  // the way the data will look like 
         guard let activity = activity else { return }
         
         imageView.image = UIImage(named: activity.imageName)
         let formattedSteps = activity.steps.map { "• \($0)" }.joined(separator: "\n")
            steps.text = formattedSteps
         instructionLabel.text = activity.description
+        titleLabel.text = activity.title
         DispatchQueue.main.async {
             self.imageView.layer.cornerRadius = self.imageView.frame.width / 2 // makes the image circular afterwards
         }
@@ -75,10 +76,6 @@ class ActivityDetailViewController: UIViewController {
                 self.timer?.invalidate()
                 self.timerCompleted()
             }
-            
-            if self.progress == 1 {
-                self.instructionLabel.text = "Great job!"
-            }
         }
     }
     func timerCompleted() {
@@ -92,7 +89,7 @@ class ActivityDetailViewController: UIViewController {
         print("Timer Done")
     }
     
-    func setupUI() {
+    func setupUI() { // this is the UI to set the palcing of the cards (Detailed cards)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
@@ -147,7 +144,7 @@ class ActivityDetailViewController: UIViewController {
             startButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
-    
+     // the timer thinline which wil appear around teh image
     func setupCircularTimer() {
            timerLayer.removeFromSuperlayer()
            backgroundLayer.removeFromSuperlayer()

@@ -2,37 +2,30 @@ import UIKit
 
 class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
 
-    // MARK: - Duration
     @IBOutlet weak var durationTitleLabel: UILabel!
     @IBOutlet weak var durationScoreLabel: UILabel!
     @IBOutlet weak var durationTrendLabel: UILabel!
 
-    // MARK: - Efficiency
     @IBOutlet weak var efficiencyTitleLabel: UILabel!
     @IBOutlet weak var efficiencyScoreLabel: UILabel!
     @IBOutlet weak var efficiencyTrendLabel: UILabel!
 
-    // MARK: - Architecture
     @IBOutlet weak var architectureTitleLabel: UILabel!
     @IBOutlet weak var architectureScoreLabel: UILabel!
     @IBOutlet weak var architectureTrendLabel: UILabel!
 
-    // MARK: - Continuity
     @IBOutlet weak var continuityTitleLabel: UILabel!
     @IBOutlet weak var continuityScoreLabel: UILabel!
     @IBOutlet weak var continuityTrendLabel: UILabel!
 
-    // MARK: - Calmness
     @IBOutlet weak var calmnessTitleLabel: UILabel!
     @IBOutlet weak var calmnessScoreLabel: UILabel!
     @IBOutlet weak var calmnessTrendLabel: UILabel!
 
-    // MARK: - Consistency
     @IBOutlet weak var consistencyTitleLabel: UILabel!
     @IBOutlet weak var consistencyScoreLabel: UILabel!
     @IBOutlet weak var consistencyTrendLabel: UILabel!
 
-    // MARK: - Views
     @IBOutlet weak var durationView: UIView!
     @IBOutlet weak var efficiencyView: UIView!
     @IBOutlet weak var architectureView: UIView!
@@ -85,8 +78,6 @@ class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
     }
-
-    // MARK: - Configure
 
     func configure(with viewModel: SleepMetricsViewModel) {
 

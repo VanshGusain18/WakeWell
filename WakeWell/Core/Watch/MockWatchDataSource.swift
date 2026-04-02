@@ -4,7 +4,7 @@ final class MockWatchDataSource: WatchDataSource {
 
     func fetchLatestData(completion: @escaping (WatchData?) -> Void) {
 
-        print("📡 Fetching data from MOCK watch...")
+        print("Fetching data from MOCK watch...")
 
         let data = WatchData(
             sleepScore: Int.random(in: 60...95),
@@ -18,7 +18,7 @@ final class MockWatchDataSource: WatchDataSource {
         )
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            print("✅ Mock data generated: \(data)")
+            print("Mock data generated: \(data)")
             completion(data)
         }
     }

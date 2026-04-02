@@ -9,7 +9,7 @@ final class DatabaseManager {
 
     private var dbURL: URL {
         guard let url = Bundle.main.url(forResource: "wakewell_v2", withExtension: "sqlite3") else {
-            fatalError("❌ Database file not found in bundle")
+            fatalError("Database file not found in bundle")
         }
         return url
     }
@@ -19,7 +19,7 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("❌ Unable to open database")
+            print("Unable to open database")
             return nil
         }
 
@@ -34,7 +34,7 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("❌ Failed to prepare query")
+            print("Failed to prepare query")
             return nil
         }
 

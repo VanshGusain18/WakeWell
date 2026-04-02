@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
+class AlarmOptionViewController: UITableViewController, SoundPickerDelegate{
     
     @IBOutlet weak var wakeUpToggle: UISwitch!
     @IBOutlet weak var bedTimeToggle: UISwitch!
@@ -20,12 +20,13 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
     @IBOutlet weak var bedtimeLabel: UILabel!
     @IBOutlet weak var wakeupLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
+    @IBOutlet weak var doneTapped: UIBarButtonItem!
     
     private let wakeUpOptionRows = [1, 2, 3]
     private let bedtimeOptionRows = [1, 2]
     var selectedWindow = "30 min"
     var activeSection: Int = 1
-   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.isScrollEnabled = true
@@ -34,9 +35,8 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         timePicker.addTarget(self, action: #selector(pickerChanged), for: .valueChanged)
     }
     
-    
-    
-    @IBAction func pickerChanged(_ sender: Any) {
+    // the changing of the picker
+    @IBAction func pickerChanged(_ sender: CircularTimePicker) {
         _ = angleToTimeString(timePicker.startAngle)
         _ = angleToTimeString(timePicker.endAngle)
         
@@ -45,7 +45,7 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         
         // Calculate Duration
         let diff = Calendar.current.dateComponents([.hour, .minute], from: timePicker.bedtime, to: timePicker.wakeUp)
-        // Adjust if wakeup is next day
+        // if wakeup is next day
         var hours = diff.hour ?? 0
         if hours < 0 { hours += 24 }
         
@@ -56,7 +56,7 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         return "10:30 PM"
     }
     
-    
+    // setting up the alarm window menu
     func setupSmartAlarmMenu() {
         let options = ["15 min", "30 min", "45 min"]
         
@@ -72,61 +72,82 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         buttonWindow.menu = UIMenu(title: "Select Window",options: .singleSelection,children: menuActions)
         buttonWindow.showsMenuAsPrimaryAction = true
     }
-        
-        @IBAction func toggleChanged(_ sender: UISwitch) {
-            tableView.beginUpdates()
-            tableView.endUpdates()
-            //tableView.performBatchUpdates(nil, completion: nil)
-        }
     
+    @IBAction func toggleChanged(_ sender: UISwitch) {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            // Section 0 is your Picker (keeps the 'collage' look away)
-            if indexPath.section == 0 {
-                return 454
-            }
-            
-            // Section 1: Wake Up
-            if indexPath.section == 1 && wakeUpOptionRows.contains(indexPath.row) {
-                return wakeUpToggle.isOn ? UITableView.automaticDimension : 0
-            }
-            
-            // Section 2: Bedtime
-            if indexPath.section == 2 && bedtimeOptionRows.contains(indexPath.row) {
-                return bedTimeToggle.isOn ? UITableView.automaticDimension : 0
-            }
-            
-            return UITableView.automaticDimension
-        }
-        
-        override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            if indexPath.section == 1 && wakeUpOptionRows.contains(indexPath.row) {
-                cell.isHidden = !wakeUpToggle.isOn
-                cell.clipsToBounds = true
-            } else if indexPath.section == 2 && bedtimeOptionRows.contains(indexPath.row) {
-                cell.isHidden = !bedTimeToggle.isOn
-                cell.clipsToBounds = true
-            } else {
-                cell.isHidden = false
-            }
-        }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            if let destinationVC = segue.destination as? SoundPickerViewController {
-                destinationVC.delegate = self
-                if let indexPath = tableView.indexPathForSelectedRow {
-                    activeSection = indexPath.section
-                    // Use safe unwrapping to avoid the Fatal Error
-                    destinationVC.selectedSoundName = (activeSection == 1) ? (selectedSoundLabel.text ?? "") : (selectedSoundLabel2.text ?? "")
+        if let destinationVC = segue.destination as? SoundPickerViewController {
+            destinationVC.delegate = self
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                activeSection = indexPath.section
+                
+                if activeSection == 1 {
+                    destinationVC.selectedSoundName = selectedSoundLabel.text ?? ""
+                } else {
+                    destinationVC.selectedSoundName = selectedSoundLabel2.text ?? ""
                 }
             }
         }
-
-        func didSelectSound(_ name: String) {
-            if activeSection == 1 {
-                selectedSoundLabel.text = name
-            } else {
-                selectedSoundLabel2.text = name
-            }
-            tableView.reloadData()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        // Section 0 is the time picker
+        if indexPath.section == 0 {
+            return 454
         }
+        
+        // Section 1: Wake Up
+        if indexPath.section == 1 && wakeUpOptionRows.contains(indexPath.row) {
+            return wakeUpToggle.isOn ? UITableView.automaticDimension : 0
+        }
+        
+        // Section 2: Bedtime
+        if indexPath.section == 2 && bedtimeOptionRows.contains(indexPath.row) {
+            return bedTimeToggle.isOn ? UITableView.automaticDimension : 0
+        }
+        
+        return UITableView.automaticDimension
+    }
+    
+    // to handle the toggles of the bed time and wake time
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 && wakeUpOptionRows.contains(indexPath.row) {
+            cell.isHidden = !wakeUpToggle.isOn
+            cell.clipsToBounds = true
+        } else if indexPath.section == 2 && bedtimeOptionRows.contains(indexPath.row) {
+            cell.isHidden = !bedTimeToggle.isOn
+            cell.clipsToBounds = true
+        } else {
+            cell.isHidden = false
+        }
+    }
+    
+    func didSelectSound(_ name: String, haptic: String) {
+        if activeSection == 1 {
+            selectedSoundLabel.text = "\(name) • \(haptic)"
+        } else {
+            selectedSoundLabel2.text = "\(name) • \(haptic)"
+        }
+        tableView.reloadData()
+    }
+    
+    @IBAction func doneTapped(_ sender: Any) {
+        let alert = UIAlertController(
+            title: "Alarm Set",
+            message: "Your alarm for the selected time has been saved.",
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+            // Optional: Dismiss this screen or navigate back after the user hits OK
+             self.dismiss(animated: true, completion: nil)
+        }
+        
+        alert.addAction(okAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
 }

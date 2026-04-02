@@ -8,7 +8,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        print(viewModel.cards)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.allowsSelection = true
@@ -22,6 +22,10 @@ class HomeViewController: UIViewController {
     }
 
     private func registerCells() {
+        collectionView.register(
+            UINib(nibName: SleepDebtViewCardCell.identifier, bundle: nil),
+            forCellWithReuseIdentifier: SleepDebtViewCardCell.identifier
+        )
         collectionView.register(
             UINib(nibName: "AlarmCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "alarm_cell"
@@ -68,6 +72,23 @@ extension HomeViewController: UICollectionViewDataSource {
         let card = viewModel.cards[indexPath.item]
 
         switch card {
+            
+        case .sleepDebt(let model):
+
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: SleepDebtViewCardCell.identifier,
+                for: indexPath
+            ) as! SleepDebtViewCardCell
+
+            let vm = SleepDebtViewModel(model: model)
+            cell.configure(with: vm)
+
+            cell.onClose = { [weak self] in
+                self?.viewModel.removeSleepDebtCard()
+                self?.collectionView.reloadData()
+            }
+
+            return cell
 
         case .alarm(let model):
 
@@ -155,6 +176,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         switch card {
 
+        case .sleepDebt:
+            return CGSize(width: width, height: 70)
         case .alarm:
             return CGSize(width: width, height: 120)
 

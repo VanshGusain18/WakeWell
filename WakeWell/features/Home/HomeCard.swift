@@ -1,6 +1,7 @@
 import Foundation
 
 enum HomeCardModel {
+    case sleepDebt(SleepDebtModel)
     case alarm(AlarmModel)
     case sleepRing(SleepRingModel)
     case metrics(SleepMetricsModel)
@@ -8,3 +9,4 @@ enum HomeCardModel {
     case notes(MorningNoteModel)
     case sounds
 }
+

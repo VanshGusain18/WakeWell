@@ -32,7 +32,17 @@ final class HomeDataProvider {
             ]
         )
     }
+    func getSleepDebt() -> SleepDebtModel {
 
+        let history = [
+            SleepDebtModelItem(sleepDuration: 6, date: Date()),
+            SleepDebtModelItem(sleepDuration: 7, date: Date().addingTimeInterval(-86400)),
+            SleepDebtModelItem(sleepDuration: 8, date: Date().addingTimeInterval(-172800)),
+            SleepDebtModelItem(sleepDuration: 5, date: Date().addingTimeInterval(-259200))
+        ]
+
+        return SleepDebtModel(sleepHistory: history)
+    }
     func getGroggy() -> GroggyModel {
         return GroggyModel(value: 5)
     }
@@ -43,4 +53,5 @@ final class HomeDataProvider {
             date: Date()
         )
     }
+    
 }

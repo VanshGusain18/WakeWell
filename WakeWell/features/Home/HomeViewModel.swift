@@ -4,6 +4,8 @@ class HomeViewModel {
 
     private let provider = HomeDataProvider.shared
     
+    let sleepDebtViewModel: SleepDebtViewModel
+    
     private var allCards: [HomeCardModel] = []
     private(set) var showMetricsCard: Bool = false   // Controls visibility of metrics card
 
@@ -24,14 +26,31 @@ class HomeViewModel {
     }
 
     init() {
+
+        let sleepDebtModel = provider.getSleepDebt()
+        sleepDebtViewModel = SleepDebtViewModel(model: sleepDebtModel)
+
+        
         allCards = [
             .alarm(provider.getAlarm()),
             .sleepRing(provider.getSleepRing()),
-            .metrics(provider.getMetrics()),   // Always keep it in allCards
+            .metrics(provider.getMetrics()),
             .groggy(provider.getGroggy()),
             .notes(provider.getNote()),
             .sounds
         ]
+        if sleepDebtViewModel.shouldShowCard() {
+            allCards.insert(.sleepDebt(sleepDebtModel), at: 0)
+        }
+        
+        
+    }
+    func removeSleepDebtCard() {
+
+        allCards.removeAll {
+            if case .sleepDebt = $0 { return true }
+            return false
+        }
     }
 
     // Call this when user taps the chevron

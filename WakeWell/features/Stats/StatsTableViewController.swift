@@ -9,6 +9,7 @@ class StatsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorStyle = .none
+        prefetchAllRanges()
         registerCells()
         loadSleepData()
     }
@@ -92,7 +93,27 @@ class StatsTableViewController: UITableViewController {
         vc.timeRange = currentRange
         present(vc, animated: true)
     }
+    private func prefetchAllRanges() {
+        let ranges: [StatsTimeRange] = [.week, .month, .year]
+        let group = DispatchGroup()
 
+        for range in ranges {
+            group.enter()
+            HealthKitSleepRepository.shared.prefetch(for: range) {
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            // All ranges cached — reload whichever table is currently visible
+            self?.tableView.reloadData()
+        }
+    }
+    func didChangeRange(_ range: StatsTimeRange) {
+        HealthKitSleepRepository.shared.prefetch(for: range) { [weak self] in
+            self?.tableView.reloadData()
+        }
+    }
     private func makeViewController(for metric: SleepMetricType) -> BaseMetricTableViewController {
         switch metric {
         case .duration:

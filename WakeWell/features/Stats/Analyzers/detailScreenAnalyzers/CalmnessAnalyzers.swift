@@ -1,15 +1,85 @@
 //
-//  DurationViewModel.swift
+//  CalmnessAnalyzers.swift
 //  WakeWell
 //
-//  Created by geu on 19/03/26.
-//
+
 import Foundation
 import UIKit
 
 final class SleepCalmnessAnalyzer {
-    
+
     static func getData(for range: StatsTimeRange) -> [CalmnessData] {
+        let records = HealthKitSleepRepository.shared.records(for: range)
+        guard !records.isEmpty else { return fallback(for: range) }
+
+        switch range {
+        case .week:
+            return records.map {
+                CalmnessData(day: weekdayLabel($0.date),
+                             restingHeartRate: $0.restingHR > 0 ? $0.restingHR : 60,
+                             hrv:              $0.hrv       > 0 ? $0.hrv       : 40,
+                             movementIndex:    $0.movementIndex)
+            }
+        case .month:
+            return weeklyAveraged(records, fields: { [$0.restingHR, $0.hrv, $0.movementIndex] }).map {
+                CalmnessData(day: $0.label,
+                             restingHeartRate: $0.values[0] > 0 ? $0.values[0] : 60,
+                             hrv:              $0.values[1] > 0 ? $0.values[1] : 40,
+                             movementIndex:    $0.values[2])
+            }
+        case .year:
+            return monthlyAveraged(records, fields: { [$0.restingHR, $0.hrv, $0.movementIndex] }).map {
+                CalmnessData(day: $0.label,
+                             restingHeartRate: $0.values[0] > 0 ? $0.values[0] : 60,
+                             hrv:              $0.values[1] > 0 ? $0.values[1] : 40,
+                             movementIndex:    $0.values[2])
+            }
+        }
+    }
+
+    // MARK: - Chart builders (unchanged)
+
+    static func trendChartData(from data: [CalmnessData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
+        let labels  = data.map { $0.day }
+        let entries = data.enumerated().map {
+            LineChartDataEntryModel(xIndex: Double($0.offset),
+                                   value: SleepScoreCalculator.calmnessScore(rhr: $0.element.restingHeartRate,
+                                                                              hrv: $0.element.hrv,
+                                                                              movementIndex: $0.element.movementIndex))
+        }
+        return (
+            title: "Calmness Score Trend",
+            dataSets: [LineChartDataSetModel(label: "Calmness Score", values: entries)],
+            xAxisLabels: labels
+        )
+    }
+
+    static func movementChartData(from data: [CalmnessData]) -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
+        let labels = data.map { $0.day }
+        let hrv    = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.hrv) }
+        let rhr    = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.restingHeartRate) }
+        return (
+            title: "HRV & Resting Heart Rate",
+            dataSets: [
+                BarChartDataSetModel(label: "HRV (ms)",  values: hrv),
+                BarChartDataSetModel(label: "RHR (bpm)", values: rhr)
+            ],
+            xAxisLabels: labels
+        )
+    }
+
+    static func calmnessInfo() -> String {
+        """
+        This reflects how calm and relaxed your body was during sleep.
+
+        A calm night means your heart stayed steady and your body wasn't too active.
+        The more relaxed you are, the better your body can recover overnight.
+        """
+    }
+
+    // MARK: - Fallback
+
+    private static func fallback(for range: StatsTimeRange) -> [CalmnessData] {
         switch range {
         case .week:
             return [
@@ -33,49 +103,9 @@ final class SleepCalmnessAnalyzer {
                        [(63,37,0.32),(62,38,0.30),(61,40,0.27),(60,42,0.24),
                         (59,44,0.21),(58,46,0.18),(57,48,0.15),(58,46,0.17),
                         (59,44,0.20),(60,42,0.23),(61,40,0.26),(62,38,0.29)]).map {
-                CalmnessData(day: $0.0,
-                             restingHeartRate: Double($0.1.0),
-                             hrv: Double($0.1.1),
-                             movementIndex: $0.1.2)
+                CalmnessData(day: $0.0, restingHeartRate: Double($0.1.0),
+                             hrv: Double($0.1.1), movementIndex: $0.1.2)
             }
         }
-    }
-    
-    static func trendChartData(from data: [CalmnessData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
-        let labels  = data.map { $0.day }
-        let entries = data.enumerated().map {
-            LineChartDataEntryModel(xIndex: Double($0.offset),
-                                    value: SleepScoreCalculator.calmnessScore(rhr: $0.element.restingHeartRate,
-                                                                              hrv: $0.element.hrv,
-                                                                              movementIndex: $0.element.movementIndex))
-        }
-        return (
-            title: "Calmness Score Trend",
-            dataSets: [LineChartDataSetModel(label: "Calmness Score", values: entries)],
-            xAxisLabels: labels
-        )
-    }
-    
-    static func movementChartData(from data: [CalmnessData]) -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
-        let labels  = data.map { $0.day }
-        let hrv     = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.hrv) }
-        let rhr     = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.restingHeartRate) }
-        return (
-            title: "HRV & Resting Heart Rate",
-            dataSets: [
-                BarChartDataSetModel(label: "HRV (ms)", values: hrv),
-                BarChartDataSetModel(label: "RHR (bpm)", values: rhr)
-            ],
-            xAxisLabels: labels
-        )
-    }
-    
-    static func calmnessInfo() -> String {
-        """
-        This reflects how calm and relaxed your body was during sleep.
-        
-        A calm night means your heart stayed steady and your body wasn’t too active.
-        The more relaxed you are, the better your body can recover overnight.
-        """
     }
 }

@@ -68,9 +68,10 @@ final class EfficiencyAnalyzer {
 
     static func efficiencyInfo() -> String {
         """
-        Efficiency = (Time Asleep / Time in Bed) × 100
-        Score is 100 if efficiency ≥ 95%, scales down between 75–95%,
-        and is 0 below 75%. Optimal range is 85–95%.
+        This tells you how much of your time in bed was actually spent sleeping.
+
+        The higher this is, the better.
+        Falling asleep quickly and staying asleep means your body is using your sleep time well.
         """
     }
 }

@@ -14,7 +14,7 @@ class ArchitectureTableViewController: BaseMetricTableViewController {
         data = SleepArchitectureAnalyzer.getData(for: range)
     }
 
-    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 270 }
+    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 200 }
 
     override func buildCell(for section: SectionType, range: StatsTimeRange,
                             tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {

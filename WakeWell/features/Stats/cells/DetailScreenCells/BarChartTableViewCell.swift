@@ -21,13 +21,11 @@ class BarChartTableViewCell: UITableViewCell {
         setupChartAppearance()
     }
     private func setupStyle() {
-            // Liquid Glass Container
             glassContainer.backgroundColor = UIColor.white.withAlphaComponent(0.6)
             glassContainer.layer.cornerRadius = 24
             glassContainer.layer.borderWidth = 1.0
             glassContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
             
-            // Shadow
             glassContainer.layer.shadowColor = UIColor.black.cgColor
             glassContainer.layer.shadowOpacity = 0.08
             glassContainer.layer.shadowOffset = CGSize(width: 0, height: 8)
@@ -77,44 +75,26 @@ class BarChartTableViewCell: UITableViewCell {
             
             let colorPalette: [UIColor]
             switch dataSets.count {
-            case 1:
-                colorPalette = [.systemGreen]
-            case 2:
-                colorPalette = [.systemGreen, .systemBlue]
-            case 3:
-                colorPalette = [.systemGreen, .systemBlue, .systemOrange]
+            case 1:  colorPalette = [.systemGreen]
+            case 2:  colorPalette = [.systemGreen, .systemBlue]
+            case 3:  colorPalette = [.systemGreen, .systemBlue, .systemOrange]
             default:
                 let baseColors: [UIColor] = [.systemGreen, .systemBlue, .systemOrange, .systemPurple, .systemRed]
                 colorPalette = Array(baseColors.prefix(dataSets.count))
             }
             
-            // 1. Create chart data sets with fixed colors
             let chartDataSets: [BarChartDataSet] = dataSets.enumerated().map { index, model in
                 let entries = model.values.map { BarChartDataEntry(x: $0.xIndex, y: $0.value) }
                 let set = BarChartDataSet(entries: entries, label: model.label)
                 set.setColor(colorPalette[index % colorPalette.count])
                 set.drawValuesEnabled = false
-                
                 return set
             }
             
-            // 2. Initialize BarChartData
             let chartData = BarChartData(dataSets: chartDataSets)
-            
-            // 3. Dynamic spacing calculation for uniformity
-            let groupSpace = 0.3
-            let barSpace = 0.05
-            let barWidth = max(0.1, (1.0 - groupSpace) / Double(dataSets.count) - barSpace)
-            chartData.barWidth = barWidth
-            barChartView.data = chartData
-            
-            // 4. Configure X-axis min/max
             let startX = 0.0
-            let endX = Double(xAxisLabels.count - 1)
-            barChartView.xAxis.axisMaximum = endX 
-            barChartView.xAxis.axisMinimum = startX
-            
-            // 5. Group bars only if multiple datasets exist
+            let groupCount = Double(xAxisLabels.count)
+
             if dataSets.count > 1 {
                 let groupSpace = 0.3
                 let barSpace = 0.05
@@ -123,19 +103,24 @@ class BarChartTableViewCell: UITableViewCell {
                 chartData.barWidth = barWidth
                 chartData.groupBars(fromX: startX, groupSpace: groupSpace, barSpace: barSpace)
                 
+                barChartView.xAxis.axisMinimum = startX
+                barChartView.xAxis.axisMaximum = startX + chartData.groupWidth(groupSpace: groupSpace, barSpace: barSpace) * groupCount
                 barChartView.xAxis.centerAxisLabelsEnabled = true
+
             } else {
-                chartData.barWidth = 0.5
+                let barWidth = 0.5
+                chartData.barWidth = barWidth
+                
+                barChartView.xAxis.axisMinimum = startX - barWidth / 2
+                barChartView.xAxis.axisMaximum = (groupCount - 1) + barWidth / 2
                 barChartView.xAxis.centerAxisLabelsEnabled = false
             }
             
-            // 6. X-axis labels
-            barChartView.xAxis.centerAxisLabelsEnabled = (dataSets.count > 1)
             barChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: xAxisLabels)
             barChartView.xAxis.labelCount = xAxisLabels.count
             barChartView.xAxis.granularity = 1
             
-            // 7. Refresh and animate
+            barChartView.data = chartData
             barChartView.notifyDataSetChanged()
             barChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
         }

@@ -14,7 +14,7 @@ class ConsistencyTableViewController: BaseMetricTableViewController {
         data = SleepConsistencyAnalyzer.getData(for: range)
     }
 
-    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 220 }
+    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 200 }
 
     override func buildCell(for section: SectionType, range: StatsTimeRange,
                             tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {

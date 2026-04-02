@@ -84,14 +84,13 @@ final class SleepConsistencyAnalyzer {
 
     static func consistencyInfo() -> String {
         """
-        Consistency measures how regular your sleep schedule is.
-        Maintaining a stable bedtime and wake-up time improves your circadian rhythm,
-        sleep quality, and daytime alertness.
+        This shows how regular your sleep schedule is.
 
-        Aim to keep similar sleep times every day, even on weekends.
+        Going to bed and waking up at similar times every day helps your body stay in a healthy rhythm,
+        making it easier to fall asleep and wake up feeling refreshed.
         """
     }
-
+    
     private static func standardDeviation(_ values: [Double]) -> Double {
         guard !values.isEmpty else { return 0 }
         let mean     = values.reduce(0, +) / Double(values.count)

@@ -41,28 +41,28 @@ class LineChartTableViewCell: UITableViewCell {
     }
     
     private func setupChartAppearance() {
-        lineChartView.backgroundColor = .clear
-        lineChartView.rightAxis.enabled = false
-        lineChartView.legend.enabled = false
-        lineChartView.chartDescription.enabled = false
-        
-        // X-axis setup
-        let xAxis = lineChartView.xAxis
-        xAxis.labelPosition = .bottom
-        xAxis.drawGridLinesEnabled = false
-        xAxis.labelFont = .systemFont(ofSize: 10, weight: .medium)
-        xAxis.granularity = 1
-        xAxis.centerAxisLabelsEnabled = true
-        
-        // Left axis setup
-        let leftAxis = lineChartView.leftAxis
-        leftAxis.drawGridLinesEnabled = true
-        leftAxis.gridColor = .systemGray5
-        leftAxis.labelFont = .systemFont(ofSize: 10)
-        leftAxis.axisMinimum = 0
-        
-        lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
-    }
+            lineChartView.backgroundColor = .clear
+            lineChartView.rightAxis.enabled = false
+            lineChartView.legend.enabled = false
+            lineChartView.chartDescription.enabled = false
+            
+            // X-axis setup
+            let xAxis = lineChartView.xAxis
+            xAxis.labelPosition = .bottom
+            xAxis.drawGridLinesEnabled = false
+            xAxis.labelFont = .systemFont(ofSize: 10, weight: .medium)
+            xAxis.granularity = 1
+            xAxis.centerAxisLabelsEnabled = false 
+            
+            // Left axis setup
+            let leftAxis = lineChartView.leftAxis
+            leftAxis.drawGridLinesEnabled = true
+            leftAxis.gridColor = .systemGray5
+            leftAxis.labelFont = .systemFont(ofSize: 10)
+            leftAxis.axisMinimum = 0
+            
+            lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
+        }
     
     func configure(
         title: String,

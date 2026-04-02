@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class SleepContinuityAnalyzer {
-
+    
     static func getData(for range: StatsTimeRange) -> [ContinuityData] {
         switch range {
         case .week:
@@ -37,18 +37,18 @@ final class SleepContinuityAnalyzer {
             }
         }
     }
-
+    
     static func calculateScore(awakenings: Int, awakeTime: Double) -> Double {
         let score = 100 - (Double(awakenings) * 5 + awakeTime * 0.5)
         return max(0, min(100, score))
     }
-
+    
     static func getAverageScore(for range: StatsTimeRange) -> Double {
         let data = getData(for: range)
         guard !data.isEmpty else { return 0 }
         return data.map { $0.score }.reduce(0, +) / Double(data.count)
     }
-
+    
     static func trendChartData(from data: [ContinuityData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map { LineChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.score) }
@@ -58,7 +58,7 @@ final class SleepContinuityAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     static func fragmentationChartData(from data: [ContinuityData]) -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         let labels     = data.map { $0.day }
         let awakenings = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: Double($0.element.awakenings)) }
@@ -72,14 +72,13 @@ final class SleepContinuityAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     static func continuityInfo() -> String {
         """
-        Sleep continuity refers to how uninterrupted your sleep is throughout the night.
-
-        Frequent awakenings or long periods of wakefulness can reduce sleep quality, even if
-        total sleep time is sufficient. Aim to minimise disturbances and maintain longer
-        uninterrupted sleep periods.
+        This measures how smooth and uninterrupted your sleep was.
+        
+        Fewer wake-ups during the night mean better rest.
+        Staying asleep for longer stretches helps your body recover properly.
         """
     }
 }

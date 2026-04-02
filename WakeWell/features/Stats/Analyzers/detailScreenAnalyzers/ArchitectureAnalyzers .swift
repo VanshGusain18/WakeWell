@@ -8,7 +8,7 @@ import Foundation
 import UIKit
 
 final class SleepArchitectureAnalyzer {
-
+    
     // Data stored as percentages
     static func getData(for range: StatsTimeRange) -> [SleepArchitectureData] {
         switch range {
@@ -41,7 +41,7 @@ final class SleepArchitectureAnalyzer {
             }
         }
     }
-
+    
     static func getAverageScore(for range: StatsTimeRange) -> Double {
         let data = getData(for: range)
         guard !data.isEmpty else { return 0 }
@@ -50,13 +50,13 @@ final class SleepArchitectureAnalyzer {
         }
         return total / Double(data.count)
     }
-
+    
     // Single score line — architecture score per day
     static func trendChartData(from data: [SleepArchitectureData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map {
             LineChartDataEntryModel(xIndex: Double($0.offset),
-                                   value: SleepScoreCalculator.architectureScore(deep: $0.element.deep,
+                                    value: SleepScoreCalculator.architectureScore(deep: $0.element.deep,
                                                                                   rem: $0.element.rem,
                                                                                   light: $0.element.light))
         }
@@ -66,7 +66,7 @@ final class SleepArchitectureAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     // Bar chart still shows raw stage breakdown
     static func distributionChartData(from data: [SleepArchitectureData]) -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         let labels = data.map { $0.day }
@@ -83,12 +83,13 @@ final class SleepArchitectureAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     static func architectureInfo() -> String {
         """
-        Architecture score measures how close your sleep stages are to ideal targets:
-        Deep 20%, REM 22%, Light 55%.
-        Uses Euclidean distance from these targets — the closer, the higher the score.
+        This shows how balanced your sleep was.
+        
+        A good night of sleep includes the right mix of deep, light, and dream (REM) sleep.
+        The closer your sleep matches this balance, the better you recover and feel the next day.
         """
     }
 }

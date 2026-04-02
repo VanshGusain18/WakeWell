@@ -8,7 +8,7 @@ import Foundation
 import UIKit
 
 final class SleepCalmnessAnalyzer {
-
+    
     static func getData(for range: StatsTimeRange) -> [CalmnessData] {
         switch range {
         case .week:
@@ -40,12 +40,12 @@ final class SleepCalmnessAnalyzer {
             }
         }
     }
-
+    
     static func trendChartData(from data: [CalmnessData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map {
             LineChartDataEntryModel(xIndex: Double($0.offset),
-                                   value: SleepScoreCalculator.calmnessScore(rhr: $0.element.restingHeartRate,
+                                    value: SleepScoreCalculator.calmnessScore(rhr: $0.element.restingHeartRate,
                                                                               hrv: $0.element.hrv,
                                                                               movementIndex: $0.element.movementIndex))
         }
@@ -55,7 +55,7 @@ final class SleepCalmnessAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     static func movementChartData(from data: [CalmnessData]) -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let hrv     = data.enumerated().map { BarChartDataEntryModel(xIndex: Double($0.offset), value: $0.element.hrv) }
@@ -69,13 +69,13 @@ final class SleepCalmnessAnalyzer {
             xAxisLabels: labels
         )
     }
-
+    
     static func calmnessInfo() -> String {
         """
-        Calmness score is weighted across three sub-metrics:
-        HRV (40%) — higher HRV = better recovery
-        Resting Heart Rate (40%) — lower RHR = calmer sleep
-        Movement Index (20%) — lower movement = more restful sleep
+        This reflects how calm and relaxed your body was during sleep.
+        
+        A calm night means your heart stayed steady and your body wasn’t too active.
+        The more relaxed you are, the better your body can recover overnight.
         """
     }
 }

@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 struct DurationData {
     let day: String
     let hoursSlept: Double

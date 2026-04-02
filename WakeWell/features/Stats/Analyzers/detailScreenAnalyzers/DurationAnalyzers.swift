@@ -63,9 +63,10 @@ final class SleepDurationAnalyzer {
 
     static func durationInfo() -> String {
         """
-        Duration score uses a Gaussian model centered at 8 hours.
-        Both oversleeping and undersleeping are penalized smoothly.
-        The optimal range is 7–9 hours for most adults.
+        This shows if you got enough sleep.
+
+        Most people feel their best with around 7 to 9 hours of sleep.
+        Too little or too much sleep can leave you feeling tired the next day.
         """
     }
 }

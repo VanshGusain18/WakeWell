@@ -15,7 +15,7 @@ class ContinuityTableViewController: BaseMetricTableViewController {
         data = SleepContinuityAnalyzer.getData(for: range)
     }
 
-    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 250 }
+    override func infoHeight(for range: StatsTimeRange) -> CGFloat { 200 }
 
     override func buildCell(for section: SectionType, range: StatsTimeRange,
                             tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {

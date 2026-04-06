@@ -12,7 +12,7 @@
         <!--Home-->
         <scene sceneID="s0d-6b-0kx">
             <objects>
-                <viewController storyboardIdentifier="home" title="Home" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Y6W-OH-hqX" customClass="HomeViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Home" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Y6W-OH-hqX" customClass="HomeViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -47,35 +47,37 @@
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="FR1-Hr-aTD" secondAttribute="trailing" id="jwR-sR-Tbu"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="yNW-37-5As"/>
+                    <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="evb-e1-h2V"/>
+                    <navigationItem key="navigationItem" title="Home" id="yNW-37-5As"/>
                     <connections>
                         <outlet property="collectionView" destination="FR1-Hr-aTD" id="0mi-05-Efa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="991.60305343511448" y="39.436619718309863"/>
+            <point key="canvasLocation" x="1918.3206106870227" y="39.436619718309863"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="bes-dq-U4B">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="zMu-nv-zVU" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="home" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="zMu-nv-zVU" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="qyW-iz-sa3">
-                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="qyW-iz-sa3">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="QKS-ff-dT2"/>
+                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="1n4-Un-pIf"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Gxb-13-EU6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="64.885496183206101" y="39.436619718309863"/>
+            <point key="canvasLocation" x="1085" y="39"/>
         </scene>
     </scenes>
     <resources>
+        <image name="house.fill" catalog="system" width="128" height="104"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

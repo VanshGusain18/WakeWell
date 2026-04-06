@@ -2,11 +2,16 @@ import UIKit
 
 class SleepRingCollectionViewCell: UICollectionViewCell {
 
+    @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var ringContainerView: UIView!
-    @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
-    @IBOutlet weak var chevronImageView: UIImageView!
     
+    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subtitleLabel: UILabel!
+    @IBOutlet weak var ctaLabel: UILabel!
+    
+    @IBOutlet weak var chevronImageView: UIImageView!
+
     var onChevronTapped: (() -> Void)?
     
     private let backgroundLayer = CAShapeLayer()
@@ -15,63 +20,73 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         setupUI()
-        applyStyling()
+        setupTextStyling()
         setupChevron()
         addChevronTapGesture()
     }
-    
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        drawRing()
+        applyShadow()
+    }
+
+    // MARK: - Setup UI
+
+    private func setupUI() {
+        contentView.backgroundColor = .clear
+        
+        containerView.backgroundColor = .systemBackground
+        containerView.layer.cornerRadius = 24
+        containerView.clipsToBounds = true
+    }
+
+    private func setupTextStyling() {
+        scoreLabel.font = UIFont.boldSystemFont(ofSize: 22)
+        scoreLabel.textAlignment = .center
+        scoreLabel.textColor = .label
+
+        titleLabel.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
+//        titleLabel.textColor = .secondaryLabel
+        titleLabel.text = "YOUR SLEEP SCORE"
+
+        subtitleLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        subtitleLabel.textColor = .label
+
+        ctaLabel.font = UIFont.systemFont(ofSize: 12)
+        ctaLabel.textColor = .secondaryLabel
+        ctaLabel.text = "Tap to see today's detailed Sleep Score"
+    }
+
+    // MARK: - Chevron
+
     private func setupChevron() {
         chevronImageView.image = UIImage(systemName: "chevron.down")
         chevronImageView.tintColor = .secondaryLabel
         chevronImageView.contentMode = .center
     }
-    
+
     private func addChevronTapGesture() {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(chevronTapped))
-            chevronImageView.isUserInteractionEnabled = true
-            chevronImageView.addGestureRecognizer(tap)
-        }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(chevronTapped))
+        chevronImageView.isUserInteractionEnabled = true
+        chevronImageView.addGestureRecognizer(tap)
+    }
 
     @objc private func chevronTapped() {
         onChevronTapped?()
         
-        // Nice rotation animation
         let isExpanded = chevronImageView.transform == .identity
+        
         UIView.animate(withDuration: 0.3) {
             self.chevronImageView.transform = isExpanded
             ? CGAffineTransform(rotationAngle: .pi)
             : .identity
         }
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        drawRing()
-        applyShadowPath()
-    }
 
-    private func setupUI() {
-        contentView.layer.cornerRadius = 24
-        contentView.clipsToBounds = true
-        layer.masksToBounds = false
-    }
-
-    private func applyStyling() {
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.15
-        layer.shadowRadius = 12
-        layer.shadowOffset = CGSize(width: 0, height: 6)
-    }
-
-    private func applyShadowPath() {
-        layer.shadowPath = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: 24
-        ).cgPath
-    }
+    // MARK: - Ring Drawing
 
     private func drawRing() {
-
         backgroundLayer.removeFromSuperlayer()
         progressLayer.removeFromSuperlayer()
 
@@ -83,7 +98,7 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         let radius = min(
             ringContainerView.bounds.width,
             ringContainerView.bounds.height
-        ) / 2 - 10
+        ) / 2 - 14
 
         let path = UIBezierPath(
             arcCenter: center,
@@ -94,22 +109,51 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         )
 
         backgroundLayer.path = path.cgPath
-        backgroundLayer.strokeColor = UIColor.systemGray4.cgColor
-        backgroundLayer.lineWidth = 10
+        backgroundLayer.strokeColor = UIColor.systemGray5.cgColor
+        backgroundLayer.lineWidth = 12
         backgroundLayer.fillColor = UIColor.clear.cgColor
         ringContainerView.layer.addSublayer(backgroundLayer)
 
         progressLayer.path = path.cgPath
-        progressLayer.strokeColor = UIColor.label.cgColor
-        progressLayer.lineWidth = 10
+        progressLayer.strokeColor = UIColor.systemBlue.cgColor
+        progressLayer.lineWidth = 12
         progressLayer.fillColor = UIColor.clear.cgColor
         progressLayer.lineCap = .round
         ringContainerView.layer.addSublayer(progressLayer)
     }
 
+    // MARK: - Shadow
+
+    private func applyShadow() {
+        layer.masksToBounds = false
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.12
+        layer.shadowRadius = 10
+        layer.shadowOffset = CGSize(width: 0, height: 6)
+
+        layer.shadowPath = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: 24
+        ).cgPath
+    }
+
+    // MARK: - Configure
+
     func configure(with viewModel: SleepRingViewModel) {
         scoreLabel.text = viewModel.scoreText
         subtitleLabel.text = viewModel.subtitleText
+
+        progressLayer.strokeEnd = 0
+
+        let animation = CABasicAnimation(keyPath: "strokeEnd")
+        animation.toValue = viewModel.progress
+        animation.duration = 0.8
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+
         progressLayer.strokeEnd = viewModel.progress
+        progressLayer.add(animation, forKey: "progress")
     }
 }
+
+    
+    

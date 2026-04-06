@@ -177,12 +177,12 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         switch card {
 
         case .sleepDebt:
-            return CGSize(width: width, height: 70)
+            return CGSize(width: width, height: 60)
         case .alarm:
-            return CGSize(width: width, height: 120)
+            return CGSize(width: width, height: 140)
 
         case .sleepRing:
-            return CGSize(width: width, height: 230)
+            return CGSize(width: width, height: 180)
 
         case .metrics:
             return CGSize(width: width, height: 200)
@@ -191,7 +191,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: width, height: 140)
 
         case .notes:
-            return CGSize(width: width, height: 160)
+            return CGSize(width: width, height: 140)
 
         case .sounds:
             return CGSize(width: width, height: 70)

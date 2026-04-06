@@ -17,11 +17,7 @@ class SoundTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> main
         filteredSounds = allSoundsData
 
         segmentView?.addTarget(self,
@@ -40,15 +36,13 @@ class SoundTableViewController: UITableViewController {
         tableView.contentInset.bottom = 110
         tableView.verticalScrollIndicatorInsets.bottom = 110
         tableView.horizontalScrollIndicatorInsets.left = tableView.adjustedContentInset.left
-<<<<<<< HEAD
-=======
+
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .cancel,
             target: self,
             action: #selector(closeTapped)
         )
->>>>>>> main
 
     }
 
@@ -206,16 +200,13 @@ class SoundTableViewController: UITableViewController {
         nowPlayingNav.modalPresentationStyle = .fullScreen
         present(nowPlayingNav, animated: true)
     }
-<<<<<<< HEAD
 
-=======
     
     @IBAction func closeTapped(_ sender: Any) {
         dismiss(animated: true)
     }
     
     
->>>>>>> main
     // Audio Setup
     private func setupAudioSession() {
         do {

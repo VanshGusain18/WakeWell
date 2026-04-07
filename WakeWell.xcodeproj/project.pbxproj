@@ -9,12 +9,42 @@
 /* Begin PBXBuildFile section */
 		D610DD8F2F3C5D070083F51A /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = D610DD8E2F3C5D070083F51A /* DGCharts */; };
 		D67C6D8C2F2CCA91004ECCDB /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = D67C6D8B2F2CCA88004ECCDB /* readme.md */; };
+		D6CFDEB92F84D17800F6419E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6CFDEB82F84D17800F6419E /* UserNotifications.framework */; };
+		D6CFDEBB2F84D17800F6419E /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6CFDEBA2F84D17800F6419E /* UserNotificationsUI.framework */; };
+		D6CFDEC52F84D17800F6419E /* WakeWellAlarmUI.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D6CFDEB62F84D17800F6419E /* WakeWellAlarmUI.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D6CFDEC32F84D17800F6419E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D67C6D6B2F2CC9F4004ECCDB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D6CFDEB52F84D17800F6419E;
+			remoteInfo = WakeWellAlarmUI;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D6CFDECA2F84D17800F6419E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D6CFDEC52F84D17800F6419E /* WakeWellAlarmUI.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D67C6D732F2CC9F4004ECCDB /* WakeWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WakeWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D67C6D8B2F2CCA88004ECCDB /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		D6C5DC742F35C1C4002DE663 /* sounds_tab.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sounds_tab.xcodeproj; sourceTree = "<group>"; };
+		D6CFDEB62F84D17800F6419E /* WakeWellAlarmUI.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WakeWellAlarmUI.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6CFDEB82F84D17800F6419E /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		D6CFDEBA2F84D17800F6419E /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -25,6 +55,13 @@
 			);
 			target = D67C6D722F2CC9F4004ECCDB /* WakeWell */;
 		};
+		D6CFDEC92F84D17800F6419E /* Exceptions for "WakeWellAlarmUI" folder in "WakeWellAlarmUI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D6CFDEB52F84D17800F6419E /* WakeWellAlarmUI */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +71,14 @@
 				D67C6D852F2CC9F4004ECCDB /* Exceptions for "WakeWell" folder in "WakeWell" target */,
 			);
 			path = WakeWell;
+			sourceTree = "<group>";
+		};
+		D6CFDEBC2F84D17800F6419E /* WakeWellAlarmUI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D6CFDEC92F84D17800F6419E /* Exceptions for "WakeWellAlarmUI" folder in "WakeWellAlarmUI" target */,
+			);
+			path = WakeWellAlarmUI;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -47,6 +92,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D6CFDEB32F84D17800F6419E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D6CFDEBB2F84D17800F6419E /* UserNotificationsUI.framework in Frameworks */,
+				D6CFDEB92F84D17800F6419E /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,6 +109,8 @@
 			children = (
 				D67C6D8B2F2CCA88004ECCDB /* readme.md */,
 				D67C6D752F2CC9F4004ECCDB /* WakeWell */,
+				D6CFDEBC2F84D17800F6419E /* WakeWellAlarmUI */,
+				D6CFDEB72F84D17800F6419E /* Frameworks */,
 				D67C6D742F2CC9F4004ECCDB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				D67C6D732F2CC9F4004ECCDB /* WakeWell.app */,
+				D6CFDEB62F84D17800F6419E /* WakeWellAlarmUI.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,6 +129,15 @@
 			children = (
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D6CFDEB72F84D17800F6419E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D6CFDEB82F84D17800F6419E /* UserNotifications.framework */,
+				D6CFDEBA2F84D17800F6419E /* UserNotificationsUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,10 +150,12 @@
 				D67C6D6F2F2CC9F4004ECCDB /* Sources */,
 				D67C6D702F2CC9F4004ECCDB /* Frameworks */,
 				D67C6D712F2CC9F4004ECCDB /* Resources */,
+				D6CFDECA2F84D17800F6419E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D6CFDEC42F84D17800F6419E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D67C6D752F2CC9F4004ECCDB /* WakeWell */,
@@ -100,6 +168,28 @@
 			productReference = D67C6D732F2CC9F4004ECCDB /* WakeWell.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D6CFDEB52F84D17800F6419E /* WakeWellAlarmUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D6CFDEC62F84D17800F6419E /* Build configuration list for PBXNativeTarget "WakeWellAlarmUI" */;
+			buildPhases = (
+				D6CFDEB22F84D17800F6419E /* Sources */,
+				D6CFDEB32F84D17800F6419E /* Frameworks */,
+				D6CFDEB42F84D17800F6419E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D6CFDEBC2F84D17800F6419E /* WakeWellAlarmUI */,
+			);
+			name = WakeWellAlarmUI;
+			packageProductDependencies = (
+			);
+			productName = WakeWellAlarmUI;
+			productReference = D6CFDEB62F84D17800F6419E /* WakeWellAlarmUI.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -111,6 +201,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					D67C6D722F2CC9F4004ECCDB = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					D6CFDEB52F84D17800F6419E = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -139,6 +232,7 @@
 			projectRoot = "";
 			targets = (
 				D67C6D722F2CC9F4004ECCDB /* WakeWell */,
+				D6CFDEB52F84D17800F6419E /* WakeWellAlarmUI */,
 			);
 		};
 /* End PBXProject section */
@@ -152,6 +246,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D6CFDEB42F84D17800F6419E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -162,7 +263,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D6CFDEB22F84D17800F6419E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D6CFDEC42F84D17800F6419E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D6CFDEB52F84D17800F6419E /* WakeWellAlarmUI */;
+			targetProxy = D6CFDEC32F84D17800F6419E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D67C6D872F2CC9F4004ECCDB /* Debug */ = {
@@ -173,7 +289,7 @@
 				CODE_SIGN_ENTITLEMENTS = WakeWell/WakeWell.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = M9H5XU96C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -193,7 +309,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.priyanshupanwar.wakewell;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paridhigoel.wakewell;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -213,7 +329,7 @@
 				CODE_SIGN_ENTITLEMENTS = WakeWell/WakeWell.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = M9H5XU96C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -233,7 +349,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.priyanshupanwar.wakewell;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paridhigoel.wakewell;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -364,6 +480,66 @@
 			};
 			name = Release;
 		};
+		D6CFDEC72F84D17800F6419E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WakeWellAlarmUI/WakeWellAlarmUI.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M9H5XU96C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WakeWellAlarmUI/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WakeWellAlarmUI;
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "To track your previous sleep cycles.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paridhigoel.wakewell.WakeWellAlarmUI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D6CFDEC82F84D17800F6419E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WakeWellAlarmUI/WakeWellAlarmUI.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M9H5XU96C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WakeWellAlarmUI/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WakeWellAlarmUI;
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "To track your previous sleep cycles.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paridhigoel.wakewell.WakeWellAlarmUI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -381,6 +557,15 @@
 			buildConfigurations = (
 				D67C6D872F2CC9F4004ECCDB /* Debug */,
 				D67C6D882F2CC9F4004ECCDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D6CFDEC62F84D17800F6419E /* Build configuration list for PBXNativeTarget "WakeWellAlarmUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D6CFDEC72F84D17800F6419E /* Debug */,
+				D6CFDEC82F84D17800F6419E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

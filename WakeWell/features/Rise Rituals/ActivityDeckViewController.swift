@@ -9,27 +9,24 @@ import UIKit
 
 class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource {
     
-    @IBOutlet weak var viewToggle: UISegmentedControl!
+    //@IBOutlet weak var viewToggle: UISegmentedControl!
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var tableView: UITableView!
+    //@IBOutlet weak var tableView: UITableView!
     
-    @IBAction func toggleChanged(_ sender: UISegmentedControl) {
-        
-        if sender.selectedSegmentIndex == 0 {
-            collectionView.isHidden = false
-            tableView.isHidden = true
-        } else {
-            collectionView.isHidden = true
-            tableView.isHidden = false
-        }
-    }
+//    @IBAction func toggleChanged(_ sender: UISegmentedControl) {
+//        
+//        if sender.selectedSegmentIndex == 0 {
+//            collectionView.isHidden = false
+//            tableView.isHidden = true
+//        } else {
+//            collectionView.isHidden = true
+//            tableView.isHidden = false
+//        }
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.isHidden = true   // start with cards
         collectionView.delegate = self
         collectionView.dataSource = self
         
@@ -48,7 +45,7 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         loadActivities()
         shuffledActivities = activities.shuffled()
         collectionView.reloadData()
-        tableView.reloadData()
+       // tableView.reloadData()
     }
     // layout for the card where 
     func setupLayout() {
@@ -247,6 +244,6 @@ extension ActivityDeckViewController: AddActivityDelegate {
         shuffledActivities = activities.shuffled()
         
         collectionView.reloadData()
-        tableView.reloadData()
+//        tableView.reloadData()
     }
 }

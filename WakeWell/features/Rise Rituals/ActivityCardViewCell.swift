@@ -12,59 +12,85 @@ class ActivityCardViewCell: UICollectionViewCell {
     let titleLabel = UILabel()
     let imageView = UIImageView()
     let categoryLabel = UILabel()
+    let gradientLayer = CAGradientLayer()
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupUI()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupUI()
-    }
-    
-    // how will the cell actually look like
-    func setupUI() {
-        contentView.layer.cornerRadius = 20
-        contentView.backgroundColor = .white
-        contentView.clipsToBounds = true
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.1
-        layer.shadowRadius = 10
-        layer.shadowOffset = CGSize(width: 0, height: 5)
+            super.init(frame: frame)
+            setupUI()
+        }
         
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
+        required init?(coder: NSCoder) {
+            super.init(coder: coder)
+            setupUI()
+        }
         
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textAlignment = .center
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            gradientLayer.frame = contentView.bounds
+        }
         
-        categoryLabel.font = UIFont.systemFont(ofSize: 12)
-        categoryLabel.textAlignment = .center
-        categoryLabel.textColor = .gray
-        
-        contentView.addSubview(imageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(categoryLabel)
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
+        func setupUI() {
+            contentView.layer.cornerRadius = 20
+            contentView.backgroundColor = .secondarySystemBackground
+            contentView.clipsToBounds = true
             
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            imageView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.7),
+            imageView.contentMode = .scaleAspectFill
+            imageView.translatesAutoresizingMaskIntoConstraints = false
             
-            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 60),
-            titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
-            titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
+            // Setup Gradient for readability
+            gradientLayer.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.7).cgColor]
+            gradientLayer.locations = [0.6, 1.0]
             
-            categoryLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
-            categoryLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            categoryLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
-        ])
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
+            titleLabel.textColor = .white
+            titleLabel.numberOfLines = 2
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            categoryLabel.font = UIFont.systemFont(ofSize: 14)
+            categoryLabel.textColor = UIColor.white.withAlphaComponent(0.8)
+            categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            contentView.addSubview(imageView)
+            contentView.layer.addSublayer(gradientLayer)
+            contentView.addSubview(titleLabel)
+            contentView.addSubview(categoryLabel)
+            
+            NSLayoutConstraint.activate([
+                // Image covers entire card
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                
+                // Labels at bottom left
+                categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                categoryLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                categoryLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
+                
+                titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                titleLabel.bottomAnchor.constraint(equalTo: categoryLabel.topAnchor, constant: -4)
+            ])
+        }
+        
+    func configure(with activity: Activity, isExplore: Bool) {
+        titleLabel.text = activity.title
+        imageView.image = UIImage(named: activity.imageName)
+        
+        if isExplore {
+            // Smaller font for the Grid
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 14)
+            categoryLabel.text = ""
+            categoryLabel.isHidden = true
+            
+            // Optional: Reduce padding for smaller cards
+            titleLabel.numberOfLines = 1
+        } else {
+            // Larger font for the Morning Routine Hero cards
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 22)
+            categoryLabel.text = activity.category
+            categoryLabel.isHidden = false
+            titleLabel.numberOfLines = 2
+        }
     }
 }

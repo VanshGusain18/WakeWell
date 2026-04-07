@@ -188,13 +188,13 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: width, height: 200)
 
         case .groggy:
-            return CGSize(width: width, height: 140)
+            return CGSize(width: width, height: 160)
 
         case .notes:
-            return CGSize(width: width, height: 140)
+            return CGSize(width: width, height: 160)
 
         case .sounds:
-            return CGSize(width: width, height: 70)
+            return CGSize(width: width, height: 60)
         }
     }
 }

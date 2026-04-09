@@ -10,6 +10,7 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
     @IBOutlet weak var collectionView: UICollectionView!
 
     var selectedActivityIDs: Set<String> = ["ritual_1", "ritual_3"]
+    var startRoutineOnAppear = false
 
     /// How many explore activities to show before "Show More"
     private let explorePreviewCount = 4
@@ -68,6 +69,14 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         loadActivities()
         shuffledActivities = activities.shuffled()
         collectionView.reloadData()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        guard startRoutineOnAppear else { return }
+        startRoutineOnAppear = false
+        startRoutineTapped()
     }
 
     // MARK: - Layout

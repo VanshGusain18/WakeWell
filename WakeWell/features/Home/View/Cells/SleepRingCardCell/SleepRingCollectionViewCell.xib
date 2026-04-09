@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,14 +11,14 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="SleepRingCollectionViewCell" customModule="WakeWell" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="359" height="196"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="300"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="359" height="196"/>
+                <rect key="frame" x="0.0" y="0.0" width="437" height="300"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7RB-xD-th3">
-                        <rect key="frame" x="0.0" y="0.0" width="359" height="196"/>
+                        <rect key="frame" x="0.0" y="0.0" width="437" height="300"/>
                         <subviews>
                             <view contentMode="top" id="X5j-0V-97t">
                                 <rect key="frame" x="20" y="16" width="108" height="108"/>
@@ -31,35 +31,35 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GJY-R7-CmQ">
+                                        <rect key="frame" x="4" y="74" width="100" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <viewLayoutGuide key="safeArea" id="WCh-D8-mTc"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6XM-h6-KA3">
-                                <rect key="frame" x="136" y="53" width="210" height="21"/>
+                                <rect key="frame" x="8" y="126" width="120" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="bottom" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JrQ-fq-p3A">
-                                <rect key="frame" x="20" y="132" width="326" height="20"/>
+                                <rect key="frame" x="8" y="173" width="120" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" id="sQg-f5-pGr">
-                                <rect key="frame" x="167" y="150" width="24" height="24"/>
+                                <rect key="frame" x="56" y="193" width="37" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GJY-R7-CmQ">
-                                <rect key="frame" x="136" y="82" width="215" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
@@ -72,7 +72,7 @@
                 <constraint firstAttribute="bottom" secondItem="7RB-xD-th3" secondAttribute="bottom" id="Vd7-I3-Zdp"/>
                 <constraint firstItem="7RB-xD-th3" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="caT-YV-bAw"/>
             </constraints>
-            <size key="customSize" width="359" height="308"/>
+            <size key="customSize" width="437" height="412"/>
             <connections>
                 <outlet property="chevronImageView" destination="sQg-f5-pGr" id="jUJ-9B-OEu"/>
                 <outlet property="containerView" destination="7RB-xD-th3" id="Ytx-HS-HK0"/>
@@ -82,7 +82,7 @@
                 <outlet property="subtitleLabel" destination="6XM-h6-KA3" id="pvM-F4-vVS"/>
                 <outlet property="titleLabel" destination="GJY-R7-CmQ" id="H1Q-nH-yL4"/>
             </connections>
-            <point key="canvasLocation" x="-176.33587786259542" y="273.23943661971833"/>
+            <point key="canvasLocation" x="-116.79389312977099" y="309.85915492957747"/>
         </collectionViewCell>
     </objects>
     <resources>

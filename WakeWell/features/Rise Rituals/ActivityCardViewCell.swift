@@ -16,14 +16,26 @@ class ActivityCardViewCell: UICollectionViewCell {
 
     /// Called when the 3-dot button is tapped
     var onOptionsTapped: (() -> Void)?
+    var menuProvider: (() -> UIMenu?)? {
+        didSet {
+            optionsButton.menu = menuProvider?()
+        }
+    }
 
     private let optionsButton: UIButton = {
         let btn = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
         btn.setImage(UIImage(systemName: "ellipsis", withConfiguration: config), for: .normal)
-        btn.tintColor = .white
-        btn.backgroundColor = UIColor.black.withAlphaComponent(0.35)
-        btn.layer.cornerRadius = 14
+        btn.tintColor = .label
+        btn.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.88)
+        btn.layer.cornerRadius = 16
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor.systemGray5.cgColor
+        btn.layer.shadowColor = UIColor.black.withAlphaComponent(0.08).cgColor
+        btn.layer.shadowOpacity = 1
+        btn.layer.shadowRadius = 10
+        btn.layer.shadowOffset = CGSize(width: 0, height: 5)
+        btn.showsMenuAsPrimaryAction = true
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -43,6 +55,12 @@ class ActivityCardViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = contentView.bounds
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        menuProvider = nil
+        onOptionsTapped = nil
     }
 
     // MARK: Setup
@@ -86,8 +104,8 @@ class ActivityCardViewCell: UICollectionViewCell {
             // 3-dot button — top-right corner
             optionsButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             optionsButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            optionsButton.widthAnchor.constraint(equalToConstant: 28),
-            optionsButton.heightAnchor.constraint(equalToConstant: 28),
+            optionsButton.widthAnchor.constraint(equalToConstant: 32),
+            optionsButton.heightAnchor.constraint(equalToConstant: 32),
 
             // Labels at bottom
             categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -105,6 +123,7 @@ class ActivityCardViewCell: UICollectionViewCell {
     func configure(with activity: Activity, isExplore: Bool) {
         titleLabel.text    = activity.title
         imageView.image    = UIImage(named: activity.imageName)
+        optionsButton.isHidden = false
 
         if isExplore {
             titleLabel.font      = UIFont.boldSystemFont(ofSize: 14)
@@ -242,7 +261,9 @@ class AddToMorningSheetViewController: UIViewController, UITableViewDelegate, UI
 
     var allActivities: [Activity] = []
     var selectedActivityIDs: Set<String> = []
+    var maximumSelections: Int = 5
     var onDone: ((Set<String>) -> Void)?
+    var onSelectionLimitReached: (() -> Void)?
 
     private var pendingIDs: Set<String> = []
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -295,6 +316,10 @@ class AddToMorningSheetViewController: UIViewController, UITableViewDelegate, UI
         if pendingIDs.contains(activity.id) {
             pendingIDs.remove(activity.id)
         } else {
+            guard pendingIDs.count < maximumSelections else {
+                onSelectionLimitReached?()
+                return
+            }
             pendingIDs.insert(activity.id)
         }
         tableView.reloadRows(at: [indexPath], with: .automatic)

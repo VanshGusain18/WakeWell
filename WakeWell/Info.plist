@@ -41,6 +41,10 @@
 	</dict>
 	<key>CFBundleSignature</key>
 	<string></string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string></string>
+	<key>NSMotionUsageDescription</key>
+	<string>WakeWell uses motion data to track your steps during walk-based rituals.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -10,6 +10,7 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
     @IBOutlet weak var collectionView: UICollectionView!
 
     var selectedActivityIDs: Set<String> = ["ritual_1", "ritual_3"]
+    private let maximumActivitiesInRoutine = 5
 
     /// How many explore activities to show before "Show More"
     private let explorePreviewCount = 4
@@ -20,7 +21,6 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         case explore
     }
 
-    // MARK: - Computed helpers
 
     var selectedActivities: [Activity] {
         activities.filter { selectedActivityIDs.contains($0.id) }
@@ -28,12 +28,10 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
 
     var allActivities: [Activity] { activities }
 
-    /// Activities shown in the Explore grid (limited or all)
+    // Activities shown in the Explore grid (limited or all)
     var exploreActivities: [Activity] {
         isExploreExpanded ? activities : Array(activities.prefix(explorePreviewCount))
     }
-
-    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,7 +68,7 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         collectionView.reloadData()
     }
 
-    // MARK: - Layout
+    // to setup the layout of morning view an dexplore grid view
 
     func setupLayout() {
         let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
@@ -148,7 +146,7 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         collectionView.setCollectionViewLayout(layout, animated: false)
     }
 
-    // MARK: - DataSource
+    //  DataSource
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         Section.allCases.count
@@ -183,8 +181,8 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
                 withReuseIdentifier: "cell", for: indexPath) as! ActivityCardViewCell
             let activity = selectedActivities[indexPath.item]
             cell.configure(with: activity, isExplore: false)
-            cell.onOptionsTapped = { [weak self] in
-                self?.showActivityDetails(activity)
+            cell.menuProvider = { [weak self] in
+                self?.makeOptionsMenu(for: activity)
             }
             cell.alpha = 1.0
             return cell
@@ -195,15 +193,14 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
             let activity = exploreActivities[indexPath.item]
             let isSelected = selectedActivityIDs.contains(activity.id)
             cell.configure(with: activity, isExplore: true)
-            cell.onOptionsTapped = { [weak self] in
-                self?.showActivityDetails(activity)
+            cell.menuProvider = { [weak self] in
+                self?.makeOptionsMenu(for: activity)
             }
             cell.alpha = isSelected ? 1.0 : 0.6
             return cell
         }
     }
 
-    // MARK: - Delegate
 
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
@@ -217,18 +214,10 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
             }
 
         case .explore:
-            // Toggle selection
-            let activity = exploreActivities[indexPath.item]
-            if selectedActivityIDs.contains(activity.id) {
-                selectedActivityIDs.remove(activity.id)
-            } else {
-                selectedActivityIDs.insert(activity.id)
-            }
-            collectionView.reloadData()
+            return
         }
     }
 
-    // MARK: - Supplementary Views
 
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
@@ -271,14 +260,18 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         }
     }
 
-    // MARK: - Add Activity Picker
 
-    /// Presents a sheet listing all activities with checkmarks so the user can
-    /// add/remove items from the Morning Routine directly from this screen.
+    // Presents a sheet listing all activities with checkmarks so the user can
+    // add/remove items from the Morning Routine directly from this screen.
+    
     private func presentAddActivityPicker() {
         let sheet = AddToMorningSheetViewController()
         sheet.allActivities       = allActivities
         sheet.selectedActivityIDs = selectedActivityIDs
+        sheet.maximumSelections   = maximumActivitiesInRoutine
+        sheet.onSelectionLimitReached = { [weak self] in
+            self?.showSelectionLimitAlert()
+        }
         sheet.onDone = { [weak self] updatedIDs in
             self?.selectedActivityIDs = updatedIDs
             self?.collectionView.reloadData()
@@ -291,50 +284,63 @@ class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UI
         present(nav, animated: true)
     }
 
-    // MARK: - Activity Details
+    //  Activity Details
 
-    private func showActivityDetails(_ activity: Activity) {
-        let alert = UIAlertController(
-            title: activity.title,
-            message: activity.description,   // add `activityDescription` to your Activity model
-            preferredStyle: .actionSheet
-        )
+    private func makeOptionsMenu(for activity: Activity) -> UIMenu {
+        let isInRoutine = selectedActivityIDs.contains(activity.id)
 
-        let addRemoveTitle = selectedActivityIDs.contains(activity.id)
-            ? "Remove from Morning Routine"
-            : "Add to Morning Routine"
-
-        alert.addAction(UIAlertAction(title: addRemoveTitle, style: .default) { [weak self] _ in
-            guard let self else { return }
-            if self.selectedActivityIDs.contains(activity.id) {
-                self.selectedActivityIDs.remove(activity.id)
-            } else {
-                self.selectedActivityIDs.insert(activity.id)
+        let primaryAction: UIAction
+        if isInRoutine {
+            primaryAction = UIAction(
+                title: "Remove Routine",
+                image: UIImage(systemName: "minus.circle")
+            ) { [weak self] _ in
+                self?.selectedActivityIDs.remove(activity.id)
+                self?.collectionView.reloadData()
             }
-            self.collectionView.reloadData()
-        })
+        } else {
+            primaryAction = UIAction(
+                title: "Add to Routine",
+                image: UIImage(systemName: "plus.circle")
+            ) { [weak self] _ in
+                guard let self else { return }
+                guard self.selectedActivityIDs.count < self.maximumActivitiesInRoutine else {
+                    self.showSelectionLimitAlert()
+                    return
+                }
+                self.selectedActivityIDs.insert(activity.id)
+                self.collectionView.reloadData()
+            }
+        }
 
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        let cancelAction = UIAction(
+            title: "Cancel",
+            image: UIImage(systemName: "xmark")
+        ) { _ in }
+
+        return UIMenu(title: "", options: .displayInline, children: [primaryAction, cancelAction])
+    }
+
+    private func showSelectionLimitAlert() {
+        let alert = UIAlertController(
+            title: "Routine Full",
+            message: "You can add up to 5 activities to your morning ritual.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
 
-    // MARK: - Start Routine
+    // Start Routine
 
     @IBAction func startRoutineTapped() {
         guard !selectedActivities.isEmpty else { return }
 
-        let storyboard = UIStoryboard(name: "Rise", bundle: nil)
-        guard let vc = storyboard.instantiateViewController(
-            withIdentifier: "ActivityDetailViewController"
-        ) as? ActivityDetailViewController else {
-            print("❌ ActivityDetailViewController not found")
-            return
-        }
-
-        vc.activity      = selectedActivities[0]
-        vc.routineQueue  = selectedActivities
-        vc.currentIndex  = 0
-
+        let vc = ActivityRunnerFactory.makeViewController(
+            for: selectedActivities[0],
+            routineQueue: selectedActivities,
+            currentIndex: 0
+        )
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -352,7 +358,7 @@ func loadActivities() {
     }
 }
 
-// MARK: - AddActivityDelegate
+//  AddActivityDelegate
 
 extension ActivityDeckViewController: AddActivityDelegate {
     func didSaveNewActivity() {

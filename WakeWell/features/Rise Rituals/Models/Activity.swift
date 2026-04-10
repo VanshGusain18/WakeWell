@@ -73,14 +73,15 @@ var activities: [Activity] = [
     
     Activity(id: "ritual_5", title: "Box Breathing",
              description: "Inhale, hold, exhale, hold.",
-             duration: 120,
+             duration: 168,
              category: "mindfulness",
-             imageName: "ritual_2",
+             imageName: "ritual_5",
              activityType: .timerBased,
              steps: [
-                "Inhale for 4 seconds",
-                "Hold for 4 seconds",
-                "Exhale and hold for 4 seconds"
+                "Inhale while the dot moves up the first edge",
+                "Hold while it crosses the top edge",
+                "Exhale on the third edge and pause on the fourth",
+                "Complete 6 slow cycles"
              ]),
     
     Activity(id: "ritual_6", title: "Extended Exhale",
@@ -121,14 +122,14 @@ var activities: [Activity] = [
     
     Activity(id: "ritual_9", title: "Short Walk",
              description: "Take a walk.",
-             duration: 600,
+             duration: 420,
              category: "physical",
              imageName: "ritual_9",
              activityType: .timerBased,
              steps: [
-                "Start walking slowly",
-                "Maintain steady pace",
-                "Observe surroundings"
+                "Start walking at an easy pace",
+                "Aim to complete 100 steps",
+                "Keep the rhythm steady and relaxed"
              ]),
     
     Activity(id: "ritual_10", title: "Neck Mobility",
@@ -157,18 +158,18 @@ var activities: [Activity] = [
     
     Activity(id: "ritual_12", title: "Reaction Tap",
              description: "Tap rapidly.",
-             duration: 30,
+             duration: 300,
              category: "productivity",
              imageName: "ritual_12",
              activityType: .timerBased,
              steps: [
-                "Start tapping quickly",
-                "Maintain speed",
-                "Track consistency"
+                "Tap the dot as soon as it appears",
+                "Missed dots score zero",
+                "The dot speed increases as you go"
              ]),
     
     Activity(id: "ritual_13", title: "Pattern Recognition",
-             description: "Find patterns.",
+             description: "Find repeated shapes, colors, or movements around you.",
              duration: nil,
              category: "productivity",
              imageName: "ritual_13",

@@ -1,74 +1,60 @@
 import Foundation
 
-final class HomeViewModel {
-    
+class HomeViewModel {
+
     private let provider = HomeDataProvider.shared
-    private let repository = HomeSleepRepository.shared
     
-    private var snapshot: HomeDashboardSnapshot
+    let sleepDebtViewModel: SleepDebtViewModel
+    
     private var allCards: [HomeCardModel] = []
-    private var dismissedCardKinds: Set<HomeCardKind> = []
-    
-    private(set) var showMetricsCard = false
-    
-    var onCardsUpdated: (() -> Void)?
-    
+    private(set) var showMetricsCard: Bool = false   // Controls visibility of metrics card
+
     var cards: [HomeCardModel] {
-        allCards.filter { showMetricsCard || $0.kind != .metrics }
-    }
-    
-    var cardCount: Int {
-        cards.count
-    }
-    
-    init() {
-        snapshot = provider.fallbackSnapshot()
-        rebuildCards()
-    }
-    
-    func loadHealthKitData() {
-        repository.fetchSnapshot { [weak self] snapshot in
-            guard let self else { return }
-            self.snapshot = snapshot
-            self.rebuildCards()
-            DispatchQueue.main.async {
-                self.onCardsUpdated?()
+        if showMetricsCard {
+            return allCards
+        } else {
+            // Remove metrics card when collapsed
+            return allCards.filter {
+                if case .metrics = $0 { return false }
+                return true
             }
         }
     }
-    
-    func dismissCard(kind: HomeCardKind) {
-        dismissedCardKinds.insert(kind)
-        rebuildCards()
+
+    var cardCount: Int {
+        return cards.count
     }
-    
+
+    init() {
+
+        let sleepDebtModel = provider.getSleepDebt()
+        sleepDebtViewModel = SleepDebtViewModel(model: sleepDebtModel)
+
+        
+        allCards = [
+            .alarm(provider.getAlarm()),
+            .sleepRing(provider.getSleepRing()),
+            .metrics(provider.getMetrics()),
+            .groggy(provider.getGroggy()),
+            .notes(provider.getNote()),
+            .sounds
+        ]
+        if sleepDebtViewModel.shouldShowCard() {
+            allCards.insert(.sleepDebt(sleepDebtModel), at: 0)
+        }
+        
+        
+    }
+    func removeSleepDebtCard() {
+
+        allCards.removeAll {
+            if case .sleepDebt = $0 { return true }
+            return false
+        }
+    }
+
+    // Call this when user taps the chevron
     func toggleMetricsCard() {
         showMetricsCard.toggle()
-    }
-    
-    func indexOfVisibleCard(kind: HomeCardKind) -> Int? {
-        cards.firstIndex { $0.kind == kind }
-    }
-    
-    private func rebuildCards() {
-        var updatedCards: [HomeCardModel] = []
-        
-        if !snapshot.sleepDebt.sleepHistory.isEmpty,
-           SleepDebtViewModel(model: snapshot.sleepDebt).shouldShowCard(),
-           !dismissedCardKinds.contains(.sleepDebt) {
-            updatedCards.append(.sleepDebt(snapshot.sleepDebt))
-        }
-        
-        if !dismissedCardKinds.contains(.riseRitual) {
-            updatedCards.append(.riseRitual(snapshot.riseRitual))
-        }
-        
-        updatedCards.append(.alarm(snapshot.alarm))
-        updatedCards.append(.sleepRing(snapshot.sleepRing))
-        updatedCards.append(.metrics(snapshot.metrics))
-        updatedCards.append(.postSleepCheckIn(snapshot.postSleepCheckIn))
-        updatedCards.append(.sounds)
-        
-        allCards = updatedCards.filter { !dismissedCardKinds.contains($0.kind) }
     }
 }

@@ -59,7 +59,7 @@
         <!--Rise Rituals-->
         <scene sceneID="6J1-Nk-gSy">
             <objects>
-                <viewController storyboardIdentifier="ActivityDeckViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="JwB-Vw-4PN" customClass="ActivityDeckViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController useStoryboardIdentifierAsRestorationIdentifier="YES" id="JwB-Vw-4PN" customClass="ActivityDeckViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7ck-GI-1jw">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

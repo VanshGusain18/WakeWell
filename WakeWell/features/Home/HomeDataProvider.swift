@@ -54,35 +54,4 @@ final class HomeDataProvider {
         )
     }
     
-    func getRiseRitual() -> RiseRitualCardModel {
-        RiseRitualCardModel(
-            title: "Rise Ritual",
-            eyebrowText: "MORNING ROUTINE",
-            message: "Awaken your mind with a guided 5-minute movement and mindfulness flow.",
-            symbolName: "sun.max.fill",
-            primaryActionTitle: "Start Ritual",
-            secondaryActionTitle: "View Rise Tab"
-        )
-    }
-    
-    func getPostSleepCheckIn() -> PostSleepCheckInModel {
-        PostSleepCheckInModel(
-            groggy: getGroggy(),
-            note: getNote()
-        )
-    }
-    
-    func fallbackSnapshot() -> HomeDashboardSnapshot {
-        let sleepDebt = getSleepDebt()
-        
-        return HomeDashboardSnapshot(
-            alarm: getAlarm(),
-            sleepDebt: sleepDebt,
-            riseRitual: getRiseRitual(),
-            sleepRing: getSleepRing(),
-            metrics: getMetrics(),
-            postSleepCheckIn: getPostSleepCheckIn()
-        )
-    }
-    
 }

@@ -2,11 +2,9 @@ import Foundation
 
 enum HomeCardModel {
     case sleepDebt(SleepDebtModel)
-    case alarm(AlarmModel)
-    case sleepRing(SleepRingModel)
+    case riseRitual(RiseRitualModel)
+    case sleepRingWithAlarm(ring: SleepRingModel, alarm: AlarmModel)
     case metrics(SleepMetricsModel)
-    case groggy(GroggyModel)
-    case notes(MorningNoteModel)
+    case groggyNotes(groggy: GroggyModel, notes: MorningNoteModel)  
     case sounds
 }
-

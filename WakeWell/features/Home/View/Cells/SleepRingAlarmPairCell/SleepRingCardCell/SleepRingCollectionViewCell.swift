@@ -14,25 +14,23 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
 
     var onChevronTapped: (() -> Void)?
 
-    private let backgroundLayer = CAShapeLayer()
-    private let progressLayer    = CAShapeLayer()
-
-    private var isExpanded: Bool = false
+    private let backgroundRingLayer = CAShapeLayer()
+    private let progressRingLayer   = CAShapeLayer()
 
     // MARK: - Lifecycle
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        setupUI()
-        setupTextStyling()
+        setupCard()
+        setupLabels()
         setupChevron()
         addChevronTapGesture()
+        setupUI()
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
         drawRing()
-        applyShadow()
     }
 
     override func prepareForReuse() {
@@ -40,44 +38,54 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         onChevronTapped = nil
     }
 
-    // MARK: - Setup
+    // MARK: - Card appearance
 
-    private func setupUI() {
-        contentView.backgroundColor = .clear
+    private func setupCard() {
+        backgroundColor                 = .systemBackground
+        contentView.backgroundColor     = .systemBackground
+        contentView.layer.cornerRadius  = 24
+        contentView.layer.masksToBounds = true
+        layer.masksToBounds             = false
 
-        containerView.backgroundColor      = .systemBackground
-        containerView.layer.cornerRadius   = 24
-        containerView.clipsToBounds        = true
+        containerView?.backgroundColor    = .systemBackground
+        ringContainerView?.backgroundColor = .systemBackground
     }
 
-    private func setupTextStyling() {
-        scoreLabel.font          = UIFont.boldSystemFont(ofSize: 22)
-        scoreLabel.textAlignment = .center
-        scoreLabel.textColor     = .label
+    // MARK: - Label styling
 
-        titleLabel.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
-        titleLabel.text = "YOUR SLEEP SCORE"
+    private func setupLabels() {
+        titleLabel?.font          = UIFont.systemFont(ofSize: 11, weight: .semibold)
+        titleLabel?.textColor     = .secondaryLabel
+        titleLabel?.textAlignment = .center
+        titleLabel?.text          = "YOUR SLEEP SCORE"
 
-        subtitleLabel.font      = UIFont.systemFont(ofSize: 15, weight: .medium)
-        subtitleLabel.textColor = .label
+        scoreLabel?.font          = UIFont.boldSystemFont(ofSize: 28)
+        scoreLabel?.textColor     = .label
+        scoreLabel?.textAlignment = .center
 
-        ctaLabel.font      = UIFont.systemFont(ofSize: 12)
-        ctaLabel.textColor = .secondaryLabel
-        ctaLabel.text      = "Tap to see today's detailed Sleep Score"
+        subtitleLabel?.font          = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        subtitleLabel?.textColor     = .label
+        subtitleLabel?.textAlignment = .center
+
+        ctaLabel?.font          = UIFont.systemFont(ofSize: 10)
+        ctaLabel?.textColor     = .secondaryLabel
+        ctaLabel?.textAlignment = .center
+        ctaLabel?.numberOfLines = 2
+        ctaLabel?.text          = "Tap for detailed sleep score"
     }
 
     // MARK: - Chevron
 
     private func setupChevron() {
-        chevronImageView.image       = UIImage(systemName: "chevron.down")
-        chevronImageView.tintColor   = .secondaryLabel
-        chevronImageView.contentMode = .center
+        chevronImageView?.image       = UIImage(systemName: "chevron.down")
+        chevronImageView?.tintColor   = .secondaryLabel
+        chevronImageView?.contentMode = .scaleAspectFit
     }
 
     private func addChevronTapGesture() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(chevronTapped))
-        chevronImageView.isUserInteractionEnabled = true
-        chevronImageView.addGestureRecognizer(tap)
+        chevronImageView?.isUserInteractionEnabled = true
+        chevronImageView?.addGestureRecognizer(tap)
     }
 
     @objc private func chevronTapped() {
@@ -88,28 +96,25 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         UIView.animate(
             withDuration: 0.25,
             delay: 0,
-            options: [.curveEaseInOut, .beginFromCurrentState],
-            animations: {
-                self.chevronImageView.transform =
-                    expanded ? CGAffineTransform(rotationAngle: .pi) : .identity
-            }
-        )
+            options: [.curveEaseInOut, .beginFromCurrentState]
+        ) {
+            self.chevronImageView?.transform =
+                expanded ? CGAffineTransform(rotationAngle: .pi) : .identity
+        }
     }
 
     // MARK: - Ring drawing
 
     private func drawRing() {
-        backgroundLayer.removeFromSuperlayer()
-        progressLayer.removeFromSuperlayer()
+        guard let rc = ringContainerView, rc.bounds.width > 0 else { return }
 
-        let center = CGPoint(
-            x: ringContainerView.bounds.width  / 2,
-            y: ringContainerView.bounds.height / 2
-        )
-        let radius = min(
-            ringContainerView.bounds.width,
-            ringContainerView.bounds.height
-        ) / 2 - 14
+        backgroundRingLayer.removeFromSuperlayer()
+        progressRingLayer.removeFromSuperlayer()
+
+        let center = CGPoint(x: rc.bounds.width / 2, y: rc.bounds.height / 2)
+        let radius = min(rc.bounds.width, rc.bounds.height) / 2 - 10
+
+        guard radius > 0 else { return }
 
         let path = UIBezierPath(
             arcCenter: center,
@@ -119,51 +124,58 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
             clockwise: true
         )
 
-        backgroundLayer.path        = path.cgPath
-        backgroundLayer.strokeColor = UIColor.systemGray5.cgColor
-        backgroundLayer.lineWidth   = 12
-        backgroundLayer.fillColor   = UIColor.clear.cgColor
-        ringContainerView.layer.addSublayer(backgroundLayer)
+        backgroundRingLayer.path        = path.cgPath
+        backgroundRingLayer.strokeColor = UIColor.systemGray5.cgColor
+        backgroundRingLayer.lineWidth   = 10
+        backgroundRingLayer.fillColor   = UIColor.clear.cgColor
+        rc.layer.addSublayer(backgroundRingLayer)
 
-        progressLayer.path        = path.cgPath
-        progressLayer.strokeColor = UIColor.systemBlue.cgColor
-        progressLayer.lineWidth   = 12
-        progressLayer.fillColor   = UIColor.clear.cgColor
-        progressLayer.lineCap     = .round
-        ringContainerView.layer.addSublayer(progressLayer)
+        progressRingLayer.path        = path.cgPath
+        progressRingLayer.strokeColor = UIColor.systemBlue.cgColor
+        progressRingLayer.lineWidth   = 10
+        progressRingLayer.fillColor   = UIColor.clear.cgColor
+        progressRingLayer.lineCap     = .round
+        rc.layer.addSublayer(progressRingLayer)
     }
 
     // MARK: - Shadow
 
-    private func applyShadow() {
-        layer.masksToBounds  = false
-        layer.shadowColor    = UIColor.black.cgColor
-        layer.shadowOpacity  = 0.12
-        layer.shadowRadius   = 10
-        layer.shadowOffset   = CGSize(width: 0, height: 6)
-        layer.shadowPath     = UIBezierPath(
+    private func setupUI() {
+        contentView.layer.cornerRadius = 20
+        contentView.layer.masksToBounds = true
+        contentView.backgroundColor = .secondarySystemBackground
+        layer.masksToBounds = false
+    }
+
+    private func applyStyling() {
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 10
+        layer.shadowOffset = CGSize(width: 0, height: 4)
+    }
+
+    private func applyShadowPath() {
+        layer.shadowPath = UIBezierPath(
             roundedRect: bounds,
-            cornerRadius: 24
+            cornerRadius: 20
         ).cgPath
     }
 
     // MARK: - Configure
 
     func configure(with viewModel: SleepRingViewModel) {
-        scoreLabel.text    = viewModel.scoreText
-        subtitleLabel.text = viewModel.subtitleText
+        titleLabel?.text    = "YOUR SLEEP SCORE"
+        scoreLabel?.text    = viewModel.scoreText
+        subtitleLabel?.text = viewModel.subtitleText
 
-        progressLayer.strokeEnd = 0
-
-        let animation                 = CABasicAnimation(keyPath: "strokeEnd")
-        animation.toValue             = viewModel.progress
-        animation.duration            = 0.9
-        animation.timingFunction      = CAMediaTimingFunction(name: .easeInEaseOut)
-        animation.fillMode            = .forwards
-        animation.isRemovedOnCompletion = false
-
-        progressLayer.strokeEnd = viewModel.progress
-        progressLayer.add(animation, forKey: "progress")
+        progressRingLayer.strokeEnd = 0
+        let anim                    = CABasicAnimation(keyPath: "strokeEnd")
+        anim.toValue                = viewModel.progress
+        anim.duration               = 0.9
+        anim.timingFunction         = CAMediaTimingFunction(name: .easeInEaseOut)
+        anim.fillMode               = .forwards
+        anim.isRemovedOnCompletion  = false
+        progressRingLayer.strokeEnd = viewModel.progress
+        progressRingLayer.add(anim, forKey: "progress")
     }
 }
-

@@ -14,24 +14,35 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
     @IBOutlet weak var ringHost : UIView!
     @IBOutlet weak var alarmHost : UIView!
     
-    private var ringCell: SleepRingCollectionViewCell?
+    private var ringCell:  SleepRingCollectionViewCell?
     private var alarmCell: AlarmCollectionViewCell?
 
-    // MARK: - Callbacks
     var onChevronTapped: (() -> Void)?
-    var onAlarmTapped: (() -> Void)?
+    var onAlarmTapped:   (() -> Void)?
 
     // MARK: - Lifecycle
 
     override func awakeFromNib() {
         super.awakeFromNib()
+
+        // The pair cell itself must be fully transparent — the two child
+        // cells each draw their own white card with shadow.
+        backgroundColor              = .clear
+        contentView.backgroundColor  = .clear
+
+        // Kill any background the XIB set on the container view that sits
+        // inside contentView (the view with id "dhx-d7-5by" in the XIB).
+        for sub in contentView.subviews {
+            sub.backgroundColor = .clear
+        }
+
         embedChildCells()
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
         onChevronTapped = nil
-        onAlarmTapped = nil
+        onAlarmTapped   = nil
     }
 
     // MARK: - Embedding
@@ -47,6 +58,7 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
         guard let cell = views.first as? SleepRingCollectionViewCell else { return }
 
         cell.translatesAutoresizingMaskIntoConstraints = false
+        ringHost.backgroundColor = .clear
         ringHost.addSubview(cell)
         NSLayoutConstraint.activate([
             cell.topAnchor.constraint(equalTo: ringHost.topAnchor),
@@ -67,6 +79,7 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
         guard let cell = views.first as? AlarmCollectionViewCell else { return }
 
         cell.translatesAutoresizingMaskIntoConstraints = false
+        alarmHost.backgroundColor = .clear
         alarmHost.addSubview(cell)
         NSLayoutConstraint.activate([
             cell.topAnchor.constraint(equalTo: alarmHost.topAnchor),
@@ -75,7 +88,6 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
             cell.trailingAnchor.constraint(equalTo: alarmHost.trailingAnchor)
         ])
 
-        // Forward alarm tap to the parent VC
         let tap = UITapGestureRecognizer(target: self, action: #selector(alarmTapped))
         cell.contentView.addGestureRecognizer(tap)
         cell.contentView.isUserInteractionEnabled = true
@@ -94,10 +106,7 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
         alarmCell?.configure(with: AlarmViewModel(model: alarmModel))
     }
 
-    // MARK: - Metrics expand/collapse animation
-
     func animateChevron(expanded: Bool) {
         ringCell?.animateChevron(expanded: expanded)
     }
 }
-

@@ -6,30 +6,25 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        setupUI()
-        applyStyling()
-    }
-
     override func layoutSubviews() {
         super.layoutSubviews()
         applyShadowPath()
+        setupUI()
+        applyStyling()
     }
 
     private func setupUI() {
         contentView.layer.cornerRadius = 20
         contentView.layer.masksToBounds = true
         contentView.backgroundColor = .secondarySystemBackground
-
         layer.masksToBounds = false
     }
 
     private func applyStyling() {
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.15
-        layer.shadowRadius = 12
-        layer.shadowOffset = CGSize(width: 0, height: 6)
+        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 10
+        layer.shadowOffset = CGSize(width: 0, height: 4)
     }
 
     private func applyShadowPath() {
@@ -40,8 +35,8 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     }
 
     func configure(with viewModel: AlarmViewModel) {
-        titleLabel.text = viewModel.title
-        timeLabel.text = viewModel.timeText
+        titleLabel.text    = viewModel.title
+        timeLabel.text     = viewModel.timeText
         subtitleLabel.text = viewModel.subtitleText
     }
 }

@@ -206,7 +206,7 @@ class HomeViewController: UIViewController {
             switch card {
             case .sleepDebt:             return CGSize(width: width, height: 60)
             case .riseRitual:            return CGSize(width: width, height: 200)
-            case .sleepRingWithAlarm:    return CGSize(width: width, height: 180)
+            case .sleepRingWithAlarm:    return CGSize(width: width, height: 200)
             case .metrics:               return CGSize(width: width, height: 200)
             case .groggyNotes:           return CGSize(width: width, height: 280)
             case .sounds:                return CGSize(width: width, height: 60)

@@ -25,17 +25,6 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        // The pair cell itself must be fully transparent — the two child
-        // cells each draw their own white card with shadow.
-        backgroundColor              = .clear
-        contentView.backgroundColor  = .clear
-
-        // Kill any background the XIB set on the container view that sits
-        // inside contentView (the view with id "dhx-d7-5by" in the XIB).
-        for sub in contentView.subviews {
-            sub.backgroundColor = .clear
-        }
-
         embedChildCells()
     }
 
@@ -57,16 +46,9 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
             .instantiate(withOwner: nil, options: nil)
         guard let cell = views.first as? SleepRingCollectionViewCell else { return }
 
-        cell.translatesAutoresizingMaskIntoConstraints = false
-        ringHost.backgroundColor = .clear
+//        cell.translatesAutoresizingMaskIntoConstraints = false
         ringHost.addSubview(cell)
-        NSLayoutConstraint.activate([
-            cell.topAnchor.constraint(equalTo: ringHost.topAnchor),
-            cell.bottomAnchor.constraint(equalTo: ringHost.bottomAnchor),
-            cell.leadingAnchor.constraint(equalTo: ringHost.leadingAnchor),
-            cell.trailingAnchor.constraint(equalTo: ringHost.trailingAnchor)
-        ])
-
+        
         cell.onChevronTapped = { [weak self] in
             self?.onChevronTapped?()
         }
@@ -78,15 +60,9 @@ class SleepRingAlarmPairCell: UICollectionViewCell {
             .instantiate(withOwner: nil, options: nil)
         guard let cell = views.first as? AlarmCollectionViewCell else { return }
 
-        cell.translatesAutoresizingMaskIntoConstraints = false
-        alarmHost.backgroundColor = .clear
+//        cell.translatesAutoresizingMaskIntoConstraints = false
         alarmHost.addSubview(cell)
-        NSLayoutConstraint.activate([
-            cell.topAnchor.constraint(equalTo: alarmHost.topAnchor),
-            cell.bottomAnchor.constraint(equalTo: alarmHost.bottomAnchor),
-            cell.leadingAnchor.constraint(equalTo: alarmHost.leadingAnchor),
-            cell.trailingAnchor.constraint(equalTo: alarmHost.trailingAnchor)
-        ])
+        
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(alarmTapped))
         cell.contentView.addGestureRecognizer(tap)

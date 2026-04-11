@@ -16,7 +16,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     private func setupUI() {
         contentView.layer.cornerRadius = 20
         contentView.layer.masksToBounds = true
-        contentView.backgroundColor = .secondarySystemBackground
+        contentView.backgroundColor = .systemBackground
         layer.masksToBounds = false
     }
 

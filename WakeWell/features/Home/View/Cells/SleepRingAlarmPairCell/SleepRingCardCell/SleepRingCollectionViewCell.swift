@@ -21,7 +21,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        setupCard()
         setupLabels()
         setupChevron()
         addChevronTapGesture()
@@ -36,19 +35,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         onChevronTapped = nil
-    }
-
-    // MARK: - Card appearance
-
-    private func setupCard() {
-        backgroundColor                 = .systemBackground
-        contentView.backgroundColor     = .systemBackground
-        contentView.layer.cornerRadius  = 24
-        contentView.layer.masksToBounds = true
-        layer.masksToBounds             = false
-
-        containerView?.backgroundColor    = .systemBackground
-        ringContainerView?.backgroundColor = .systemBackground
     }
 
     // MARK: - Label styling
@@ -141,11 +127,13 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     // MARK: - Shadow
 
     private func setupUI() {
-        contentView.layer.cornerRadius = 20
-        contentView.layer.masksToBounds = true
-        contentView.backgroundColor = .secondarySystemBackground
+        contentView.backgroundColor = .clear
+        containerView.layer.cornerRadius = 20
+        containerView.layer.masksToBounds = true
+        containerView.backgroundColor = .systemBackground
         layer.masksToBounds = false
     }
+
 
     private func applyStyling() {
         layer.shadowColor = UIColor.black.cgColor

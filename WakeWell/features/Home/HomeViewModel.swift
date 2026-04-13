@@ -28,8 +28,8 @@ class HomeViewModel {
 
         allCards = [
             .riseRitual(provider.getRiseRitual()),
-            .sleepRing(provider.getSleepRing()),   // consecutive — FlowLayout places side-by-side
-            .alarm(provider.getAlarm()),            //
+            .sleepRing(provider.getSleepRing()),  
+            .alarm(provider.getAlarm()),
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
             .sounds

@@ -38,9 +38,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         onChevronTapped = nil
     }
-
-    // MARK: - Labels
-
     private func setupLabels() {
         titleLabel?.font          = UIFont.systemFont(ofSize: 11, weight: .semibold)
         titleLabel?.textColor     = .secondaryLabel
@@ -61,8 +58,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         ctaLabel?.numberOfLines = 2
         ctaLabel?.text          = "Tap for detailed sleep score"
     }
-
-    // MARK: - Chevron
 
     private func setupChevron() {
         chevronImageView?.image       = UIImage(systemName: "chevron.down")
@@ -85,8 +80,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
                 expanded ? CGAffineTransform(rotationAngle: .pi) : .identity
         }
     }
-
-    // MARK: - Ring
 
     private func drawRing() {
         guard let rc = ringContainerView, rc.bounds.width > 0 else { return }
@@ -115,8 +108,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         rc.layer.addSublayer(progressRingLayer)
     }
 
-    // MARK: - Styling
-
     private func setupUI() {
         contentView.backgroundColor       = .clear
         containerView.layer.cornerRadius  = 20
@@ -135,8 +126,6 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     private func applyShadowPath() {
         layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: 20).cgPath
     }
-
-    // MARK: - Configure
 
     func configure(with viewModel: SleepRingViewModel) {
         titleLabel?.text    = "YOUR SLEEP SCORE"

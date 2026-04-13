@@ -24,8 +24,6 @@ class HomeViewController: UIViewController {
         }
     }
 
-    // MARK: - Cell registration
-
     private func registerCells() {
         collectionView.register(
             UINib(nibName: SleepDebtViewCardCell.identifier, bundle: nil),
@@ -59,8 +57,6 @@ class HomeViewController: UIViewController {
     }
 }
 
-// MARK: - UICollectionViewDataSource
-
 extension HomeViewController: UICollectionViewDataSource {
 
     func numberOfSections(in collectionView: UICollectionView) -> Int { 1 }
@@ -76,8 +72,7 @@ extension HomeViewController: UICollectionViewDataSource {
         let card = viewModel.cards[indexPath.item]
 
         switch card {
-
-        // ── Sleep debt alert ───────────────────────────────────────────────
+            
         case .sleepDebt(let model):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: SleepDebtViewCardCell.identifier,
@@ -92,8 +87,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 }
             }
             return cell
-
-        // ── Rise ritual ────────────────────────────────────────────────────
+            
         case .riseRitual(let model):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: RiseRitualCollectionViewCell.identifier,
@@ -113,7 +107,6 @@ extension HomeViewController: UICollectionViewDataSource {
             }
             return cell
 
-        // ── Sleep ring (left half-width card) ─────────────────────────────
         case .sleepRing(let ringModel):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: SleepRingCollectionViewCell.identifier,
@@ -127,8 +120,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 let shouldExpand = !self.viewModel.showMetricsCard
                 self.viewModel.toggleMetricsCard()
                 cell.animateChevron(expanded: shouldExpand)
-
-                // Metrics card sits after alarm card (ringIndex + 2)
+                
                 guard let ringIndex = self.viewModel.cards.firstIndex(where: {
                     if case .sleepRing = $0 { return true }
                     return false
@@ -145,7 +137,6 @@ extension HomeViewController: UICollectionViewDataSource {
             }
             return cell
 
-        // ── Alarm (right half-width card) ─────────────────────────────────
         case .alarm(let alarmModel):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: AlarmCollectionViewCell.identifier,
@@ -161,7 +152,6 @@ extension HomeViewController: UICollectionViewDataSource {
             }
             return cell
 
-        // ── Metrics ────────────────────────────────────────────────────────
         case .metrics(let model):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
@@ -170,7 +160,6 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: SleepMetricsViewModel(model: model))
             return cell
 
-        // ── Groggy + notes ─────────────────────────────────────────────────
         case .groggyNotes(let groggyModel, let notesModel):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: GroggyNotesCollectionViewCell.identifier,
@@ -182,7 +171,6 @@ extension HomeViewController: UICollectionViewDataSource {
             )
             return cell
 
-        // ── Sounds ─────────────────────────────────────────────────────────
         case .sounds:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_sounds_cell",
@@ -194,30 +182,26 @@ extension HomeViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
-
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-        let fullWidth = collectionView.bounds.width - 32   // left(16) + right(16) insets
-        let halfWidth = (fullWidth - 8) / 2                // minus interitemSpacing(8)
+        let fullWidth = collectionView.bounds.width - 32
+        let halfWidth = (fullWidth - 8) / 2
 
         switch viewModel.cards[indexPath.item] {
         case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
         case .riseRitual:   return CGSize(width: fullWidth, height: 200)
-        case .sleepRing:    return CGSize(width: halfWidth, height: 200)  // left card
-        case .alarm:        return CGSize(width: halfWidth, height: 200)  // right card
+        case .sleepRing:    return CGSize(width: halfWidth, height: 200)
+        case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .metrics:      return CGSize(width: fullWidth, height: 200)
         case .groggyNotes:  return CGSize(width: fullWidth, height: 280)
         case .sounds:       return CGSize(width: fullWidth, height: 60)
         }
     }
 }
-
-// MARK: - UICollectionViewDelegate
 
 extension HomeViewController: UICollectionViewDelegate {
 

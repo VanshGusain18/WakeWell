@@ -12,10 +12,9 @@ final class SleepArchitectureAnalyzer {
         let records = HealthKitSleepRepository.shared.records(for: range)
         guard !records.isEmpty else { return fallback(for: range) }
 
-        // Convert raw hours → percentages of total asleep time
         func toPct(_ record: NightRecord) -> (deep: Double, rem: Double, light: Double) {
             let total = record.deepHours + record.remHours + record.lightHours
-            guard total > 0 else { return (20, 22, 58) }   // use ideal if no stage data
+            guard total > 0 else { return (20, 22, 58) }
             return (
                 deep:  (record.deepHours  / total) * 100,
                 rem:   (record.remHours   / total) * 100,
@@ -46,8 +45,6 @@ final class SleepArchitectureAnalyzer {
             }
         }
     }
-
-    // MARK: - Chart builders (unchanged)
 
     static func getAverageScore(for range: StatsTimeRange) -> Double {
         let data = getData(for: range)
@@ -96,8 +93,6 @@ final class SleepArchitectureAnalyzer {
         The closer your sleep matches this balance, the better you recover and feel the next day.
         """
     }
-
-    // MARK: - Fallback
 
     private static func fallback(for range: StatsTimeRange) -> [SleepArchitectureData] {
         switch range {

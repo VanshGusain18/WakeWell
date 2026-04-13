@@ -34,8 +34,6 @@ final class SleepContinuityAnalyzer {
         }
     }
 
-    // MARK: - Chart builders (unchanged)
-
     static func calculateScore(awakenings: Int, awakeTime: Double) -> Double {
         return max(0, min(100, 100 - (Double(awakenings) * 5 + awakeTime * 0.5)))
     }

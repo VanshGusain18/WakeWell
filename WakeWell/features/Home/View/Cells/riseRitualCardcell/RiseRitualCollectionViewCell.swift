@@ -21,8 +21,6 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
     
     var onClose: (() -> Void)?
     
-    // MARK: - Lifecycle
-
     override func awakeFromNib() {
         super.awakeFromNib()
         setupCard()
@@ -48,10 +46,8 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
         
         switch gesture.state {
         case .changed:
-            // Only allow horizontal drag, resist leftward drag slightly
             let clampedX = translation.x > 0 ? translation.x : translation.x * 0.3
             contentView.transform = CGAffineTransform(translationX: clampedX, y: 0)
-            // Fade out as it slides
             let progress = min(abs(clampedX) / (bounds.width * 0.5), 1.0)
             contentView.alpha = 1.0 - progress * 0.6
             
@@ -62,7 +58,6 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
             if movedEnough || fastEnough {
                 dismissWithAnimation()
             } else {
-                // Snap back
                 UIView.animate(withDuration: 0.3,
                                delay: 0,
                                usingSpringWithDamping: 0.7,
@@ -92,13 +87,9 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
             self.onClose?()
         }
     }
-    
-    // MODIFY closeTapped to also animate
     @objc private func closeTapped() {
         dismissWithAnimation()
     }
-    // MARK: - Setup
-
     private func setupCard() {
         contentView.layer.cornerRadius  = 24
         contentView.layer.masksToBounds = true
@@ -156,8 +147,6 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
         ).cgPath
     }
 
-    // MARK: - Configure
-
     func configure(with viewModel: RiseRitualViewModel) {
         titleLabel.text       = viewModel.title
         categoryLabel.text    = viewModel.category
@@ -165,8 +154,6 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
         startButton.setTitle(viewModel.startButtonTitle, for: .normal)
         viewTabButton.setTitle(viewModel.viewTabTitle, for: .normal)
     }
-
-
 
     @IBAction func startButtonfunction(_ sender: Any) {
     }

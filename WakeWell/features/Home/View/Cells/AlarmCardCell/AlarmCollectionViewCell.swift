@@ -8,10 +8,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
 
-    /// Wired by HomeViewController — fires when user taps the card.
     var onTapped: (() -> Void)?
-
-    // MARK: - Lifecycle
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,8 +30,6 @@ class AlarmCollectionViewCell: UICollectionViewCell {
 
     @objc private func handleTap() { onTapped?() }
 
-    // MARK: - Styling
-
     private func setupUI() {
         contentView.layer.cornerRadius  = 20
         contentView.layer.masksToBounds = true
@@ -52,8 +47,6 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     private func applyShadowPath() {
         layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: 20).cgPath
     }
-
-    // MARK: - Configure
 
     func configure(with viewModel: AlarmViewModel) {
         titleLabel.text    = viewModel.title

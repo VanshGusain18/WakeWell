@@ -20,8 +20,6 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
     
     @IBOutlet weak var notesTitleLabel : UILabel!
     @IBOutlet weak var notesTextView : UITextView!
-    
-    // MARK: - Lifecycle
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -35,8 +33,6 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         super.layoutSubviews()
         applyShadowPath()
     }
-
-    // MARK: - Setup
 
     private func setupCard() {
         contentView.layer.cornerRadius  = 24
@@ -53,10 +49,8 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
     private func setupNotesSection() {
         notesTextView.delegate  = self
         notesTextView.textColor = .secondaryLabel
-        // Remove text view's own background so the card colour shows through
         notesTextView.backgroundColor = .clear
         notesTextView.layer.cornerRadius = 0
-
         dividerView.backgroundColor = .separator
     }
 
@@ -74,8 +68,6 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         ).cgPath
     }
 
-    // MARK: - UITextViewDelegate
-
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.secondaryLabel {
             textView.text      = ""
@@ -90,18 +82,13 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         }
     }
 
-    // MARK: - Configure
-
     func configure(groggy groggyVM: GroggySliderViewModel,
                    notes  notesVM:  MorningNotesViewModel) {
-
-        // Groggy
         groggyTitleLabel.text = groggyVM.title
         leftLabel.text        = groggyVM.leftLabel
         rightLabel.text       = groggyVM.rightLabel
         groggySlider.value    = groggyVM.value
 
-        // Notes
         notesTitleLabel.text  = notesVM.title
         if notesVM.text.isEmpty {
             notesTextView.text      = notesVM.placeholderText

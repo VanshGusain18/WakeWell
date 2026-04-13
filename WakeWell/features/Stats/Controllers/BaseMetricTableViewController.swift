@@ -17,8 +17,7 @@ class BaseMetricTableViewController: UITableViewController {
     }
     
     func infoHeight(for range: StatsTimeRange) -> CGFloat { 220 }
-    
-    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.backgroundColor = .systemBackground
@@ -35,7 +34,6 @@ class BaseMetricTableViewController: UITableViewController {
     
     func loadData(for range: StatsTimeRange) {}
     
-    // MARK: - Cell Registration
     private func registerCells() {
         ["HeaderTableViewCell",
          "LineChartTableViewCell",
@@ -68,7 +66,6 @@ class BaseMetricTableViewController: UITableViewController {
         return buildCell(for: section, range: timeRange, tableView: tableView, indexPath: indexPath)
     }
     
-    // MARK: - Dequeue Helpers
     func dequeueHeader(_ tableView: UITableView, indexPath: IndexPath) -> HeaderTableViewCell {
         tableView.dequeueReusableCell(withIdentifier: "HeaderTableViewCell", for: indexPath) as! HeaderTableViewCell
     }

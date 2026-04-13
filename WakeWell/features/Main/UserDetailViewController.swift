@@ -58,10 +58,11 @@ class UserDetailViewController: UIViewController {
                 attributes: [.foregroundColor: UIColor(hex: "#8A9BB0")]
             )
         }
-        ageTextField.keyboardType = .numberPad
+        ageTextField?.keyboardType = .numberPad
     }
 
     private func styleSegmentedControl() {
+        guard let goalSegmentedControl = goalSegmentedControl else { return }
         goalSegmentedControl.setTitleTextAttributes(
             [.foregroundColor: UIColor(hex: "#8A9BB0")], for: .normal)
         goalSegmentedControl.setTitleTextAttributes(

@@ -120,8 +120,7 @@ class OnboardingPageViewController: UIViewController {
     }
 
     private func goToUserDetails() {
-        // ✅ REPLACE "UserDetailViewController" with your actual first user detail VC
-        let userDetailVC = UserDetailViewController()
+        let userDetailVC = UserDetailViewController(nibName: "UserDetailViewController", bundle: nil)
         userDetailVC.modalPresentationStyle = .fullScreen
         userDetailVC.modalTransitionStyle = .crossDissolve
         present(userDetailVC, animated: true)

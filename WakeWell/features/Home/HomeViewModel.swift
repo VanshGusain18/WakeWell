@@ -20,9 +20,7 @@ class HomeViewModel {
         }
     }
 
-    var cardCount: Int {
-        return cards.count
-    }
+    var cardCount: Int { cards.count }
 
     init() {
         let sleepDebtModel = provider.getSleepDebt()
@@ -30,7 +28,8 @@ class HomeViewModel {
 
         allCards = [
             .riseRitual(provider.getRiseRitual()),
-            .sleepRingWithAlarm(ring: provider.getSleepRing(), alarm: provider.getAlarm()),
+            .sleepRing(provider.getSleepRing()),   // consecutive — FlowLayout places side-by-side
+            .alarm(provider.getAlarm()),            //
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
             .sounds
@@ -40,18 +39,13 @@ class HomeViewModel {
             allCards.insert(.sleepDebt(sleepDebtModel), at: 0)
         }
     }
+
     func removeRiseRitualCard() {
-        allCards.removeAll {
-            if case .riseRitual = $0 { return true }
-            return false
-        }
+        allCards.removeAll { if case .riseRitual = $0 { return true }; return false }
     }
-    
+
     func removeSleepDebtCard() {
-        allCards.removeAll {
-            if case .sleepDebt = $0 { return true }
-            return false
-        }
+        allCards.removeAll { if case .sleepDebt = $0 { return true }; return false }
     }
 
     func toggleMetricsCard() {

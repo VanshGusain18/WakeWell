@@ -18,7 +18,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         WatchDebugRunner.run()
+        WatchDataManager.shared.start()
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            let vitals = DatabaseManager.shared.fetchRecentVitals()
+            print("Fetched vitals:", vitals)
+        }
         return true
     }
 

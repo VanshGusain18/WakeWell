@@ -2,24 +2,30 @@ import Foundation
 
 final class MockWatchDataSource: WatchDataSource {
 
-    func fetchLatestData(completion: @escaping (WatchData?) -> Void) {
+    private var timer: Timer?
 
-        print("Fetching data from MOCK watch...")
+    func startStreaming(completion: @escaping (WatchVitalsModel) -> Void) {
 
-        let data = WatchData(
-            sleepScore: Int.random(in: 60...95),
-            duration: Int.random(in: 10...20),
-            efficiency: Int.random(in: 8...15),
-            architecture: Int.random(in: 15...25),
-            continuity: Int.random(in: 10...15),
-            calmness: Int.random(in: 8...15),
-            consistency: Int.random(in: 5...10),
-            timestamp: Date()
-        )
+        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            print("Mock data generated: \(data)")
+            let data = WatchVitalsModel(
+                timestamp: Date(),
+                heartRate: Double.random(in: 50...90),
+                hrv: Double.random(in: 20...80),
+                motion: Double.random(in: 0...1),
+                respiratoryRate: Double.random(in: 12...20),
+                wristTemp: Double.random(in: 36.0...37.5),
+                oxygenSaturation: Double.random(in: 95...100)
+            )
+
+            print("Mock Vitals:", data)
+
             completion(data)
         }
+    }
+
+    func stopStreaming() {
+        timer?.invalidate()
+        timer = nil
     }
 }

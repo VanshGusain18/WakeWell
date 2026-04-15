@@ -4,27 +4,24 @@ final class WatchDataManager {
 
     static let shared = WatchDataManager()
 
-    private let dataSource: WatchDataSource
+    private let dataSource: WatchDataSource = MockWatchDataSource()
 
-    private(set) var latestData: WatchData?
+    private init() {}
 
-    private init() {
-        self.dataSource = MockWatchDataSource()
+    func start() {
+        dataSource.startStreaming { data in
+            self.handleIncomingData(data)
+        }
     }
 
-    func syncData(completion: (() -> Void)? = nil) {
+    private func handleIncomingData(_ data: WatchVitalsModel) {
 
-        print("Sync started...")
+        print("Processing Vitals at:", data.timestamp)
 
-        dataSource.fetchLatestData { [weak self] data in
+        DatabaseManager.shared.insertWatchVitals(data)
+    }
 
-            guard let self = self else { return }
-
-            self.latestData = data
-
-            print("Data stored in manager: \(String(describing: data))")
-
-            completion?()
-        }
+    func stop() {
+        dataSource.stopStreaming()
     }
 }

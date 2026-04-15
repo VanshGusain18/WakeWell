@@ -25,7 +25,7 @@ final class DatabaseManager {
             }
         }
 
-        print("DB PATH:", dbURL.path)
+//        print("DB PATH:", dbURL.path)
         
         return dbURL
     }

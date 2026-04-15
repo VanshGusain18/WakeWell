@@ -18,7 +18,7 @@ final class MockWatchDataSource: WatchDataSource {
                 oxygenSaturation: Double.random(in: 95...100)
             )
 
-            print("Mock Vitals:", data)
+//            print("Mock Vitals:", data)
 
             completion(data)
         }

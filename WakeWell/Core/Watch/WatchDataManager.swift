@@ -16,9 +16,15 @@ final class WatchDataManager {
 
     private func handleIncomingData(_ data: WatchVitalsModel) {
 
-        print("Processing Vitals at:", data.timestamp)
-
         DatabaseManager.shared.insertWatchVitals(data)
+
+        let shouldWake = SmartAlarmEngine.shared.evaluateWakeOpportunity()
+
+        if shouldWake {
+            print("🔥 TRIGGER ALARM NOW")
+        } else {
+            print("😴 WAIT")
+        }
     }
 
     func stop() {

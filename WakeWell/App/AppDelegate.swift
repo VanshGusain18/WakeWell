@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             let vitals = DatabaseManager.shared.fetchRecentVitals()
-            print("Fetched vitals:", vitals)
+            //print("Fetched vitals:", vitals)
         }
         return true
     }

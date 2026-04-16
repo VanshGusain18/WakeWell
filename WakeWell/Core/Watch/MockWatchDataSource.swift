@@ -9,7 +9,7 @@ final class MockWatchDataSource: WatchDataSource {
         timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
 
             let data = WatchVitalsModel(
-                timestamp: Date(),
+                timestamp: Date().addingTimeInterval(Double.random(in: 0...5)),
                 heartRate: Double.random(in: 50...90),
                 hrv: Double.random(in: 20...80),
                 motion: Double.random(in: 0...1),

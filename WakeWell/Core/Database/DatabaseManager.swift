@@ -25,7 +25,7 @@ final class DatabaseManager {
             }
         }
 
-//        print("DB PATH:", dbURL.path)
+        print("DB PATH:", dbURL.path)
         
         return dbURL
     }
@@ -123,7 +123,8 @@ final class DatabaseManager {
 
         let formatter = ISO8601DateFormatter()
 
-        sqlite3_bind_text(statement, 1, formatter.string(from: data.timestamp), -1, nil)
+        let timestampString = formatter.string(from: data.timestamp)
+        sqlite3_bind_text(statement, 1, (timestampString as NSString).utf8String, -1, nil)
         sqlite3_bind_double(statement, 2, data.heartRate)
         sqlite3_bind_double(statement, 3, data.hrv)
         sqlite3_bind_double(statement, 4, data.motion)
@@ -132,9 +133,10 @@ final class DatabaseManager {
         sqlite3_bind_double(statement, 7, data.oxygenSaturation ?? 0)
 
         if sqlite3_step(statement) == SQLITE_DONE {
-            print("Vitals inserted into DB")
+            print("✅ INSERT SUCCESS at:", data.timestamp)
         } else {
-            print("Insert failed")
+            let errorMsg = String(cString: sqlite3_errmsg(db))
+            print("❌ INSERT FAILED:", errorMsg)
         }
     }
     
@@ -186,7 +188,7 @@ final class DatabaseManager {
             results.append(data)
         }
 
-        print("Fetched \(results.count) vitals from DB")
+//        print("Fetched \(results.count) vitals from DB")
 
         return results
     }

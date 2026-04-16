@@ -36,7 +36,7 @@ final class HealthKitManager {
 
     func fetchLastNightSleep() {
         
-        print("fetchLastNightSleep CALLED")
+//        print("fetchLastNightSleep CALLED")
 
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
 
@@ -63,7 +63,7 @@ final class HealthKitManager {
                 return
             }
 
-            print("Total samples:", samples.count)
+//            print("Total samples:", samples.count)
 
             for sample in samples {
 

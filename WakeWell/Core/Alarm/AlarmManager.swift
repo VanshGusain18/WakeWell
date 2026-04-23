@@ -8,10 +8,17 @@ final class AlarmManager {
 
     private var currentAlarm: AlarmModel?
 
+    private let alarmKey = "wakewell_alarm_time"
+    
     // MARK: - Public API
 
     func setAlarm(_ alarm: AlarmModel) {
         self.currentAlarm = alarm
+
+        if let time = alarm.time {
+            UserDefaults.standard.set(time.timeIntervalSince1970, forKey: alarmKey)
+        }
+
         print("⏰ Alarm set for:", alarm.time ?? Date())
     }
 
@@ -30,4 +37,17 @@ final class AlarmManager {
         self.currentAlarm = AlarmModel(time: testTime)
         print("🧪 Test alarm set for:", testTime)
     }
+    
+    func loadSavedAlarm() {
+
+        let timestamp = UserDefaults.standard.double(forKey: alarmKey)
+
+        guard timestamp > 0 else { return }
+
+        let date = Date(timeIntervalSince1970: timestamp)
+        self.currentAlarm = AlarmModel(time: date)
+
+        print("📦 Loaded saved alarm:", date)
+    }
+    
 }

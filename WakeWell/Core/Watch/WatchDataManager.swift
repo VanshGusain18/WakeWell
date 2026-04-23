@@ -9,6 +9,9 @@ final class WatchDataManager {
     private init() {}
 
     func start() {
+        // 🔥 RESET DATABASE EVERY SESSION START
+        DatabaseManager.shared.clearVitals()
+
         dataSource.startStreaming { data in
             self.handleIncomingData(data)
         }
@@ -22,6 +25,7 @@ final class WatchDataManager {
 
         if shouldWake {
             print("🔥 TRIGGER ALARM NOW")
+            stop()
         } else {
             print("😴 WAIT")
         }

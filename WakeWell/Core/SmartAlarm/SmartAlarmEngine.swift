@@ -12,16 +12,17 @@ final class SmartAlarmEngine {
         let vitals = DatabaseManager.shared.fetchRecentVitals(limit: 20)
         print("Vitals count:", vitals.count)
         
-        guard vitals.count >= 5 else { return false }
+        let windowSize = min(5, vitals.count)
+        guard windowSize > 0 else { return false }
 
-        let recent = vitals.sorted { $0.timestamp > $1.timestamp }.prefix(5)
+        let recent = vitals.sorted { $0.timestamp > $1.timestamp }.prefix(windowSize)
 
         let avgHR = recent.map { $0.heartRate }.reduce(0, +) / Double(recent.count)
         let avgHRV = recent.map { $0.hrv }.reduce(0, +) / Double(recent.count)
         let avgMotion = recent.map { $0.motion }.reduce(0, +) / Double(recent.count)
         print(avgHR, avgHRV, avgMotion)
-        let hrScore = normalize(avgHR, min: 50, max: 100)
-        let hrvScore = normalize(avgHRV, min: 20, max: 80)
+        let hrScore = normalize(avgHR, minValue: 50, maxValue: 100)
+        let hrvScore = normalize(avgHRV, minValue: 20, maxValue: 80)
         let motionScore = avgMotion
 
         let wakeScore =
@@ -31,7 +32,7 @@ final class SmartAlarmEngine {
 
         print("🔥🔥🔥 SCORE:", wakeScore)
 
-        if wakeScore > 0.48 && !hasTriggered {
+        if wakeScore > 0.5 && !hasTriggered {
             hasTriggered = true
             triggerAlarm()
             return true
@@ -44,7 +45,8 @@ final class SmartAlarmEngine {
         print("⏰ WAKE UP TRIGGERED")
     }
 
-    private func normalize(_ value: Double, min: Double, max: Double) -> Double {
-        return (value - min) / (max - min)
+    private func normalize(_ value: Double, minValue: Double, maxValue: Double) -> Double {
+        let normalized = (value - minValue) / (maxValue - minValue)
+        return Swift.max(0, Swift.min(1, normalized))
     }
 }

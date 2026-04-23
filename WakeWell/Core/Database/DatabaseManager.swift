@@ -192,4 +192,23 @@ final class DatabaseManager {
 
         return results
     }
+    
+    func clearVitals() {
+        var db: OpaquePointer?
+
+        if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
+            print("Failed to open DB for clearing")
+            return
+        }
+
+        defer { sqlite3_close(db) }
+
+        // 1. Delete all rows
+        sqlite3_exec(db, "DELETE FROM watch_vitals;", nil, nil, nil)
+
+        // 2. Reset AUTOINCREMENT counter
+        sqlite3_exec(db, "DELETE FROM sqlite_sequence WHERE name='watch_vitals';", nil, nil, nil)
+
+        print("🧹 Vitals cleared + ID reset")
+    }
 }

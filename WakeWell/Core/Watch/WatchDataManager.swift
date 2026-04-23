@@ -9,8 +9,10 @@ final class WatchDataManager {
     private init() {}
 
     func start() {
-        // 🔥 RESET DATABASE EVERY SESSION START
+
+        // 🔥 CLEAN SESSION START
         DatabaseManager.shared.clearVitals()
+        SmartAlarmEngine.shared.reset()
 
         dataSource.startStreaming { data in
             self.handleIncomingData(data)

@@ -16,12 +16,17 @@ final class SmartAlarmEngine {
     private let analysisWindowSize = 10
     private let scoringWindowSize = 5
     private let requiredConsecutiveCount = 3
+    private let requiredMotionIncreaseCount = 4
     private let triggerWakeWindow: TimeInterval = 15 * 60
+    private let safetyTriggerWindow: TimeInterval = 5 * 60
     private let cooldownDuration: TimeInterval = 10 * 60
 
     private let wakeConfidenceThreshold = 0.75
     private let minimumTriggerScore = 0.65
     private let confidenceSmoothingFactor = 0.45
+    private let strongSignalConfidenceThreshold = 0.65
+    private let trendTriggerConfidenceThreshold = 0.60
+    private let safetyTriggerConfidenceThreshold = 0.50
 
     private let motionSpikeThreshold = 0.55
     private let motionDeltaThreshold = 0.07
@@ -34,6 +39,7 @@ final class SmartAlarmEngine {
     private var hasTriggered = false
     private var wakeConfidence: Double = 0
     private var consecutiveHighScoreCount = 0
+    private var motionIncreasingCount = 0
     private var lastTriggerTime: Date?
     private var lastKnownAverages: VitalAverages?
 
@@ -49,6 +55,7 @@ final class SmartAlarmEngine {
         hasTriggered = false
         wakeConfidence = 0
         consecutiveHighScoreCount = 0
+        motionIncreasingCount = 0
         lastTriggerTime = nil
         lastKnownAverages = nil
         lastMotionValues = []
@@ -68,6 +75,7 @@ final class SmartAlarmEngine {
                 signals: SignalState.none,
                 analysis: TrendAnalysis.zero,
                 components: .zero,
+                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: cooldownDecision
             )
@@ -87,6 +95,7 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
+                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: decision
             )
@@ -106,6 +115,7 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
+                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
                 timeToAlarm: 0,
                 decision: decision
             )
@@ -122,6 +132,7 @@ final class SmartAlarmEngine {
 
         guard vitals.count >= minimumRequiredSamples else {
             consecutiveHighScoreCount = 0
+            motionIncreasingCount = 0
             wakeConfidence = max(0, wakeConfidence - 0.04)
 
             let decision = WakeDecision(
@@ -136,6 +147,7 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
+                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
                 timeToAlarm: timeToAlarm,
                 decision: decision
             )
@@ -163,19 +175,24 @@ final class SmartAlarmEngine {
         let components = buildConfidenceComponents(
             score: score,
             signals: signals,
+            analysis: analysis,
             withinWakeWindow: withinWakeWindow
         )
         wakeConfidence = updateConfidence(using: components)
 
-        let shouldTrigger = shouldTrigger(
+        let triggerEvaluation = evaluateTrigger(
             score: score,
             signals: signals,
+            analysis: analysis,
+            remainingTimeToAlarm: timeToAlarm,
             withinWakeWindow: withinWakeWindow
         )
+        let shouldTrigger = triggerEvaluation.shouldTrigger
 
         let reason = shouldTrigger ? "smart_detection" : decisionReason(
             score: score,
             signals: signals,
+            analysis: analysis,
             withinWakeWindow: withinWakeWindow
         )
 
@@ -194,6 +211,7 @@ final class SmartAlarmEngine {
             signals: signals,
             analysis: analysis,
             components: components,
+            triggerEvaluation: triggerEvaluation,
             timeToAlarm: timeToAlarm,
             decision: decision
         )
@@ -211,6 +229,7 @@ final class SmartAlarmEngine {
                 reason: "smart_detection"
             )
 
+            logTriggerPath(triggerEvaluation, confidence: wakeConfidence)
             logTriggered(
                 reason: "smart_detection",
                 confidence: wakeConfidence,
@@ -302,10 +321,13 @@ final class SmartAlarmEngine {
         let hrDelta = calculateHRDelta(smoothedVitals: smoothedVitals)
         let hrTrend = isHRIncreasing(smoothedVitals)
         let motionSpike = isMotionSpikeDetected(motionDelta)
+        let motionIncreasing = isMotionIncreasing(smoothedVitals)
+        updateMotionIncreasingCount(isIncreasing: motionIncreasing)
 
         return TrendAnalysis(
             hrTrend: hrTrend,
             motionSpike: motionSpike,
+            motionIncreasing: motionIncreasing,
             motionDelta: motionDelta.rawDelta,
             hrDelta: hrDelta
         )
@@ -344,15 +366,20 @@ final class SmartAlarmEngine {
     private func buildConfidenceComponents(
         score: ScoreBreakdown,
         signals: SignalState,
+        analysis: TrendAnalysis,
         withinWakeWindow: Bool
     ) -> ConfidenceComponents {
         let baseScore = clamp((score.finalScore - 0.25) * 1.35, minValue: 0, maxValue: 0.55)
-        let trendBonus = signals.hrTrend ? 0.18 : 0
+        var trendBonus = signals.hrTrend ? 0.25 : 0
+        if signals.hrTrend && analysis.motionIncreasing {
+            trendBonus += 0.10
+        }
         let spikeBonus = signals.motionSpike ? 0.22 : 0
         let consecutiveBonus = min(Double(consecutiveHighScoreCount) * 0.08, 0.24)
+        let motionIncreaseBonus = min(Double(motionIncreasingCount) * 0.03, 0.12)
         let wakeWindowBonus = withinWakeWindow ? 0.05 : 0
         let targetConfidence = clamp(
-            baseScore + trendBonus + spikeBonus + consecutiveBonus + wakeWindowBonus,
+            baseScore + trendBonus + spikeBonus + consecutiveBonus + motionIncreaseBonus + wakeWindowBonus,
             minValue: 0,
             maxValue: 1
         )
@@ -362,6 +389,7 @@ final class SmartAlarmEngine {
             trendBonus: trendBonus,
             spikeBonus: spikeBonus,
             consecutiveBonus: consecutiveBonus,
+            motionIncreaseBonus: motionIncreaseBonus,
             wakeWindowBonus: wakeWindowBonus,
             targetConfidence: targetConfidence
         )
@@ -372,17 +400,34 @@ final class SmartAlarmEngine {
         return clamp(nextValue, minValue: 0, maxValue: 1)
     }
 
-    private func shouldTrigger(
+    private func evaluateTrigger(
         score: ScoreBreakdown,
         signals: SignalState,
+        analysis: TrendAnalysis,
+        remainingTimeToAlarm: TimeInterval,
         withinWakeWindow: Bool
-    ) -> Bool {
-        withinWakeWindow &&
-            signals.motionSpike &&
-            signals.hrTrend &&
-            score.finalScore > minimumTriggerScore &&
-            consecutiveHighScoreCount >= requiredConsecutiveCount &&
-            wakeConfidence >= wakeConfidenceThreshold
+    ) -> TriggerEvaluation {
+        guard withinWakeWindow else {
+            return TriggerEvaluation(shouldTrigger: false, type: .none)
+        }
+
+        if signals.motionSpike && wakeConfidence > strongSignalConfidenceThreshold {
+            return TriggerEvaluation(shouldTrigger: true, type: .strongSignal)
+        }
+
+        if signals.hrTrend &&
+            analysis.motionIncreasing &&
+            motionIncreasingCount >= requiredMotionIncreaseCount &&
+            wakeConfidence > trendTriggerConfidenceThreshold {
+            return TriggerEvaluation(shouldTrigger: true, type: .trendBased)
+        }
+
+        if remainingTimeToAlarm <= safetyTriggerWindow &&
+            wakeConfidence > safetyTriggerConfidenceThreshold {
+            return TriggerEvaluation(shouldTrigger: true, type: .safety)
+        }
+
+        return TriggerEvaluation(shouldTrigger: false, type: .none)
     }
 
     // MARK: - Signal Analysis
@@ -429,11 +474,27 @@ final class SmartAlarmEngine {
         return positiveSteps >= 3 && totalIncrease >= hrTotalIncreaseThreshold
     }
 
+    private func isMotionIncreasing(_ vitals: [WatchVitalsModel]) -> Bool {
+        guard vitals.count >= 2 else { return false }
+
+        let latest = vitals[vitals.count - 1].motion
+        let previous = vitals[vitals.count - 2].motion
+        return latest > previous
+    }
+
     private func isMotionSpikeDetected(_ motionDelta: MotionDelta) -> Bool {
         motionDelta.latestMotion >= motionSpikeThreshold &&
             motionDelta.rawDelta >= motionDeltaThreshold &&
             motionDelta.smoothedDelta >= motionDeltaThreshold * 0.6 &&
             motionDelta.motionRatio >= motionSpikeRatioThreshold
+    }
+
+    private func updateMotionIncreasingCount(isIncreasing: Bool) {
+        if isIncreasing {
+            motionIncreasingCount += 1
+        } else {
+            motionIncreasingCount = 0
+        }
     }
 
     // MARK: - Decision Helpers
@@ -489,6 +550,7 @@ final class SmartAlarmEngine {
             signals: .none,
             analysis: .zero,
             components: .zero,
+            triggerEvaluation: TriggerEvaluation(shouldTrigger: true, type: .fallback),
             timeToAlarm: timeToAlarm,
             decision: decision
         )
@@ -499,29 +561,30 @@ final class SmartAlarmEngine {
     private func decisionReason(
         score: ScoreBreakdown,
         signals: SignalState,
+        analysis: TrendAnalysis,
         withinWakeWindow: Bool
     ) -> String {
         if !withinWakeWindow {
             return "outside_wake_window"
         }
 
-        if !signals.motionSpike {
-            return "awaiting_motion_confirmation"
-        }
-
-        if !signals.hrTrend {
-            return "awaiting_hr_confirmation"
+        if signals.hrTrend && !analysis.motionIncreasing {
+            return "awaiting_motion_rise"
         }
 
         if score.finalScore <= minimumTriggerScore {
             return "score_below_threshold"
         }
 
-        if consecutiveHighScoreCount < requiredConsecutiveCount {
-            return "awaiting_consecutive_validation"
+        if !signals.motionSpike && !signals.hrTrend {
+            return "awaiting_wake_signals"
         }
 
-        if wakeConfidence < wakeConfidenceThreshold {
+        if motionIncreasingCount < requiredMotionIncreaseCount {
+            return "building_motion_trend"
+        }
+
+        if wakeConfidence < trendTriggerConfidenceThreshold {
             return "building_confidence"
         }
 
@@ -554,12 +617,14 @@ final class SmartAlarmEngine {
         print("- motionDelta: \(formatted(analysis.motionDelta))")
         print("- hrTrend: \(analysis.hrTrend)")
         print("- motionSpike: \(analysis.motionSpike)")
+        print("- motionIncreasing: \(analysis.motionIncreasing)")
 
         print("""
           📈 TREND ANALYSIS:
           
           * HR increasing: \(analysis.hrTrend)
           * motion spike detected: \(analysis.motionSpike)
+          * motion increasing: \(analysis.motionIncreasing)
           * motion delta: \(formatted(analysis.motionDelta))
           * HR delta: \(formatted(analysis.hrDelta))
           """)
@@ -571,6 +636,7 @@ final class SmartAlarmEngine {
         signals: SignalState,
         analysis: TrendAnalysis,
         components: ConfidenceComponents,
+        triggerEvaluation: TriggerEvaluation,
         timeToAlarm: TimeInterval,
         decision: WakeDecision
     ) {
@@ -587,6 +653,7 @@ final class SmartAlarmEngine {
         print("- baseScore: \(formatted(components.baseScore))")
         print("- trendBonus: \(formatted(components.trendBonus))")
         print("- spikeBonus: \(formatted(components.spikeBonus))")
+        print("- motionIncreaseBonus: \(formatted(components.motionIncreaseBonus))")
         print("- finalConfidence: \(formatted(decision.confidence))")
 
         print("""
@@ -597,6 +664,8 @@ final class SmartAlarmEngine {
           * threshold: \(formatted(wakeConfidenceThreshold))
           * motionSpike: \(signals.motionSpike)
           * hrTrend: \(signals.hrTrend)
+          * motionIncreasing: \(analysis.motionIncreasing)
+          * motionIncreasingCount: \(motionIncreasingCount)
           * consecutiveCount: \(consecutiveHighScoreCount)
           * shouldTrigger: \(decision.shouldTrigger)
           """)
@@ -604,7 +673,14 @@ final class SmartAlarmEngine {
         print("[DECISION]")
         print("- threshold: 0.75")
         print("- confidence: \(formatted(decision.confidence))")
+        print("- motionIncreasingCount: \(motionIncreasingCount)")
+        print("- triggerType: \(triggerEvaluation.type.rawValue)")
         print("- shouldTrigger: \(decision.shouldTrigger)")
+    }
+
+    private func logTriggerPath(_ evaluation: TriggerEvaluation, confidence: Double) {
+        guard evaluation.type != .none else { return }
+        print("[TRIGGER] type: \(evaluation.type.rawValue) confidence: \(formatted(confidence)) motionCount: \(motionIncreasingCount)")
     }
 
     private func logTriggered(
@@ -704,10 +780,17 @@ private struct MotionDelta {
 private struct TrendAnalysis {
     let hrTrend: Bool
     let motionSpike: Bool
+    let motionIncreasing: Bool
     let motionDelta: Double
     let hrDelta: Double
 
-    static let zero = TrendAnalysis(hrTrend: false, motionSpike: false, motionDelta: 0, hrDelta: 0)
+    static let zero = TrendAnalysis(
+        hrTrend: false,
+        motionSpike: false,
+        motionIncreasing: false,
+        motionDelta: 0,
+        hrDelta: 0
+    )
 }
 
 private struct InputSnapshot {
@@ -723,6 +806,7 @@ private struct ConfidenceComponents {
     let trendBonus: Double
     let spikeBonus: Double
     let consecutiveBonus: Double
+    let motionIncreaseBonus: Double
     let wakeWindowBonus: Double
     let targetConfidence: Double
 
@@ -731,7 +815,21 @@ private struct ConfidenceComponents {
         trendBonus: 0,
         spikeBonus: 0,
         consecutiveBonus: 0,
+        motionIncreaseBonus: 0,
         wakeWindowBonus: 0,
         targetConfidence: 0
     )
+}
+
+private struct TriggerEvaluation {
+    let shouldTrigger: Bool
+    let type: TriggerType
+}
+
+private enum TriggerType: String {
+    case none = "NONE"
+    case strongSignal = "STRONG_SIGNAL"
+    case trendBased = "TREND_BASED"
+    case safety = "SAFETY"
+    case fallback = "FALLBACK"
 }

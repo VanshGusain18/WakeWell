@@ -16,7 +16,6 @@ class BarChartTableViewCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
         setupStyle()
         setupChartAppearance()
     }

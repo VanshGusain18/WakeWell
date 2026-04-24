@@ -2,251 +2,368 @@
 //  ActivityDeckViewController.swift
 //  WakeWell
 //
-//  Created by geu on 18/03/26.
-//
 
 import UIKit
 
-class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource {
-    
-    @IBOutlet weak var viewToggle: UISegmentedControl!
+class ActivityDeckViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var tableView: UITableView!
-    
-    @IBAction func toggleChanged(_ sender: UISegmentedControl) {
-        
-        if sender.selectedSegmentIndex == 0 {
-            collectionView.isHidden = false
-            tableView.isHidden = true
-        } else {
-            collectionView.isHidden = true
-            tableView.isHidden = false
-        }
+
+    var selectedActivityIDs: Set<String> = ["ritual_1", "ritual_3"]
+    private let maximumActivitiesInRoutine = 5
+
+    /// How many explore activities to show before "Show More"
+    private let explorePreviewCount = 4
+    private var isExploreExpanded = false
+
+    enum Section: Int, CaseIterable {
+        case morning
+        case explore
     }
-    
+
+
+    var selectedActivities: [Activity] {
+        activities.filter { selectedActivityIDs.contains($0.id) }
+    }
+
+    var allActivities: [Activity] { activities }
+
+    // Activities shown in the Explore grid (limited or all)
+    var exploreActivities: [Activity] {
+        isExploreExpanded ? activities : Array(activities.prefix(explorePreviewCount))
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.isHidden = true   // start with cards
-        collectionView.delegate = self
+
+        collectionView.delegate   = self
         collectionView.dataSource = self
-        
         collectionView.decelerationRate = .fast
         collectionView.showsHorizontalScrollIndicator = false
-        
-        collectionView.register(ActivityCardViewCell.self, forCellWithReuseIdentifier: "cell")
+
+        // Cells
+        collectionView.register(ActivityCardViewCell.self,
+                                forCellWithReuseIdentifier: "cell")
+        collectionView.register(AddActivityCardCell.self,
+                                forCellWithReuseIdentifier: AddActivityCardCell.identifier)
+
+        // Supplementary
+        collectionView.register(RitualHeaderView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: RitualHeaderView.identifier)
+        collectionView.register(RoutineFooterView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: RoutineFooterView.identifier)
+        collectionView.register(ShowMoreFooterView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: ShowMoreFooterView.identifier)
+
         setupLayout()
-//        let refreshButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshData))
-//        navigationItem.rightBarButtonItem = refreshButton
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         loadActivities()
         shuffledActivities = activities.shuffled()
         collectionView.reloadData()
-        tableView.reloadData()
     }
-    // layout for the card where 
+
+    // to setup the layout of morning view an dexplore grid view
+
     func setupLayout() {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        
-        let width = view.frame.width * 0.7
-        let height = view.frame.height * 0.5
-        
-        layout.itemSize = CGSize(width: width, height: height)
-        layout.minimumLineSpacing = 20
-        
-        collectionView.collectionViewLayout = layout
+        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+            guard let self, let section = Section(rawValue: sectionIndex) else { return nil }
+
+            switch section {
+
+            case .morning:
+                let item = NSCollectionLayoutItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .fractionalHeight(1.0))
+                )
+                item.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
+
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: .init(widthDimension: .fractionalWidth(0.85),
+                                      heightDimension: .fractionalHeight(0.55)),
+                    subitems: [item]
+                )
+
+                let sectionLayout = NSCollectionLayoutSection(group: group)
+                sectionLayout.orthogonalScrollingBehavior = .groupPagingCentered
+
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .absolute(60)),
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .absolute(80)),
+                    elementKind: UICollectionView.elementKindSectionFooter,
+                    alignment: .bottom
+                )
+                sectionLayout.boundarySupplementaryItems = [header, footer]
+                sectionLayout.contentInsets = .init(top: 10, leading: 0, bottom: 20, trailing: 0)
+                return sectionLayout
+
+            case .explore:
+                let item = NSCollectionLayoutItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(0.5),
+                                      heightDimension: .fractionalHeight(1.0))
+                )
+                item.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
+
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .absolute(160)),
+                    subitems: [item]
+                )
+
+                let sectionLayout = NSCollectionLayoutSection(group: group)
+
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .absolute(50)),
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+
+                // Show More footer (hidden when expanded)
+                let showMoreFooter = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .absolute(self.isExploreExpanded ? 0 : 52)),
+                    elementKind: UICollectionView.elementKindSectionFooter,
+                    alignment: .bottom
+                )
+
+                sectionLayout.boundarySupplementaryItems = [header, showMoreFooter]
+                return sectionLayout
+            }
+        }
+
+        collectionView.setCollectionViewLayout(layout, animated: false)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return shuffledActivities.count
+
+    //  DataSource
+
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        Section.allCases.count
     }
-    
+
+    func collectionView(_ collectionView: UICollectionView,
+                        numberOfItemsInSection section: Int) -> Int {
+        switch Section(rawValue: section) {
+        case .morning:
+            // selectedActivities + 1 "Add" card at the end
+            return selectedActivities.count + 1
+        case .explore:
+            return exploreActivities.count
+        case .none:
+            return 0
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ActivityCardViewCell
-        
-        let activity = shuffledActivities[indexPath.item]
-        
-        cell.titleLabel.text = activity.title
-        cell.categoryLabel.text = activity.category
-        cell.imageView.image = UIImage(named: activity.imageName)
-        
-        return cell
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        
-        let itemWidth = layout.itemSize.width
-        let inset = (view.frame.width - itemWidth) / 2
-        
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selected = shuffledActivities[indexPath.item]
-        print("Selected: \(selected.title)")
-    }
-    
-    @IBAction func shuffleTapped() {
-        shuffledActivities.shuffle()
-        collectionView.reloadData()
-        performShuffleAnimation()
-    }
-    func performShuffleAnimation() {
-        
-        guard shuffledActivities.count > 0 else { return }
-        
-        let totalSpins = 1
-        var delay: Double = 0.1
-        
-        for _ in 0..<totalSpins {
-            
-            let randomIndex = Int.random(in: 0..<shuffledActivities.count)
-            let indexPath = IndexPath(item: randomIndex, section: 0)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                self.collectionView.scrollToItem(at: indexPath,
-                                                 at: .centeredHorizontally,
-                                                 animated: true)
+        let section = Section(rawValue: indexPath.section)!
+
+        switch section {
+        case .morning:
+            // Last item is always the "Add" card
+            if indexPath.item == selectedActivities.count {
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: AddActivityCardCell.identifier, for: indexPath)
+                return cell
             }
-            
-//            delay += 0.1 + (Double(i) * 0.02)
-            delay += 0.1
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            
-            let finalIndex = Int.random(in: 0..<shuffledActivities.count)
-            let finalPath = IndexPath(item: finalIndex, section: 0)
-            
-            UIView.animate(withDuration: 0.6,
-                           delay: 0,
-                           usingSpringWithDamping: 0.8,
-                           initialSpringVelocity: 0.5,
-                           options: [.curveEaseOut],
-                           animations: {
-                
-                self.collectionView.scrollToItem(at: finalPath,
-                                                 at: .centeredHorizontally,
-                                                 animated: false)
-            })
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "cell", for: indexPath) as! ActivityCardViewCell
+            let activity = selectedActivities[indexPath.item]
+            cell.configure(with: activity, isExplore: false)
+            cell.menuProvider = { [weak self] in
+                self?.makeOptionsMenu(for: activity)
+            }
+            cell.alpha = 1.0
+            return cell
+
+        case .explore:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "cell", for: indexPath) as! ActivityCardViewCell
+            let activity = exploreActivities[indexPath.item]
+            let isSelected = selectedActivityIDs.contains(activity.id)
+            cell.configure(with: activity, isExplore: true)
+            cell.menuProvider = { [weak self] in
+                self?.makeOptionsMenu(for: activity)
+            }
+            cell.alpha = isSelected ? 1.0 : 0.6
+            return cell
         }
     }
+
+
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
+        let section = Section(rawValue: indexPath.section)!
+
+        switch section {
+        case .morning:
+            // Tapped the "Add" card → show picker sheet
+            if indexPath.item == selectedActivities.count {
+                presentAddActivityPicker()
+            }
+
+        case .explore:
+            return
+        }
+    }
+
+
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+
+        let section = Section(rawValue: indexPath.section)!
+
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: RitualHeaderView.identifier,
+                for: indexPath) as! RitualHeaderView
+            header.titleLabel.text = (section == .morning) ? "Your Morning Routine" : "Explore Activities"
+            return header
+
+        } else { // footer
+            switch section {
+            case .morning:
+                let footer = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: RoutineFooterView.identifier,
+                    for: indexPath) as! RoutineFooterView
+                footer.startAction = { [weak self] in self?.startRoutineTapped() }
+                return footer
+
+            case .explore:
+                let footer = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: ShowMoreFooterView.identifier,
+                    for: indexPath) as! ShowMoreFooterView
+                footer.isHidden = isExploreExpanded
+                footer.onShowMore = { [weak self] in
+                    guard let self else { return }
+                    self.isExploreExpanded = true
+                    self.setupLayout()          // rebuild layout to collapse footer height
+                    self.collectionView.reloadSections(IndexSet(integer: Section.explore.rawValue))
+                }
+                return footer
+            }
+        }
+    }
+
+
+    // Presents a sheet listing all activities with checkmarks so the user can
+    // add/remove items from the Morning Routine directly from this screen.
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return activities.count   // NOT shuffled
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath)
-
-        let activity = activities[indexPath.row]
-        cell.textLabel?.text = activity.title
-        cell.detailTextLabel?.text = activity.category
-
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-           
-            activities.remove(at: indexPath.row)
-            saveActivities()
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            shuffledActivities = activities.shuffled()
-            collectionView.reloadData()
+    private func presentAddActivityPicker() {
+        let sheet = AddToMorningSheetViewController()
+        sheet.allActivities       = allActivities
+        sheet.selectedActivityIDs = selectedActivityIDs
+        sheet.maximumSelections   = maximumActivitiesInRoutine
+        sheet.onSelectionLimitReached = { [weak self] in
+            self?.showSelectionLimitAlert()
         }
+        sheet.onDone = { [weak self] updatedIDs in
+            self?.selectedActivityIDs = updatedIDs
+            self?.collectionView.reloadData()
+        }
+        let nav = UINavigationController(rootViewController: sheet)
+        if let sheet = nav.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+        present(nav, animated: true)
     }
-    // choosing of the card and showing it in the new screen
-    @IBAction func chooseTapped(_ sender: UIButton) {
-        print("Choose tapped") //just to check
-        let index = getCenteredIndex()
-        print("Index:", index) // just to check
-        let selectedActivity = shuffledActivities[index]
-        openDetail(activity: selectedActivity)
+
+    //  Activity Details
+
+    private func makeOptionsMenu(for activity: Activity) -> UIMenu {
+        let isInRoutine = selectedActivityIDs.contains(activity.id)
+
+        let primaryAction: UIAction
+        if isInRoutine {
+            primaryAction = UIAction(
+                title: "Remove Routine",
+                image: UIImage(systemName: "minus.circle")
+            ) { [weak self] _ in
+                self?.selectedActivityIDs.remove(activity.id)
+                self?.collectionView.reloadData()
+            }
+        } else {
+            primaryAction = UIAction(
+                title: "Add to Routine",
+                image: UIImage(systemName: "plus.circle")
+            ) { [weak self] _ in
+                guard let self else { return }
+                guard self.selectedActivityIDs.count < self.maximumActivitiesInRoutine else {
+                    self.showSelectionLimitAlert()
+                    return
+                }
+                self.selectedActivityIDs.insert(activity.id)
+                self.collectionView.reloadData()
+            }
+        }
+
+        let cancelAction = UIAction(
+            title: "Cancel",
+            image: UIImage(systemName: "xmark")
+        ) { _ in }
+
+        return UIMenu(title: "", options: .displayInline, children: [primaryAction, cancelAction])
     }
-    func getCenteredIndex() -> Int {
-        let centerPoint = CGPoint(
-            x: collectionView.contentOffset.x + collectionView.bounds.width / 2,
-            y: collectionView.bounds.height / 2
+
+    private func showSelectionLimitAlert() {
+        let alert = UIAlertController(
+            title: "Routine Full",
+            message: "You can add up to 5 activities to your morning ritual.",
+            preferredStyle: .alert
         )
-        
-        if let indexPath = collectionView.indexPathForItem(at: centerPoint) {
-            return indexPath.item
-        }
-        
-        return 0
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
-    func openDetail(activity: Activity) {
-        let storyboard = UIStoryboard(name: "Rise", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "ActivityDetailViewController") as! ActivityDetailViewController
-        
-        vc.activity = activity
-        vc.modalTransitionStyle = .flipHorizontal
+
+    // Start Routine
+
+    @IBAction func startRoutineTapped() {
+        guard !selectedActivities.isEmpty else { return }
+
+        let vc = ActivityRunnerFactory.makeViewController(
+            for: selectedActivities[0],
+            routineQueue: selectedActivities,
+            currentIndex: 0
+        )
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    @IBAction func addTapped() {
-        let storyboard = UIStoryboard(name: "Rise", bundle: nil)
-        
-        let vc = storyboard.instantiateViewController(withIdentifier: "AddActivityViewController") as! AddActivityViewController
-        vc.delegate = self
-        present(vc, animated: true)
-    }
-    
-//    @objc func refreshData() {
-//        loadActivities()
-//        shuffledActivities = activities.shuffled()
-//        
-//        // Add a small haptic pop so the user feels the refresh
-//        UISelectionFeedbackGenerator().selectionChanged()
-//        
-//        collectionView.reloadData()
-//        tableView.reloadData()
-//        
-//        print("Data refreshed: \(activities.count) activities found.")
-//    }
-    
-    func loadActivities() {
-        let decoder = JSONDecoder()
-        
-        if let data = UserDefaults.standard.data(forKey: "activities") { // to show the saved chnages by the user.
-            do {
-                activities = try decoder.decode([Activity].self, from: data)
-            } catch {
-                print("Error loading activities:", error)
-            }
-        }
-    }
-    func saveActivities() {
-        let encoder = JSONEncoder()
+}
+
+// MARK: - loadActivities (global helper, unchanged)
+
+func loadActivities() {
+    let decoder = JSONDecoder()
+    if let data = UserDefaults.standard.data(forKey: "activities") {
         do {
-            let data = try encoder.encode(activities)
-            UserDefaults.standard.set(data, forKey: "activities")
+            activities = try decoder.decode([Activity].self, from: data)
         } catch {
-            print("Error saving after deletion: \(error)")
+            print("Error loading activities:", error)
         }
     }
 }
+
+//  AddActivityDelegate
+
 extension ActivityDeckViewController: AddActivityDelegate {
     func didSaveNewActivity() {
         loadActivities()
         shuffledActivities = activities.shuffled()
-        
         collectionView.reloadData()
-        tableView.reloadData()
     }
 }

@@ -30,8 +30,6 @@ final class SleepConsistencyAnalyzer {
         }
     }
 
-    // MARK: - Chart builders (unchanged)
-
     static func calculateScore(bedtime: Double, wakeTime: Double) -> Double {
         let data      = getData(for: .week)
         let sigmaBed  = standardDeviation(data.map { $0.bedtime })
@@ -79,8 +77,6 @@ final class SleepConsistencyAnalyzer {
         making it easier to fall asleep and wake up feeling refreshed.
         """
     }
-
-    // MARK: - Fallback
 
     private static func fallback(for range: StatsTimeRange) -> [SleepConsistencyData] {
         switch range {

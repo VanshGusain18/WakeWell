@@ -30,8 +30,6 @@ final class EfficiencyAnalyzer {
         }
     }
 
-    // MARK: - Chart builders (unchanged)
-
     static func trendChartData(from data: [EfficiencyData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map {
@@ -68,8 +66,6 @@ final class EfficiencyAnalyzer {
         Falling asleep quickly and staying asleep means your body is using your sleep time well.
         """
     }
-
-    // MARK: - Fallback
 
     private static func fallback(for range: StatsTimeRange) -> [EfficiencyData] {
         switch range {

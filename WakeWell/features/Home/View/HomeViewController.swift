@@ -5,20 +5,43 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
     private let viewModel = HomeViewModel()
-    
+
+    // MARK: - Lifecycle
+    private var isAnimatingMetrics = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(viewModel.cards)
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        collectionView.delegate        = self
+        collectionView.dataSource      = self
         collectionView.allowsSelection = true
         registerCells()
 
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.estimatedItemSize = .zero
-            layout.minimumLineSpacing = 16
-            layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+            layout.estimatedItemSize       = .zero
+            layout.minimumLineSpacing      = 16
+            layout.minimumInteritemSpacing = 8   // horizontal gap between the two half-width cards
+            layout.sectionInset            = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         }
+
+        // Reload the alarm card whenever the user saves a new time in AlarmOptionViewController.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reloadAlarmCard),
+            name: .alarmTimeDidChange,
+            object: nil
+        )
+    }
+
+    @objc private func reloadAlarmCard() {
+        guard let alarmIndex = viewModel.cards.firstIndex(where: {
+            if case .alarm = $0 { return true }
+            return false
+        }) else { return }
+        collectionView.reloadItems(at: [IndexPath(item: alarmIndex, section: 0)])
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     private func registerCells() {
@@ -27,26 +50,25 @@ class HomeViewController: UIViewController {
             forCellWithReuseIdentifier: SleepDebtViewCardCell.identifier
         )
         collectionView.register(
-            UINib(nibName: "AlarmCollectionViewCell", bundle: nil),
-            forCellWithReuseIdentifier: "alarm_cell"
+            UINib(nibName: RiseRitualCollectionViewCell.identifier, bundle: nil),
+            forCellWithReuseIdentifier: RiseRitualCollectionViewCell.identifier
         )
-
+        // Individual cells registered directly — no wrapper pair cell needed.
         collectionView.register(
-            UINib(nibName: "SleepRingCollectionViewCell", bundle: nil),
-            forCellWithReuseIdentifier: "sleep_ring_cell"
+            UINib(nibName: SleepRingCollectionViewCell.identifier, bundle: nil),
+            forCellWithReuseIdentifier: SleepRingCollectionViewCell.identifier
         )
-
+        collectionView.register(
+            UINib(nibName: AlarmCollectionViewCell.identifier, bundle: nil),
+            forCellWithReuseIdentifier: AlarmCollectionViewCell.identifier
+        )
         collectionView.register(
             UINib(nibName: "SleepMetricsGridCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "sleep_metrics_cell"
         )
         collectionView.register(
-            UINib(nibName: "GroggySliderCollectionViewCell", bundle: nil),
-            forCellWithReuseIdentifier: "groggy_slider_cell"
-        )
-        collectionView.register(
-            UINib(nibName: "MorningNotesCollectionViewCell", bundle: nil),
-            forCellWithReuseIdentifier: "morning_notes_cell"
+            UINib(nibName: GroggyNotesCollectionViewCell.identifier, bundle: nil),
+            forCellWithReuseIdentifier: GroggyNotesCollectionViewCell.identifier
         )
         collectionView.register(
             UINib(nibName: "SleepSoundsCollectionViewCell", bundle: nil),
@@ -57,9 +79,7 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: UICollectionViewDataSource {
 
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
+    func numberOfSections(in collectionView: UICollectionView) -> Int { 1 }
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
@@ -74,92 +94,132 @@ extension HomeViewController: UICollectionViewDataSource {
         switch card {
             
         case .sleepDebt(let model):
-
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: SleepDebtViewCardCell.identifier,
                 for: indexPath
             ) as! SleepDebtViewCardCell
-
-            let vm = SleepDebtViewModel(model: model)
-            cell.configure(with: vm)
-
+            cell.configure(with: SleepDebtViewModel(model: model))
             cell.onClose = { [weak self] in
-                self?.viewModel.removeSleepDebtCard()
-                self?.collectionView.reloadData()
+                guard let self else { return }
+                self.viewModel.removeSleepDebtCard()
+                self.collectionView.performBatchUpdates {
+                    self.collectionView.deleteItems(at: [indexPath])
+                }
+            }
+            return cell
+            
+        case .riseRitual(let model):
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RiseRitualCollectionViewCell.identifier,
+                for: indexPath
+            ) as! RiseRitualCollectionViewCell
+            cell.configure(with: RiseRitualViewModel(model: model))
+
+            // ── Start Ritual → switch to Rise tab (index 2) and trigger startRoutineTapped ──
+            cell.onStartRitual = { [weak self] in
+                guard let self else { return }
+                self.tabBarController?.selectedIndex = 2
+                // Give the tab a tick to finish appearing, then fire the routine
+                DispatchQueue.main.async {
+                    if let nav  = self.tabBarController?.selectedViewController as? UINavigationController,
+                       let deck = nav.topViewController as? ActivityDeckViewController {
+                        deck.startRoutineTapped()
+                    }
+                }
             }
 
+            // ── View Rise Tab → just switch to the Rise tab ──────────────────
+            cell.onViewRiseTab = { [weak self] in
+                self?.tabBarController?.selectedIndex = 2
+            }
+
+            cell.onClose = { [weak self] in
+                guard let self else { return }
+                guard let currentIndex = self.viewModel.cards.firstIndex(where: {
+                    if case .riseRitual = $0 { return true }
+                    return false
+                }) else { return }
+                self.viewModel.removeRiseRitualCard()
+                self.collectionView.performBatchUpdates {
+                    self.collectionView.deleteItems(at: [IndexPath(item: currentIndex, section: 0)])
+                }
+            }
             return cell
 
-        case .alarm(let model):
-
+        case .sleepRing(let ringModel):
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "alarm_cell",
-                for: indexPath
-            ) as! AlarmCollectionViewCell
-
-            let vm = AlarmViewModel(model: model)
-            cell.configure(with: vm)
-            return cell
-
-        case .sleepRing(let model):
-
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "sleep_ring_cell",
+                withReuseIdentifier: SleepRingCollectionViewCell.identifier,
                 for: indexPath
             ) as! SleepRingCollectionViewCell
-
-            let vm = SleepRingViewModel(model: model)
-
-            cell.configure(with: vm)
+            cell.configure(with: SleepRingViewModel(model: ringModel))
             cell.onChevronTapped = { [weak self] in
-                self?.viewModel.toggleMetricsCard()
-                self?.collectionView.reloadData()   // Refresh to show/hide metrics card
+                guard let self, !self.isAnimatingMetrics else { return }
+                self.isAnimatingMetrics = true
+
+                let shouldExpand = !self.viewModel.showMetricsCard
+                self.viewModel.toggleMetricsCard()
+                cell.animateChevron(expanded: shouldExpand)
+                
+                guard let ringIndex = self.viewModel.cards.firstIndex(where: {
+                    if case .sleepRing = $0 { return true }
+                    return false
+                }) else { self.isAnimatingMetrics = false; return }
+
+                self.collectionView.performBatchUpdates {
+                    let metricsIndex = IndexPath(item: ringIndex + 2, section: 0)
+                    if shouldExpand {
+                        self.collectionView.insertItems(at: [metricsIndex])
+                    } else {
+                        self.collectionView.deleteItems(at: [metricsIndex])
+                    }
+                } completion: { _ in self.isAnimatingMetrics = false }
+            }
+            return cell
+
+        case .alarm:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: AlarmCollectionViewCell.identifier,
+                for: indexPath
+            ) as! AlarmCollectionViewCell
+            // Always pull the latest saved time — the model baked into allCards at init
+            // may be stale if the user set an alarm during this session.
+            let freshTime  = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
+            let freshModel = AlarmModel(time: freshTime)
+            cell.configure(with: AlarmViewModel(model: freshModel))
+            cell.onTapped = { [weak self] in
+                guard let self else { return }
+                let vc = UIStoryboard(name: "Main", bundle: nil)
+                    .instantiateViewController(withIdentifier: "alarm")
+                vc.modalPresentationStyle = .automatic
+                self.present(vc, animated: true)
             }
             return cell
 
         case .metrics(let model):
-
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_metrics_cell",
                 for: indexPath
             ) as! SleepMetricsGridCollectionViewCell
-
-            let vm = SleepMetricsViewModel(model: model)
-            cell.configure(with: vm)
+            cell.configure(with: SleepMetricsViewModel(model: model))
             return cell
 
-        case .groggy(let model):
-
+        case .groggyNotes(let groggyModel, let notesModel):
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "groggy_slider_cell",
+                withReuseIdentifier: GroggyNotesCollectionViewCell.identifier,
                 for: indexPath
-            ) as! GroggySliderCollectionViewCell
-
-            let vm = GroggySliderViewModel(model: model)
-            cell.configure(with: vm)
-            return cell
-
-        case .notes(let model):
-
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "morning_notes_cell",
-                for: indexPath
-            ) as! MorningNotesCollectionViewCell
-
-            let vm = MorningNotesViewModel(model: model)
-            cell.configure(with: vm)
+            ) as! GroggyNotesCollectionViewCell
+            cell.configure(
+                groggy: GroggySliderViewModel(model: groggyModel),
+                notes:  MorningNotesViewModel(model: notesModel)
+            )
             return cell
 
         case .sounds:
-
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "sleep_sounds_cell",
                 for: indexPath
             ) as! SleepSoundsCollectionViewCell
-
-            let vm = SleepSoundsViewModel()
-            cell.configure(with: vm)
-
+            cell.configure(with: SleepSoundsViewModel())
             return cell
         }
     }
@@ -171,60 +231,29 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-        let width = collectionView.bounds.width - 32
-        let card = viewModel.cards[indexPath.item]
+        let fullWidth = collectionView.bounds.width - 32
+        let halfWidth = (fullWidth - 8) / 2
 
-        switch card {
-
-        case .sleepDebt:
-            return CGSize(width: width, height: 60)
-        case .alarm:
-            return CGSize(width: width, height: 140)
-
-        case .sleepRing:
-            return CGSize(width: width, height: 180)
-
-        case .metrics:
-            return CGSize(width: width, height: 200)
-
-        case .groggy:
-            return CGSize(width: width, height: 140)
-
-        case .notes:
-            return CGSize(width: width, height: 140)
-
-        case .sounds:
-            return CGSize(width: width, height: 70)
+        switch viewModel.cards[indexPath.item] {
+        case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
+        case .riseRitual:   return CGSize(width: fullWidth, height: 200)
+        case .sleepRing:    return CGSize(width: halfWidth, height: 200)
+        case .alarm:        return CGSize(width: halfWidth, height: 200)
+        case .metrics:      return CGSize(width: fullWidth, height: 200)
+        case .groggyNotes:  return CGSize(width: fullWidth, height: 280)
+        case .sounds:       return CGSize(width: fullWidth, height: 60)
         }
     }
 }
 
 extension HomeViewController: UICollectionViewDelegate {
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
-        let card = viewModel.cards[indexPath.item]
-
-        switch card {
-
-        case .alarm:
-
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "alarm")
-
-            vc.modalPresentationStyle = .automatic
-            present(vc, animated: true)
-
-        case .sounds:
-
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "sound")
-
-            vc.modalPresentationStyle = .fullScreen
-            present(vc, animated: true)
-
-        default:
-            break
-        }
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
+        guard case .sounds = viewModel.cards[indexPath.item] else { return }
+        let vc = UIStoryboard(name: "Main", bundle: nil)
+            .instantiateViewController(withIdentifier: "sound")
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true)
     }
 }

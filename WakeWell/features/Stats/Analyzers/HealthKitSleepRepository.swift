@@ -74,8 +74,6 @@ final class HealthKitSleepRepository {
         }
     }
 
-    // MARK: - Private fetch
-
     private func fetchSleep(for range: StatsTimeRange, completion: @escaping ([NightRecord]) -> Void) {
         let interval   = range.dateInterval
         let predicate  = HKQuery.predicateForSamples(withStart: interval.start,
@@ -99,11 +97,7 @@ final class HealthKitSleepRepository {
                     stage:     HKCategoryValueSleepAnalysis(rawValue: $0.value) ?? .inBed
                 )
             }
-
-            // Group into nights by wake-up calendar date
             let nights = self.groupIntoNights(raw)
-
-            // Fetch HR/HRV per night and build final records
             self.enrichWithHeartData(nights: nights, interval: interval) { records in
                 completion(records)
             }
@@ -111,15 +105,11 @@ final class HealthKitSleepRepository {
         store.execute(query)
     }
 
-    // MARK: - Group samples into nightly buckets
-
     private func groupIntoNights(_ samples: [RawSleepSample]) -> [[RawSleepSample]] {
-        // A "night" boundary is noon — samples whose start is after noon belong to the next bucket
         var buckets: [String: [RawSleepSample]] = [:]
         let cal = Calendar.current
 
         for s in samples {
-            // Assign to the wake-up date (end date rounded to day)
             let anchor = cal.date(byAdding: .hour, value: -12, to: s.endDate) ?? s.endDate
             let key    = DateFormatter.yyyyMMdd.string(from: anchor)
             buckets[key, default: []].append(s)
@@ -128,8 +118,6 @@ final class HealthKitSleepRepository {
             (a.first?.startDate ?? .distantPast) < (b.first?.startDate ?? .distantPast)
         }
     }
-
-    // MARK: - Convert bucket → NightRecord
 
     private func enrichWithHeartData(nights: [[RawSleepSample]],
                                       interval: DateInterval,
@@ -159,8 +147,6 @@ final class HealthKitSleepRepository {
 
         let cal      = Calendar.current
         let wakeDate = bucket.map { $0.endDate }.max() ?? bucket[0].endDate
-
-        // Stage totals
         let asleepStages: [HKCategoryValueSleepAnalysis] = [.asleepREM, .asleepCore, .asleepDeep, .asleepUnspecified]
         let totalAsleep  = bucket.filter { asleepStages.contains($0.stage) }.reduce(0) { $0 + $1.duration }
         let totalInBed   = bucket.filter { $0.stage == .inBed || asleepStages.contains($0.stage) }.reduce(0) { $0 + $1.duration }
@@ -173,12 +159,10 @@ final class HealthKitSleepRepository {
         let hoursSlept   = totalAsleep / 3600
         let timeInBed    = max(totalInBed, totalAsleep) / 3600
 
-        // Percentages of asleep time
         let deepPct  = totalAsleep > 0 ? (deepSecs  / totalAsleep) * 100 : 0
         let remPct   = totalAsleep > 0 ? (remSecs   / totalAsleep) * 100 : 0
         let lightPct = totalAsleep > 0 ? (lightSecs / totalAsleep) * 100 : max(0, 100 - deepPct - remPct)
 
-        // Bedtime / wake time as hour decimals
         let sleepOnset   = bucket.filter { asleepStages.contains($0.stage) }.map { $0.startDate }.min() ?? bucket[0].startDate
         let bedComponents = cal.dateComponents([.hour, .minute], from: sleepOnset)
         var bedDecimal    = Double(bedComponents.hour ?? 23) + Double(bedComponents.minute ?? 0) / 60.0
@@ -187,11 +171,9 @@ final class HealthKitSleepRepository {
         let wakeComponents = cal.dateComponents([.hour, .minute], from: wakeDate)
         let wakeDecimal    = Double(wakeComponents.hour ?? 7) + Double(wakeComponents.minute ?? 0) / 60.0
 
-        // Date label
         let start = bucket.map { $0.startDate }.min() ?? wakeDate
         let end   = wakeDate
 
-        // Fetch HR & HRV for this night window
         fetchHeartStats(from: start, to: end) { rhr, hrv in
             let record = NightRecord(
                 date:          wakeDate,
@@ -204,15 +186,13 @@ final class HealthKitSleepRepository {
                 totalAwakeMin: awakeSecs / 60,
                 restingHR:     rhr,
                 hrv:           hrv,
-                movementIndex: 0.20,   // replace with CoreMotion data when available
+                movementIndex: 0.20,
                 bedtime:       bedDecimal,
                 wakeTime:      wakeDecimal
             )
             completion(record)
         }
     }
-
-    // MARK: - Heart rate helpers
 
     private func fetchHeartStats(from start: Date, to end: Date,
                                   completion: @escaping (_ rhr: Double, _ hrv: Double) -> Void) {
@@ -251,8 +231,6 @@ final class HealthKitSleepRepository {
     }
 }
 
-// MARK: - StatsTimeRange helpers
-
 extension StatsTimeRange {
     var cacheKey: String { title }
 
@@ -272,8 +250,6 @@ extension StatsTimeRange {
         }
     }
 }
-
-// MARK: - DateFormatter helper
 
 private extension DateFormatter {
     static let yyyyMMdd: DateFormatter = {

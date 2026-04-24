@@ -16,18 +16,15 @@ class LineChartTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
         setupStyle()
         setupChartAppearance()
     }
     private func setupStyle() {
-        // Liquid Glass Container
         glassContainer.backgroundColor = UIColor.white.withAlphaComponent(0.6)
         glassContainer.layer.cornerRadius = 24
         glassContainer.layer.borderWidth = 1.0
         glassContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
         
-        // Shadow for depth
         glassContainer.layer.shadowColor = UIColor.black.cgColor
         glassContainer.layer.shadowOpacity = 0.08
         glassContainer.layer.shadowOffset = CGSize(width: 0, height: 8)
@@ -46,7 +43,6 @@ class LineChartTableViewCell: UITableViewCell {
             lineChartView.legend.enabled = false
             lineChartView.chartDescription.enabled = false
             
-            // X-axis setup
             let xAxis = lineChartView.xAxis
             xAxis.labelPosition = .bottom
             xAxis.drawGridLinesEnabled = false
@@ -54,7 +50,6 @@ class LineChartTableViewCell: UITableViewCell {
             xAxis.granularity = 1
             xAxis.centerAxisLabelsEnabled = false 
             
-            // Left axis setup
             let leftAxis = lineChartView.leftAxis
             leftAxis.drawGridLinesEnabled = true
             leftAxis.gridColor = .systemGray5
@@ -90,7 +85,6 @@ class LineChartTableViewCell: UITableViewCell {
             set.circleRadius = 4
             set.setCircleColor(fixedColor)
             
-            // Gradient Fill
             let gradientColors = [fixedColor.withAlphaComponent(0.3).cgColor, UIColor.clear.cgColor] as CFArray
             let gradient = CGGradient(colorsSpace: nil, colors: gradientColors, locations: nil)!
             set.fill = LinearGradientFill(gradient: gradient, angle: 90)

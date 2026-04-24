@@ -37,8 +37,6 @@ final class SleepCalmnessAnalyzer {
         }
     }
 
-    // MARK: - Chart builders (unchanged)
-
     static func trendChartData(from data: [CalmnessData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map {
@@ -76,8 +74,6 @@ final class SleepCalmnessAnalyzer {
         The more relaxed you are, the better your body can recover overnight.
         """
     }
-
-    // MARK: - Fallback
 
     private static func fallback(for range: StatsTimeRange) -> [CalmnessData] {
         switch range {

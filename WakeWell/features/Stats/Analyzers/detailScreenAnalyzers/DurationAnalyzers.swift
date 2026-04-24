@@ -31,8 +31,6 @@ final class SleepDurationAnalyzer {
         }
     }
 
-    // MARK: - Chart builders (unchanged)
-
     static func trendChartData(from data: [DurationData]) -> (title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         let labels  = data.map { $0.day }
         let entries = data.enumerated().map {
@@ -67,8 +65,6 @@ final class SleepDurationAnalyzer {
         """
     }
 
-    // MARK: - Fallback (original hardcoded data)
-
     private static func fallback(for range: StatsTimeRange) -> [DurationData] {
         switch range {
         case .week:
@@ -97,12 +93,9 @@ final class SleepDurationAnalyzer {
     }
 }
 
-// MARK: - Shared aggregation helpers (used by all analyzers)
-
-// Returns one bucket per week with averaged values
 struct AggregatedBucket {
     let label:  String
-    let values: [Double]   // index matches caller's fields
+    let values: [Double]
 }
 
 func weeklyAveraged(_ records: [NightRecord],
@@ -138,7 +131,6 @@ func monthlyAveraged(_ records: [NightRecord],
     }
 }
 
-// Averages an array-of-arrays column-wise
 private func average(_ matrix: [[Double]]) -> [Double] {
     guard let cols = matrix.first?.count, cols > 0 else { return [] }
     return (0..<cols).map { col in

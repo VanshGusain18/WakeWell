@@ -6,18 +6,13 @@
 //
 import Foundation
 
-// MARK: - Score Calculators (one place for all formulas)
-
 struct SleepScoreCalculator {
 
-    // MARK: 1. Duration — Gaussian penalty centered at 8hrs
     static func durationScore(hoursSlept: Double) -> Double {
         let sigma: Double = 1.5
         let score = 100 * exp(-pow(hoursSlept - 8.0, 2) / (2 * sigma * sigma))
         return max(0, min(100, score))
     }
-
-    // MARK: 2. Efficiency
     static func efficiencyScore(timeInBed: Double, timeAsleep: Double) -> Double {
         guard timeInBed > 0 else { return 0 }
         let e = (timeAsleep / timeInBed) * 100
@@ -27,29 +22,24 @@ struct SleepScoreCalculator {
         default:      return 0
         }
     }
-
-    // MARK: 3. Architecture — Euclidean distance from target stages
-    // Expects deep, rem, light as percentages (e.g. 20.0, 22.0, 55.0)
+    
     static func architectureScore(deep: Double, rem: Double, light: Double) -> Double {
         let k: Double = 1.2
         let error = sqrt(pow(deep - 20, 2) + pow(rem - 22, 2) + pow(light - 55, 2))
         return max(0, min(100, 100 - k * error))
     }
 
-    // MARK: 4. Continuity
     static func continuityScore(awakenings: Int, waso: Double) -> Double {
         let score = 100 - (0.5 * waso + 5.0 * Double(awakenings))
         return max(0, min(100, score))
     }
 
-    // MARK: 5. Consistency — std deviation penalty
     static func consistencyScore(bedtimes: [Double], wakeTimes: [Double]) -> Double {
         let k1: Double = 10, k2: Double = 10
         let score = 100 - (k1 * standardDeviation(bedtimes) + k2 * standardDeviation(wakeTimes))
         return max(0, min(100, score))
     }
 
-    // MARK: 6. Calmness — HRV + RHR + Movement
     static func calmnessScore(rhr: Double, hrv: Double, movementIndex: Double,
                                rhrMin: Double = 40, rhrMax: Double = 100,
                                hrvMin: Double = 20, hrvMax: Double = 80) -> Double {
@@ -61,7 +51,6 @@ struct SleepScoreCalculator {
         return max(0, min(100, score))
     }
 
-    // MARK: 7. Final Combined Score
     static func combinedScore(duration: Double, efficiency: Double, architecture: Double,
                                continuity: Double, calmness: Double, consistency: Double) -> Double {
         return (0.20 * duration) +
@@ -72,7 +61,6 @@ struct SleepScoreCalculator {
                (0.10 * consistency)
     }
 
-    // MARK: Helper
     static func standardDeviation(_ values: [Double]) -> Double {
         guard values.count > 1 else { return 0 }
         let mean     = values.reduce(0, +) / Double(values.count)
@@ -80,8 +68,6 @@ struct SleepScoreCalculator {
         return sqrt(variance)
     }
 }
-
-// MARK: - MetricDataProvider
 
 final class MetricDataProvider {
 
@@ -143,12 +129,12 @@ final class MetricDataProvider {
         return (0..<count).map { index in
             let dayLabel = allData[0][index].day
 
-            let d   = allData[0][index].value.raw  // duration
-            let e   = allData[1][index].value.raw  // efficiency
-            let a   = allData[2][index].value.raw  // architecture
-            let con = allData[3][index].value.raw  // continuity
-            let cal = allData[4][index].value.raw  // calmness
-            let cs  = allData[5][index].value.raw  // consistency
+            let d   = allData[0][index].value.raw
+            let e   = allData[1][index].value.raw
+            let a   = allData[2][index].value.raw
+            let con = allData[3][index].value.raw
+            let cal = allData[4][index].value.raw
+            let cs  = allData[5][index].value.raw 
 
             let combined = SleepScoreCalculator.combinedScore(
                 duration:     d,

@@ -40,11 +40,7 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
     }
 
     private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .sound, .criticalAlert]   // criticalAlert overrides silent mode
-        ) { granted, error in
-            if let error { print("Notification permission error: \(error)") }
-        }
+        NotificationManager.shared.requestAuthorizationIfNeeded()
     }
 
     // Requests HealthKit sleep-analysis read permission.
@@ -108,30 +104,10 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
             return
         }
 
-        // 1. Remove any previously scheduled WakeWell alarms
-        UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: ["wakewell.alarm"]
-        )
-
-        // 2. Determine the hard wake-up time from the picker
-        let hardWakeTime = timePicker.wakeUp          // Date with today's time components
-        let windowMinutes = windowToMinutes(selectedWindow)
+        let hardWakeTime = timePicker.wakeUp
         UserDefaults.standard.set(hardWakeTime, forKey: "wakewell.savedAlarmTime")
         NotificationCenter.default.post(name: .alarmTimeDidChange, object: nil)
-        // 3. Build a window: [hardWakeTime - window, hardWakeTime]
-        //    During scheduling we'll try to find a light-sleep moment in this window.
-        //    If HealthKit data isn't available yet we fall back to the hard wake time.
-        requestHealthKitPermission { [weak self] granted in
-            guard let self else { return }
-            if granted {
-                self.scheduleSmartAlarm(hardWakeTime: hardWakeTime,
-                                        windowMinutes: windowMinutes)
-            } else {
-                // No HealthKit — schedule a regular alarm at the exact wake time
-                self.scheduleAlarmNotification(at: hardWakeTime,
-                                               isSmart: false)
-            }
-        }
+        AlarmManager.shared.setAlarm(AlarmModel(time: hardWakeTime))
 
         showAlarmSetAlert(message: "Your smart alarm has been set for \(timePicker.formatTime(hardWakeTime)).")
     }

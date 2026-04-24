@@ -24,6 +24,7 @@ final class AlarmManager {
         UserDefaults.standard.set(time.timeIntervalSince1970, forKey: alarmKey)
         NotificationManager.shared.cancelAllScheduledAlarms()
         NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: time)
+        SleepSessionManager.shared.startSession(alarmTime: time)
 
         print("⏰ Alarm set for:", time)
     }

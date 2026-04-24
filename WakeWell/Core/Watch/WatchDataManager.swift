@@ -28,6 +28,11 @@ final class WatchDataManager {
             print("[SmartAlarm] reason:", decision.reason)
 
             NotificationManager.shared.triggerImmediateAlarm()
+            SleepSessionManager.shared.endSession(
+                triggerTime: Date(),
+                reason: decision.reason,
+                confidence: decision.confidence
+            )
             stop()
         } else {
             print("[SmartAlarm] waiting")

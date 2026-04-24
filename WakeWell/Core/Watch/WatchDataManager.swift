@@ -9,8 +9,6 @@ final class WatchDataManager {
     private init() {}
 
     func start() {
-
-        // 🔥 CLEAN SESSION START
         DatabaseManager.shared.clearVitals()
         SmartAlarmEngine.shared.reset()
 
@@ -20,16 +18,21 @@ final class WatchDataManager {
     }
 
     private func handleIncomingData(_ data: WatchVitalsModel) {
-
         DatabaseManager.shared.insertWatchVitals(data)
 
-        let shouldWake = SmartAlarmEngine.shared.evaluateWakeOpportunity()
+        let decision = SmartAlarmEngine.shared.evaluateWakeOpportunity()
 
-        if shouldWake {
-            print("🔥 TRIGGER ALARM NOW")
+        if decision.shouldTrigger {
+            print("[SmartAlarm] delivery requested")
+            print("[SmartAlarm] confidence:", String(format: "%.3f", decision.confidence))
+            print("[SmartAlarm] reason:", decision.reason)
+
+            NotificationManager.shared.triggerImmediateAlarm()
             stop()
         } else {
-            print("😴 WAIT")
+            print("[SmartAlarm] waiting")
+            print("[SmartAlarm] confidence:", String(format: "%.3f", decision.confidence))
+            print("[SmartAlarm] reason:", decision.reason)
         }
     }
 

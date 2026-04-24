@@ -23,10 +23,11 @@ final class SmartAlarmEngine {
     private let minimumTriggerScore = 0.65
     private let confidenceSmoothingFactor = 0.45
 
-    private let motionSpikeThreshold = 0.42
-    private let motionDeltaThreshold = 0.12
-    private let hrStepIncreaseThreshold = 1.2
-    private let hrTotalIncreaseThreshold = 3.5
+    private let motionSpikeThreshold = 0.55
+    private let motionDeltaThreshold = 0.07
+    private let motionSpikeRatioThreshold = 1.25
+    private let hrStepIncreaseThreshold = 0.45
+    private let hrTotalIncreaseThreshold = 2.0
 
     // MARK: - State
 
@@ -66,6 +67,7 @@ final class SmartAlarmEngine {
                 score: ScoreBreakdown.zero,
                 signals: SignalState.none,
                 analysis: TrendAnalysis.zero,
+                components: .zero,
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: cooldownDecision
             )
@@ -84,6 +86,7 @@ final class SmartAlarmEngine {
                 score: .zero,
                 signals: .none,
                 analysis: .zero,
+                components: .zero,
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: decision
             )
@@ -102,6 +105,7 @@ final class SmartAlarmEngine {
                 score: .zero,
                 signals: .none,
                 analysis: .zero,
+                components: .zero,
                 timeToAlarm: 0,
                 decision: decision
             )
@@ -118,7 +122,7 @@ final class SmartAlarmEngine {
 
         guard vitals.count >= minimumRequiredSamples else {
             consecutiveHighScoreCount = 0
-            wakeConfidence = applyConfidenceDelta(-0.04)
+            wakeConfidence = max(0, wakeConfidence - 0.04)
 
             let decision = WakeDecision(
                 shouldTrigger: false,
@@ -131,6 +135,7 @@ final class SmartAlarmEngine {
                 score: .zero,
                 signals: .none,
                 analysis: .zero,
+                components: .zero,
                 timeToAlarm: timeToAlarm,
                 decision: decision
             )
@@ -141,6 +146,7 @@ final class SmartAlarmEngine {
         let scoringRawVitals = Array(vitals.suffix(scoringWindowSize))
         let scoringSmoothedVitals = Array(smoothedVitals.suffix(scoringWindowSize))
 
+        let input = latestInput(from: scoringRawVitals)
         let averages = resolveAverages(from: scoringSmoothedVitals)
         updateSignalWindows(with: averages)
 
@@ -154,11 +160,12 @@ final class SmartAlarmEngine {
         updateConsecutiveCount(using: score, signals: signals)
 
         let withinWakeWindow = timeToAlarm <= triggerWakeWindow
-        wakeConfidence = updateConfidence(
-            with: score,
+        let components = buildConfidenceComponents(
+            score: score,
             signals: signals,
             withinWakeWindow: withinWakeWindow
         )
+        wakeConfidence = updateConfidence(using: components)
 
         let shouldTrigger = shouldTrigger(
             score: score,
@@ -178,6 +185,7 @@ final class SmartAlarmEngine {
             reason: reason
         )
 
+        logInput(input)
         logSignalWindow()
         logTrendAnalysis(analysis)
         logDecision(
@@ -185,6 +193,7 @@ final class SmartAlarmEngine {
             score: score,
             signals: signals,
             analysis: analysis,
+            components: components,
             timeToAlarm: timeToAlarm,
             decision: decision
         )
@@ -258,6 +267,16 @@ final class SmartAlarmEngine {
         return smoothed
     }
 
+    private func latestInput(from vitals: [WatchVitalsModel]) -> InputSnapshot {
+        guard let latest = vitals.last else { return .zero }
+
+        return InputSnapshot(
+            motion: latest.motion,
+            hr: latest.heartRate,
+            hrv: latest.hrv
+        )
+    }
+
     private func resolveAverages(from vitals: [WatchVitalsModel]) -> VitalAverages {
         if !vitals.isEmpty {
             let averages = VitalAverages(
@@ -281,12 +300,12 @@ final class SmartAlarmEngine {
     private func analyzeTrends(rawVitals: [WatchVitalsModel], smoothedVitals: [WatchVitalsModel]) -> TrendAnalysis {
         let motionDelta = calculateMotionDelta(rawVitals: rawVitals, smoothedVitals: smoothedVitals)
         let hrDelta = calculateHRDelta(smoothedVitals: smoothedVitals)
+        let hrTrend = isHRIncreasing(smoothedVitals)
+        let motionSpike = isMotionSpikeDetected(motionDelta)
 
         return TrendAnalysis(
-            hrTrend: hrDelta >= hrTotalIncreaseThreshold && isHRIncreasing(smoothedVitals),
-            motionSpike: motionDelta.latestMotion >= motionSpikeThreshold &&
-                motionDelta.rawDelta >= motionDeltaThreshold &&
-                motionDelta.smoothedDelta >= motionDeltaThreshold * 0.6,
+            hrTrend: hrTrend,
+            motionSpike: motionSpike,
             motionDelta: motionDelta.rawDelta,
             hrDelta: hrDelta
         )
@@ -322,19 +341,35 @@ final class SmartAlarmEngine {
         }
     }
 
-    private func updateConfidence(
-        with score: ScoreBreakdown,
+    private func buildConfidenceComponents(
+        score: ScoreBreakdown,
         signals: SignalState,
         withinWakeWindow: Bool
-    ) -> Double {
-        let delta = confidenceDelta(
-            score: score,
-            signals: signals,
-            withinWakeWindow: withinWakeWindow,
-            consecutiveCount: consecutiveHighScoreCount
+    ) -> ConfidenceComponents {
+        let baseScore = clamp((score.finalScore - 0.25) * 1.35, minValue: 0, maxValue: 0.55)
+        let trendBonus = signals.hrTrend ? 0.18 : 0
+        let spikeBonus = signals.motionSpike ? 0.22 : 0
+        let consecutiveBonus = min(Double(consecutiveHighScoreCount) * 0.08, 0.24)
+        let wakeWindowBonus = withinWakeWindow ? 0.05 : 0
+        let targetConfidence = clamp(
+            baseScore + trendBonus + spikeBonus + consecutiveBonus + wakeWindowBonus,
+            minValue: 0,
+            maxValue: 1
         )
 
-        return applyConfidenceDelta(delta)
+        return ConfidenceComponents(
+            baseScore: baseScore,
+            trendBonus: trendBonus,
+            spikeBonus: spikeBonus,
+            consecutiveBonus: consecutiveBonus,
+            wakeWindowBonus: wakeWindowBonus,
+            targetConfidence: targetConfidence
+        )
+    }
+
+    private func updateConfidence(using components: ConfidenceComponents) -> Double {
+        let nextValue = wakeConfidence + (components.targetConfidence - wakeConfidence) * confidenceSmoothingFactor
+        return clamp(nextValue, minValue: 0, maxValue: 1)
     }
 
     private func shouldTrigger(
@@ -345,6 +380,7 @@ final class SmartAlarmEngine {
         withinWakeWindow &&
             signals.motionSpike &&
             signals.hrTrend &&
+            score.finalScore > minimumTriggerScore &&
             consecutiveHighScoreCount >= requiredConsecutiveCount &&
             wakeConfidence >= wakeConfidenceThreshold
     }
@@ -355,76 +391,52 @@ final class SmartAlarmEngine {
         rawVitals: [WatchVitalsModel],
         smoothedVitals: [WatchVitalsModel]
     ) -> MotionDelta {
-        guard rawVitals.count >= 3, smoothedVitals.count >= 3 else {
+        guard rawVitals.count >= 5, smoothedVitals.count >= 5 else {
             return .zero
         }
 
-        let rawLastThree = Array(rawVitals.suffix(3))
-        let smoothedLastThree = Array(smoothedVitals.suffix(3))
+        let rawWindow = Array(rawVitals.suffix(5))
+        let smoothedWindow = Array(smoothedVitals.suffix(5))
 
-        let rawBaseline = average(for: [rawLastThree[0].motion, rawLastThree[1].motion])
-        let smoothedBaseline = average(for: [smoothedLastThree[0].motion, smoothedLastThree[1].motion])
-        let latestRawMotion = rawLastThree[2].motion
-        let latestSmoothedMotion = smoothedLastThree[2].motion
+        let rawBaseline = average(for: Array(rawWindow.prefix(3)).map(\.motion))
+        let smoothedBaseline = average(for: Array(smoothedWindow.prefix(3)).map(\.motion))
+        let latestRawMotion = average(for: Array(rawWindow.suffix(2)).map(\.motion))
+        let latestSmoothedMotion = average(for: Array(smoothedWindow.suffix(2)).map(\.motion))
+        let motionRatio = smoothedBaseline > 0 ? latestSmoothedMotion / smoothedBaseline : 0
 
         return MotionDelta(
             rawDelta: latestRawMotion - rawBaseline,
             smoothedDelta: latestSmoothedMotion - smoothedBaseline,
-            latestMotion: latestSmoothedMotion
+            latestMotion: latestSmoothedMotion,
+            motionRatio: motionRatio
         )
     }
 
     private func calculateHRDelta(smoothedVitals: [WatchVitalsModel]) -> Double {
-        guard smoothedVitals.count >= 3 else { return 0 }
-        let lastThree = Array(smoothedVitals.suffix(3))
-        return lastThree[2].heartRate - lastThree[0].heartRate
+        guard smoothedVitals.count >= 5 else { return 0 }
+        let window = Array(smoothedVitals.suffix(5))
+        return window.last!.heartRate - window.first!.heartRate
     }
 
     private func isHRIncreasing(_ vitals: [WatchVitalsModel]) -> Bool {
-        guard vitals.count >= 3 else { return false }
-        let lastThree = Array(vitals.suffix(3))
-        let firstIncrease = lastThree[1].heartRate - lastThree[0].heartRate
-        let secondIncrease = lastThree[2].heartRate - lastThree[1].heartRate
+        guard vitals.count >= 5 else { return false }
 
-        return firstIncrease >= hrStepIncreaseThreshold &&
-            secondIncrease >= hrStepIncreaseThreshold
+        let window = Array(vitals.suffix(5))
+        let steps = zip(window.dropFirst(), window).map { $0.0.heartRate - $0.1.heartRate }
+        let positiveSteps = steps.filter { $0 >= hrStepIncreaseThreshold }.count
+        let totalIncrease = window.last!.heartRate - window.first!.heartRate
+
+        return positiveSteps >= 3 && totalIncrease >= hrTotalIncreaseThreshold
+    }
+
+    private func isMotionSpikeDetected(_ motionDelta: MotionDelta) -> Bool {
+        motionDelta.latestMotion >= motionSpikeThreshold &&
+            motionDelta.rawDelta >= motionDeltaThreshold &&
+            motionDelta.smoothedDelta >= motionDeltaThreshold * 0.6 &&
+            motionDelta.motionRatio >= motionSpikeRatioThreshold
     }
 
     // MARK: - Decision Helpers
-
-    private func confidenceDelta(
-        score: ScoreBreakdown,
-        signals: SignalState,
-        withinWakeWindow: Bool,
-        consecutiveCount: Int
-    ) -> Double {
-        var delta = -0.04
-
-        if signals.motionSpike && signals.hrTrend {
-            delta = 0.18
-        } else if signals.motionSpike && score.finalScore > minimumTriggerScore {
-            delta = 0.10
-        } else if signals.hrTrend && score.finalScore > 0.58 {
-            delta = 0.08
-        } else if score.finalScore > 0.62 {
-            delta = 0.04
-        }
-
-        if consecutiveCount >= requiredConsecutiveCount {
-            delta += 0.06
-        }
-
-        if withinWakeWindow {
-            delta += 0.03
-        }
-
-        return delta
-    }
-
-    private func applyConfidenceDelta(_ delta: Double) -> Double {
-        let nextValue = wakeConfidence + (delta * confidenceSmoothingFactor)
-        return clamp(nextValue, minValue: 0, maxValue: 1)
-    }
 
     private func cooldownDecision(at now: Date) -> WakeDecision? {
         guard let lastTriggerTime else { return nil }
@@ -476,6 +488,7 @@ final class SmartAlarmEngine {
             score: ScoreBreakdown(baseScore: 1.0, finalScore: 1.0),
             signals: .none,
             analysis: .zero,
+            components: .zero,
             timeToAlarm: timeToAlarm,
             decision: decision
         )
@@ -517,7 +530,18 @@ final class SmartAlarmEngine {
 
     // MARK: - Logging
 
+    private func logInput(_ input: InputSnapshot) {
+        print("[INPUT]")
+        print("- motion: \(formatted(input.motion))")
+        print("- hr: \(formatted(input.hr))")
+        print("- hrv: \(formatted(input.hrv))")
+    }
+
     private func logSignalWindow() {
+        print("[WINDOW]")
+        print("- motionWindow: [\(formattedWindow(lastMotionValues))]")
+        print("- hrWindow: [\(formattedWindow(lastHRValues))]")
+
         print("📊 SIGNAL WINDOW:")
         print("- Motion: \(formattedWindow(lastMotionValues))")
         print("- HR: \(formattedWindow(lastHRValues))")
@@ -525,6 +549,12 @@ final class SmartAlarmEngine {
     }
 
     private func logTrendAnalysis(_ analysis: TrendAnalysis) {
+        print("[TREND]")
+        print("- hrDelta: \(formatted(analysis.hrDelta))")
+        print("- motionDelta: \(formatted(analysis.motionDelta))")
+        print("- hrTrend: \(analysis.hrTrend)")
+        print("- motionSpike: \(analysis.motionSpike)")
+
         print("""
           📈 TREND ANALYSIS:
           
@@ -540,6 +570,7 @@ final class SmartAlarmEngine {
         score: ScoreBreakdown,
         signals: SignalState,
         analysis: TrendAnalysis,
+        components: ConfidenceComponents,
         timeToAlarm: TimeInterval,
         decision: WakeDecision
     ) {
@@ -552,8 +583,15 @@ final class SmartAlarmEngine {
         print("- reason:", decision.reason)
         print("- decision:", decision.shouldTrigger ? "trigger" : "wait")
 
+        print("[CONFIDENCE]")
+        print("- baseScore: \(formatted(components.baseScore))")
+        print("- trendBonus: \(formatted(components.trendBonus))")
+        print("- spikeBonus: \(formatted(components.spikeBonus))")
+        print("- finalConfidence: \(formatted(decision.confidence))")
+
         print("""
-          DECISION CHECK:
+          🧠 DECISION CHECK:
+          
           * score: \(formatted(score.finalScore))
           * confidence: \(formatted(decision.confidence))
           * threshold: \(formatted(wakeConfidenceThreshold))
@@ -562,6 +600,11 @@ final class SmartAlarmEngine {
           * consecutiveCount: \(consecutiveHighScoreCount)
           * shouldTrigger: \(decision.shouldTrigger)
           """)
+
+        print("[DECISION]")
+        print("- threshold: 0.75")
+        print("- confidence: \(formatted(decision.confidence))")
+        print("- shouldTrigger: \(decision.shouldTrigger)")
     }
 
     private func logTriggered(
@@ -653,8 +696,9 @@ private struct MotionDelta {
     let rawDelta: Double
     let smoothedDelta: Double
     let latestMotion: Double
+    let motionRatio: Double
 
-    static let zero = MotionDelta(rawDelta: 0, smoothedDelta: 0, latestMotion: 0)
+    static let zero = MotionDelta(rawDelta: 0, smoothedDelta: 0, latestMotion: 0, motionRatio: 0)
 }
 
 private struct TrendAnalysis {
@@ -664,4 +708,30 @@ private struct TrendAnalysis {
     let hrDelta: Double
 
     static let zero = TrendAnalysis(hrTrend: false, motionSpike: false, motionDelta: 0, hrDelta: 0)
+}
+
+private struct InputSnapshot {
+    let motion: Double
+    let hr: Double
+    let hrv: Double
+
+    static let zero = InputSnapshot(motion: 0, hr: 0, hrv: 0)
+}
+
+private struct ConfidenceComponents {
+    let baseScore: Double
+    let trendBonus: Double
+    let spikeBonus: Double
+    let consecutiveBonus: Double
+    let wakeWindowBonus: Double
+    let targetConfidence: Double
+
+    static let zero = ConfidenceComponents(
+        baseScore: 0,
+        trendBonus: 0,
+        spikeBonus: 0,
+        consecutiveBonus: 0,
+        wakeWindowBonus: 0,
+        targetConfidence: 0
+    )
 }

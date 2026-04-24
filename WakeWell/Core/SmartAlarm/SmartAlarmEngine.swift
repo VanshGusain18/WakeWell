@@ -7,10 +7,13 @@ final class SmartAlarmEngine {
     private var hasTriggered = false
     private var wakeConfidence: Double = 0
     private var consecutiveHighScoreCount = 0
+    private var lastTriggerTime: Date?
     private let requiredConsecutiveCount = 3
     private let evaluationWindowSize = 5
     private let minimumSampleCount = 3
     private let wakeConfidenceThreshold = 0.75
+    private let minimumTriggerScore = 0.55
+    private let cooldownDuration: TimeInterval = 10 * 60
     private var lastKnownAverages: (avgHR: Double, avgHRV: Double, avgMotion: Double)?
 
     private(set) var lastTriggerResult: TriggerResult?
@@ -21,12 +24,21 @@ final class SmartAlarmEngine {
         hasTriggered = false
         wakeConfidence = 0
         consecutiveHighScoreCount = 0
+        lastTriggerTime = nil
         lastKnownAverages = nil
         lastTriggerResult = nil
         print("🔄 Engine reset")
     }
 
     func evaluateWakeOpportunity() -> Bool {
+        let now = Date()
+        let cooldownStatus = cooldownStatus(at: now)
+
+        if cooldownStatus.isActive {
+            print("🧊 Cooldown active: \(cooldownStatus.description)")
+            return false
+        }
+
         if hasTriggered {
             print("🧊 Engine frozen: trigger already completed")
             return false
@@ -37,7 +49,6 @@ final class SmartAlarmEngine {
             return false
         }
 
-        let now = Date()
         let windowStart = wakeTime.addingTimeInterval(-30 * 60)
         let timeToAlarm = wakeTime.timeIntervalSince(now)
 
@@ -55,6 +66,7 @@ final class SmartAlarmEngine {
             )
 
             hasTriggered = true
+            lastTriggerTime = now
             wakeConfidence = 1
             consecutiveHighScoreCount = 0
             triggerAlarm(
@@ -63,6 +75,9 @@ final class SmartAlarmEngine {
                 motionSpike: false,
                 hrTrend: false,
                 wakeConfidence: wakeConfidence,
+                timeToAlarm: timeToAlarm,
+                cooldownStatus: cooldownStatus.description,
+                triggerEligibility: true,
                 reason: "fallback"
             )
             return true
@@ -118,7 +133,12 @@ final class SmartAlarmEngine {
         )
 
         let reason = triggerReason(motionSpike: motionSpike, hrTrend: hrTrend)
-        let finalDecision = wakeConfidence >= wakeConfidenceThreshold ? "trigger" : "wait"
+        let isEligibleToTrigger =
+            wakeConfidence >= wakeConfidenceThreshold &&
+            finalScore > minimumTriggerScore &&
+            !cooldownStatus.isActive
+
+        let finalDecision = isEligibleToTrigger ? "trigger" : "wait"
         let loggedReason = finalDecision == "trigger" ? reason : "not_ready"
         printEvaluationLog(
             baseScore: baseScore,
@@ -131,12 +151,16 @@ final class SmartAlarmEngine {
             isStrongScore: isStrongScore,
             consecutiveCount: consecutiveHighScoreCount,
             wakeConfidence: wakeConfidence,
+            timeToAlarm: timeToAlarm,
+            cooldownStatus: cooldownStatus.description,
+            triggerEligibility: isEligibleToTrigger,
             finalDecision: finalDecision,
             reason: loggedReason
         )
 
-        if wakeConfidence >= wakeConfidenceThreshold {
+        if isEligibleToTrigger {
             hasTriggered = true
+            lastTriggerTime = now
             consecutiveHighScoreCount = 0
 
             lastTriggerResult = TriggerResult(
@@ -154,6 +178,9 @@ final class SmartAlarmEngine {
                 motionSpike: motionSpike,
                 hrTrend: hrTrend,
                 wakeConfidence: wakeConfidence,
+                timeToAlarm: timeToAlarm,
+                cooldownStatus: cooldownStatus.description,
+                triggerEligibility: isEligibleToTrigger,
                 reason: reason
             )
             return true
@@ -170,6 +197,9 @@ final class SmartAlarmEngine {
         motionSpike: Bool,
         hrTrend: Bool,
         wakeConfidence: Double,
+        timeToAlarm: TimeInterval,
+        cooldownStatus: String,
+        triggerEligibility: Bool,
         reason: String
     ) {
         if let result = lastTriggerResult {
@@ -179,6 +209,9 @@ final class SmartAlarmEngine {
             print("🏃 Motion Spike:", motionSpike)
             print("❤️ HR Trend:", hrTrend)
             print("💤 Wake Confidence:", formatted(wakeConfidence))
+            print("⏳ Time To Alarm:", formattedMinutes(timeToAlarm))
+            print("🧊 Cooldown Status:", cooldownStatus)
+            print("✅ Trigger Eligibility:", triggerEligibility)
             print("📊 Consecutive Count:", requiredConsecutiveCount)
             print("🧠 Trigger Reason:", reason)
             print("✅ Final Decision: trigger")
@@ -274,18 +307,37 @@ final class SmartAlarmEngine {
         } else if motionSpike || hrTrend {
             wakeConfidence += 0.12
         } else {
-            wakeConfidence -= 0.05
+            wakeConfidence -= 0.03
         }
 
         if consecutiveCount >= requiredConsecutiveCount {
-            wakeConfidence += 0.2
+            wakeConfidence += 0.12
         }
 
         if timeToAlarm < 15 * 60 {
             wakeConfidence += 0.1
         }
 
+        if wakeConfidence >= 0.65 && timeToAlarm < 10 * 60 {
+            wakeConfidence += 0.05
+        }
+
         wakeConfidence = clamp(wakeConfidence, minValue: 0, maxValue: 1)
+    }
+
+    private func cooldownStatus(at now: Date) -> (isActive: Bool, description: String) {
+        guard let lastTriggerTime else {
+            return (false, "inactive")
+        }
+
+        let elapsed = now.timeIntervalSince(lastTriggerTime)
+
+        guard elapsed < cooldownDuration else {
+            return (false, "inactive")
+        }
+
+        let remaining = cooldownDuration - elapsed
+        return (true, "active (\(formattedMinutes(remaining)) remaining)")
     }
 
     private func triggerReason(motionSpike: Bool, hrTrend: Bool) -> String {
@@ -315,6 +367,9 @@ final class SmartAlarmEngine {
         isStrongScore: Bool,
         consecutiveCount: Int,
         wakeConfidence: Double,
+        timeToAlarm: TimeInterval,
+        cooldownStatus: String,
+        triggerEligibility: Bool,
         finalDecision: String,
         reason: String
     ) {
@@ -329,6 +384,9 @@ final class SmartAlarmEngine {
         print("💪 Strong Score (>0.7):", isStrongScore)
         print("🔁 Consecutive Count:", consecutiveCount)
         print("💤 Wake Confidence:", formatted(wakeConfidence))
+        print("⏳ Time To Alarm:", formattedMinutes(timeToAlarm))
+        print("🧊 Cooldown Status:", cooldownStatus)
+        print("✅ Trigger Eligibility:", triggerEligibility)
         print("🧾 Final Decision:", finalDecision)
         print("🧠 Trigger Reason:", reason)
     }
@@ -339,5 +397,9 @@ final class SmartAlarmEngine {
 
     private func formatted(_ value: Double) -> String {
         String(format: "%.3f", value)
+    }
+
+    private func formattedMinutes(_ timeInterval: TimeInterval) -> String {
+        String(format: "%.1f min", timeInterval / 60)
     }
 }

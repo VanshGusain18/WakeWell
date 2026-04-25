@@ -5,6 +5,8 @@ final class HealthKitManager {
 
     static let shared = HealthKitManager()
     private let healthStore = HKHealthStore()
+    private let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)
+    private let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)
     
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
 
@@ -14,8 +16,12 @@ final class HealthKitManager {
         }
 
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
-        let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+
+        guard let heartRateType,
+              let hrvType else {
+            completion(false)
+            return
+        }
 
         let readTypes: Set<HKObjectType> = [
             sleepType,
@@ -32,6 +38,69 @@ final class HealthKitManager {
                 completion(success)
             }
         }
+    }
+
+    func fetchLatestHeartRate(completion: @escaping (Double?) -> Void) {
+        guard let heartRateType else {
+            completion(nil)
+            return
+        }
+
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let query = HKSampleQuery(
+            sampleType: heartRateType,
+            predicate: nil,
+            limit: 1,
+            sortDescriptors: [sortDescriptor]
+        ) { _, samples, _ in
+            let value = (samples?.first as? HKQuantitySample)?
+                .quantity
+                .doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+
+            if let value {
+                print("❤️ Live HR: \(String(format: "%.2f", value))")
+            }
+
+            DispatchQueue.main.async {
+                completion(value)
+            }
+        }
+
+        healthStore.execute(query)
+    }
+
+    func fetchLatestHRV(completion: @escaping (Double?) -> Void) {
+        guard let hrvType else {
+            completion(nil)
+            return
+        }
+
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let query = HKSampleQuery(
+            sampleType: hrvType,
+            predicate: nil,
+            limit: 1,
+            sortDescriptors: [sortDescriptor]
+        ) { _, samples, _ in
+            let value = (samples?.first as? HKQuantitySample)?
+                .quantity
+                .doubleValue(for: HKUnit.secondUnit(with: .milli))
+
+            if let value {
+                print("📈 HRV: \(String(format: "%.2f", value))")
+            }
+
+            DispatchQueue.main.async {
+                completion(value)
+            }
+        }
+
+        healthStore.execute(query)
+    }
+
+    func startWatchWorkoutSessionForLiveStreaming() {
+        // Demo placeholder: the real HKWorkoutSession must run on watchOS.
+        print("⌚️ Start HKWorkoutSession on Apple Watch for live heart-rate streaming")
     }
 
     func fetchLastNightSleep() {

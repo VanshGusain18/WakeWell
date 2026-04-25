@@ -72,6 +72,7 @@ struct SmartDebugView: View {
             statusRow(label: "Avg HRV", value: formatted(snapshot.avgHRV))
             statusRow(label: "Alarm State", value: snapshot.alarmState.rawValue.capitalized)
             statusRow(label: "Current Phase", value: snapshot.currentPhase)
+            statusRow(label: "Time To Alarm", value: snapshot.timeToAlarm)
             statusRow(label: "Reason", value: snapshot.decisionReason)
         }
         .padding(16)

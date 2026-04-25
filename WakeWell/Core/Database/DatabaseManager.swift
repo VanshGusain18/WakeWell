@@ -337,19 +337,54 @@ final class DatabaseManager {
         let createTableQuery = """
         CREATE TABLE IF NOT EXISTS sleep_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            start_time DOUBLE,
-            end_time DOUBLE,
-            alarm_time DOUBLE,
-            trigger_time DOUBLE,
+            start_time DATETIME,
+            end_time DATETIME,
+            alarm_time DATETIME,
+            trigger_time DATETIME,
             trigger_reason TEXT,
             confidence REAL,
-            created_at DOUBLE
+            created_at DATETIME
         );
         """
 
         if sqlite3_exec(db, createTableQuery, nil, nil, nil) != SQLITE_OK {
             let errorMsg = String(cString: sqlite3_errmsg(db))
             print("Failed to ensure sleep_sessions table:", errorMsg)
+        }
+
+        // Demo-safe migration: if an older bundled DB is missing columns, add them in place.
+        ensureSleepSessionColumn(named: "start_time", type: "DATETIME", db: db)
+        ensureSleepSessionColumn(named: "end_time", type: "DATETIME", db: db)
+        ensureSleepSessionColumn(named: "alarm_time", type: "DATETIME", db: db)
+        ensureSleepSessionColumn(named: "trigger_time", type: "DATETIME", db: db)
+        ensureSleepSessionColumn(named: "trigger_reason", type: "TEXT", db: db)
+        ensureSleepSessionColumn(named: "confidence", type: "REAL", db: db)
+        ensureSleepSessionColumn(named: "created_at", type: "DATETIME", db: db)
+    }
+
+    private func ensureSleepSessionColumn(named columnName: String, type: String, db: OpaquePointer?) {
+        let pragma = "PRAGMA table_info(sleep_sessions);"
+        var statement: OpaquePointer?
+        var existingColumns = Set<String>()
+
+        if sqlite3_prepare_v2(db, pragma, -1, &statement, nil) == SQLITE_OK {
+            defer { sqlite3_finalize(statement) }
+
+            while sqlite3_step(statement) == SQLITE_ROW {
+                if let cString = sqlite3_column_text(statement, 1) {
+                    existingColumns.insert(String(cString: cString))
+                }
+            }
+        }
+
+        guard !existingColumns.contains(columnName) else { return }
+
+        let alterQuery = "ALTER TABLE sleep_sessions ADD COLUMN \(columnName) \(type);"
+        if sqlite3_exec(db, alterQuery, nil, nil, nil) == SQLITE_OK {
+            print("🛠️ Migrated sleep_sessions: added \(columnName)")
+        } else {
+            let errorMsg = String(cString: sqlite3_errmsg(db))
+            print("❌ Failed migration for \(columnName):", errorMsg)
         }
     }
 }

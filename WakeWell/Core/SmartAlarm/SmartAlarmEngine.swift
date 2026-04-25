@@ -20,6 +20,7 @@ struct SmartAlarmDebugSnapshot {
     let currentPhase: String
     let alarmState: AlarmState
     let decisionReason: String
+    let timeToAlarm: String
 
     static let empty = SmartAlarmDebugSnapshot(
         currentHR: 0,
@@ -34,7 +35,8 @@ struct SmartAlarmDebugSnapshot {
         motionIncreasingCount: 0,
         currentPhase: "idle",
         alarmState: .idle,
-        decisionReason: "waiting_for_alarm"
+        decisionReason: "waiting_for_alarm",
+        timeToAlarm: "--"
     )
 }
 
@@ -61,6 +63,7 @@ final class SmartAlarmEngine {
 
     private let optimalTriggerThreshold = 0.70
     private let earlySafeTriggerThreshold = 0.55
+    private let earlyOverrideThreshold = 0.60
     private let minimumTriggerScore = 0.65
     private let confidenceSmoothingFactor = 0.45
 
@@ -267,7 +270,7 @@ final class SmartAlarmEngine {
         )
         let shouldTrigger = triggerEvaluation.shouldTrigger
 
-        let reason = shouldTrigger ? "smart_detection" : decisionReason(
+        let reason = shouldTrigger ? triggerEvaluation.reason : decisionReason(
             score: score,
             signals: signals,
             analysis: analysis,
@@ -305,12 +308,12 @@ final class SmartAlarmEngine {
                 avgHR: averages.avgHR,
                 avgHRV: averages.avgHRV,
                 avgMotion: averages.avgMotion,
-                reason: "smart_detection"
+                reason: triggerEvaluation.reason
             )
 
             logTriggerPath(triggerEvaluation, confidence: wakeConfidence)
             logTriggered(
-                reason: "smart_detection",
+                reason: triggerEvaluation.reason,
                 confidence: wakeConfidence,
                 score: score.finalScore,
                 timeToAlarm: timeToAlarm,
@@ -520,6 +523,20 @@ final class SmartAlarmEngine {
             )
         }
 
+        // Demo safety valve: when HR is rising and motion is steadily increasing,
+        // allow an earlier wake even before the stricter optimal threshold is reached.
+        if wakeConfidence > earlyOverrideThreshold &&
+            motionIncreasingCount >= 3 &&
+            signals.hrTrend {
+            print("⚡ Early trigger override activated")
+            return TriggerEvaluation(
+                shouldTrigger: true,
+                type: .earlyOverride,
+                thresholdUsed: earlyOverrideThreshold,
+                reason: "early_override_hr_and_motion_trend"
+            )
+        }
+
         if motionIncreasingCount >= requiredMotionIncreaseCount &&
             wakeConfidence >= earlySafeTriggerThreshold &&
             remainingTimeToAlarm <= safetyTriggerWindow {
@@ -655,6 +672,7 @@ final class SmartAlarmEngine {
         )
 
         print("[FAILSAFE] Triggering due to time expiry")
+        print("⏰ Fallback alarm triggered")
         logTriggered(
             reason: "fallback",
             confidence: wakeConfidence,
@@ -700,6 +718,12 @@ final class SmartAlarmEngine {
 
         if wakeConfidence >= optimalTriggerThreshold {
             return "confidence_reached_optimal_threshold"
+        }
+
+        if wakeConfidence > earlyOverrideThreshold &&
+            motionIncreasingCount >= 3 &&
+            signals.hrTrend {
+            return "early_override_hr_and_motion_trend"
         }
 
         if motionIncreasingCount >= requiredMotionIncreaseCount &&
@@ -757,16 +781,6 @@ final class SmartAlarmEngine {
         print("- hrTrend: \(analysis.hrTrend)")
         print("- motionSpike: \(analysis.motionSpike)")
         print("- motionIncreasing: \(analysis.motionIncreasing)")
-
-        print("""
-          📈 TREND ANALYSIS:
-          
-          * HR increasing: \(analysis.hrTrend)
-          * motion spike detected: \(analysis.motionSpike)
-          * motion increasing: \(analysis.motionIncreasing)
-          * motion delta: \(formatted(analysis.motionDelta))
-          * HR delta: \(formatted(analysis.hrDelta))
-          """)
     }
 
     private func logDecision(
@@ -816,7 +830,8 @@ final class SmartAlarmEngine {
             motionIncreasingCount: motionIncreasingCount,
             currentPhase: currentPhaseLabel,
             alarmState: alarmState,
-            decisionReason: triggerEvaluation.reason
+            decisionReason: triggerEvaluation.reason,
+            timeToAlarm: formattedMinutes(timeToAlarm)
         )
         debugSnapshot = snapshot
         publishDebugSnapshot(snapshot)
@@ -862,7 +877,8 @@ final class SmartAlarmEngine {
             motionIncreasingCount: debugSnapshot.motionIncreasingCount,
             currentPhase: debugSnapshot.currentPhase,
             alarmState: newState,
-            decisionReason: debugSnapshot.decisionReason
+            decisionReason: debugSnapshot.decisionReason,
+            timeToAlarm: debugSnapshot.timeToAlarm
         )
         publishDebugSnapshot(debugSnapshot)
     }
@@ -1005,6 +1021,7 @@ private struct TriggerEvaluation {
 private enum TriggerType: String {
     case none = "NONE"
     case optimal = "OPTIMAL"
+    case earlyOverride = "EARLY_OVERRIDE"
     case earlySafe = "EARLY_SAFE"
     case fallback = "FALLBACK"
 }

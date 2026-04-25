@@ -19,8 +19,7 @@ final class SleepSessionManager {
         let startTime = Date()
 
         print("🟢 SESSION STARTED")
-        print("- startTime:", startTime)
-        print("- alarmTime:", alarmTime)
+        print("alarmTime:", alarmTime)
 
         guard let sessionId = DatabaseManager.shared.createSleepSession(
             startTime: startTime,
@@ -40,7 +39,7 @@ final class SleepSessionManager {
             return
         }
 
-        print("🔴 SESSION ENDED")
+        print("🛑 SESSION ENDED")
         print("- triggerTime:", triggerTime)
         print("- reason:", reason)
         print("- confidence:", confidence)

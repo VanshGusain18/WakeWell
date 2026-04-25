@@ -195,10 +195,36 @@ final class MockWatchProvider: VitalDataProvider {
 
 final class RealWatchProvider: VitalDataProvider {
     var onData: ((VitalData) -> Void)?
+    private var timer: Timer?
 
     func start() {
-        print("[STATE] RealWatchProvider placeholder ready")
+        stop()
+        HealthKitManager.shared.startWatchWorkoutSessionForLiveStreaming()
+
+        // Demo-level "real watch" mode: poll the newest HealthKit HR/HRV values on iPhone.
+        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            guard let self else { return }
+
+            HealthKitManager.shared.fetchLatestHeartRate { heartRate in
+                HealthKitManager.shared.fetchLatestHRV { hrv in
+                    let sample = VitalData(
+                        timestamp: Date(),
+                        heartRate: heartRate ?? 0,
+                        hrv: hrv ?? 0,
+                        motion: 0,
+                        respiratoryRate: 0,
+                        wristTemp: nil,
+                        oxygenSaturation: nil,
+                        phase: "Live Watch"
+                    )
+                    self.onData?(sample)
+                }
+            }
+        }
     }
 
-    func stop() {}
+    func stop() {
+        timer?.invalidate()
+        timer = nil
+    }
 }

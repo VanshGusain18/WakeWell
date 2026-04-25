@@ -4,10 +4,16 @@ final class WatchDataManager {
 
     static let shared = WatchDataManager()
 
+    var useSimulation = true {
+        didSet {
+            configureProvider()
+        }
+    }
+
     private var provider: VitalDataProvider = MockWatchProvider()
 
     private init() {
-        configureProviderCallback()
+        configureProvider()
     }
 
     func setProvider(_ provider: VitalDataProvider) {
@@ -25,6 +31,7 @@ final class WatchDataManager {
         }
 
         SmartAlarmEngine.shared.beginMonitoring()
+        print("[STATE] Using provider:", useSimulation ? "MockWatchProvider" : "RealWatchProvider")
         provider.start()
     }
 
@@ -43,6 +50,11 @@ final class WatchDataManager {
         NotificationManager.shared.cancelAllScheduledAlarms()
         DatabaseManager.shared.clearVitals()
         SmartAlarmEngine.shared.reset()
+    }
+
+    private func configureProvider() {
+        provider = useSimulation ? MockWatchProvider() : RealWatchProvider()
+        configureProviderCallback()
     }
 
     private func configureProviderCallback() {

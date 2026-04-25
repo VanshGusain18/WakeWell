@@ -10,46 +10,49 @@ class BarChartTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
-        backgroundColor = WakeWellTheme.glassBackground
-//        contentView.backgroundColor = .clear
-        WakeWellTheme.styleGlassCard(glassContainer, cornerRadius: 24)
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
+        glassContainer.backgroundColor = WakeWellTheme.background
+        glassContainer.layer.cornerRadius = 0
+        glassContainer.layer.borderWidth = 0
+        glassContainer.layer.shadowOpacity = 0
+
         titleLabel.font      = .systemFont(ofSize: 18, weight: .semibold)
         titleLabel.textColor = WakeWellTheme.labelPrimary
         setupChartAppearance()
     }
 
     private func setupChartAppearance() {
-        barChartView.backgroundColor        = .clear
-        barChartView.rightAxis.enabled      = false
+        barChartView.backgroundColor         = .clear
+        barChartView.rightAxis.enabled       = false
         barChartView.chartDescription.enabled = false
 
-        let xAxis                           = barChartView.xAxis
-        xAxis.labelPosition                 = .bottom
-        xAxis.drawGridLinesEnabled          = false
-        xAxis.granularity                   = 1
-        xAxis.labelFont                     = .systemFont(ofSize: 10, weight: .medium)
-        xAxis.labelTextColor                = WakeWellTheme.chartAxisText
+        let xAxis = barChartView.xAxis
+        xAxis.labelPosition        = .bottom
+        xAxis.drawGridLinesEnabled = false
+        xAxis.granularity          = 1
+        xAxis.labelFont            = .systemFont(ofSize: 10, weight: .medium)
+        xAxis.labelTextColor       = WakeWellTheme.chartAxisText
 
-        let leftAxis                        = barChartView.leftAxis
-        leftAxis.drawGridLinesEnabled       = true
-        leftAxis.gridColor                  = WakeWellTheme.chartGrid
-        leftAxis.labelTextColor             = WakeWellTheme.chartAxisText
-        leftAxis.axisMinimum                = 0
+        let leftAxis = barChartView.leftAxis
+        leftAxis.drawGridLinesEnabled = true
+        leftAxis.gridColor            = WakeWellTheme.chartGrid
+        leftAxis.labelTextColor       = WakeWellTheme.chartAxisText
+        leftAxis.axisMinimum          = 0
 
-        let legend                          = barChartView.legend
-        legend.horizontalAlignment          = .center
-        legend.verticalAlignment            = .bottom
-        legend.orientation                  = .horizontal
-        legend.drawInside                   = false
-        legend.font                         = .systemFont(ofSize: 11)
-        legend.textColor                    = WakeWellTheme.labelSecondary
+        let legend = barChartView.legend
+        legend.horizontalAlignment = .center
+        legend.verticalAlignment   = .bottom
+        legend.orientation         = .horizontal
+        legend.drawInside          = false
+        legend.font                = .systemFont(ofSize: 11)
+        legend.textColor           = WakeWellTheme.labelSecondary
     }
 
     func configure(title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         titleLabel.text = title
         guard !dataSets.isEmpty else { barChartView.data = nil; return }
 
-        // Purple gradient palette for bars
         let palette: [UIColor] = [
             WakeWellTheme.accentPurple,
             WakeWellTheme.accentGold,
@@ -58,7 +61,7 @@ class BarChartTableViewCell: UITableViewCell {
 
         let chartDataSets: [BarChartDataSet] = dataSets.enumerated().map { idx, model in
             let entries = model.values.map { BarChartDataEntry(x: $0.xIndex, y: $0.value) }
-            let set     = BarChartDataSet(entries: entries, label: model.label)
+            let set = BarChartDataSet(entries: entries, label: model.label)
             set.setColor(palette[idx % palette.count])
             set.drawValuesEnabled = false
             return set
@@ -73,8 +76,7 @@ class BarChartTableViewCell: UITableViewCell {
             chartData.barWidth = barWidth
             chartData.groupBars(fromX: 0, groupSpace: groupSpace, barSpace: barSpace)
             barChartView.xAxis.axisMinimum = 0
-            barChartView.xAxis.axisMaximum = chartData.groupWidth(
-                groupSpace: groupSpace, barSpace: barSpace) * groupCount
+            barChartView.xAxis.axisMaximum = chartData.groupWidth(groupSpace: groupSpace, barSpace: barSpace) * groupCount
             barChartView.xAxis.centerAxisLabelsEnabled = true
         } else {
             let bw = 0.5

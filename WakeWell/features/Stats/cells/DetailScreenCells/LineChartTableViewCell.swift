@@ -10,33 +10,39 @@ class LineChartTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
-        backgroundColor = WakeWellTheme.glassBackground
+        backgroundColor = .clear
         contentView.backgroundColor = .clear
-        WakeWellTheme.styleGlassCard(glassContainer, cornerRadius: 24)
+        glassContainer.backgroundColor = WakeWellTheme.background
+        glassContainer.layer.cornerRadius = 0
+        glassContainer.layer.borderWidth = 0
+        glassContainer.layer.shadowOpacity = 0
+
         titleLabel.font      = .systemFont(ofSize: 18, weight: .semibold)
         titleLabel.textColor = WakeWellTheme.labelPrimary
         setupChartAppearance()
     }
 
     private func setupChartAppearance() {
-        lineChartView.backgroundColor       = .clear
-        lineChartView.rightAxis.enabled     = false
-        lineChartView.legend.enabled        = false
+        lineChartView.backgroundColor         = .clear
+        lineChartView.rightAxis.enabled       = false
+        lineChartView.legend.enabled          = false
         lineChartView.chartDescription.enabled = false
 
-        let xAxis                           = lineChartView.xAxis
-        xAxis.labelPosition                 = .bottom
-        xAxis.drawGridLinesEnabled          = false
-        xAxis.labelFont                     = .systemFont(ofSize: 10, weight: .medium)
-        xAxis.labelTextColor                = WakeWellTheme.chartAxisText
-        xAxis.granularity                   = 1
+        let xAxis = lineChartView.xAxis
+        xAxis.labelPosition       = .bottom
+        xAxis.drawGridLinesEnabled = false
+        xAxis.labelFont           = .systemFont(ofSize: 10, weight: .medium)
+        xAxis.labelTextColor      = WakeWellTheme.chartAxisText
+        xAxis.granularity         = 1
+        xAxis.centerAxisLabelsEnabled = false
 
-        let leftAxis                        = lineChartView.leftAxis
-        leftAxis.drawGridLinesEnabled       = true
-        leftAxis.gridColor                  = WakeWellTheme.chartGrid
-        leftAxis.labelFont                  = .systemFont(ofSize: 10)
-        leftAxis.labelTextColor             = WakeWellTheme.chartAxisText
-        leftAxis.axisMinimum                = 0
+        let leftAxis = lineChartView.leftAxis
+        leftAxis.drawGridLinesEnabled = true
+        leftAxis.gridColor            = WakeWellTheme.chartGrid
+        leftAxis.labelFont            = .systemFont(ofSize: 10)
+        leftAxis.labelTextColor       = WakeWellTheme.chartAxisText
+        leftAxis.axisMinimum          = 0
+
         lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
@@ -46,17 +52,19 @@ class LineChartTableViewCell: UITableViewCell {
 
         let chartDataSets: [LineChartDataSet] = dataSets.map { model in
             let entries = model.values.map { ChartDataEntry(x: $0.xIndex, y: $0.value) }
-            let set     = LineChartDataSet(entries: entries, label: model.label)
-            set.setColor(WakeWellTheme.chartLine)            // amber line
-            set.lineWidth            = 3
-            set.mode                 = .cubicBezier
-            set.drawValuesEnabled    = false
-            set.drawCirclesEnabled   = true
-            set.circleRadius         = 4
+            let set = LineChartDataSet(entries: entries, label: model.label)
+            set.setColor(WakeWellTheme.chartLine)
+            set.lineWidth          = 3
+            set.mode               = .cubicBezier
+            set.drawValuesEnabled  = false
+            set.drawCirclesEnabled = true
+            set.circleRadius       = 4
             set.setCircleColor(WakeWellTheme.chartLine)
+            set.circleHoleColor    = WakeWellTheme.background
+            set.circleHoleRadius   = 2
             let gc = [WakeWellTheme.chartFillTop.cgColor, UIColor.clear.cgColor] as CFArray
             if let g = CGGradient(colorsSpace: nil, colors: gc, locations: nil) {
-                set.fill              = LinearGradientFill(gradient: g, angle: 90)
+                set.fill = LinearGradientFill(gradient: g, angle: 90)
                 set.drawFilledEnabled = true
             }
             return set

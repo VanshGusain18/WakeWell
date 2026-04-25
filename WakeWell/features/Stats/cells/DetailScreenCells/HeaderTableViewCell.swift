@@ -8,21 +8,23 @@ class HeaderTableViewCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        selectionStyle      = .none
-        backgroundColor     = WakeWellTheme.glassBackground
+        selectionStyle = .none
+        backgroundColor = .clear
         contentView.backgroundColor = .clear
-        WakeWellTheme.styleGlassCard(glassContainer, cornerRadius: 24)
+        glassContainer.backgroundColor = WakeWellTheme.background
+        glassContainer.layer.cornerRadius = 0
+        glassContainer.layer.borderWidth = 0
+        glassContainer.layer.shadowOpacity = 0
 
         titleLabel.font       = .systemFont(ofSize: 28, weight: .bold)
         titleLabel.textColor  = WakeWellTheme.labelPrimary
-
-        descriptionLabel.font          = .systemFont(ofSize: 15, weight: .regular)
-        descriptionLabel.textColor     = WakeWellTheme.labelSecondary
+        descriptionLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        descriptionLabel.textColor = WakeWellTheme.labelSecondary
         descriptionLabel.numberOfLines = 0
     }
 
     func configure(title: String, description: String) {
-        titleLabel.text      = title
+        titleLabel.text       = title
         descriptionLabel.text = description
     }
 

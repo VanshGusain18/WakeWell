@@ -21,6 +21,13 @@ class BaseMetricTableViewController: UITableViewController {
         loadData(for: timeRange)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Force background every time screen appears (fixes modal presentation resetting it)
+        view.backgroundColor      = WakeWellTheme.background
+        tableView.backgroundColor = WakeWellTheme.background
+    }
+
     func update(range: StatsTimeRange) {
         timeRange = range; loadData(for: range); tableView.reloadData()
     }
@@ -52,8 +59,12 @@ class BaseMetricTableViewController: UITableViewController {
         guard let section = SectionType(rawValue: indexPath.section) else {
             return UITableViewCell()
         }
-        return buildCell(for: section, range: timeRange,
-                         tableView: tableView, indexPath: indexPath)
+        let cell = buildCell(for: section, range: timeRange,
+                             tableView: tableView, indexPath: indexPath)
+        // Ensure every cell's background matches the screen — not white
+        cell.backgroundColor        = WakeWellTheme.background
+        cell.contentView.backgroundColor = .clear
+        return cell
     }
 
     // Convenience dequeue helpers (unchanged)

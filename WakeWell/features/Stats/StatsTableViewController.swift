@@ -3,6 +3,9 @@ import UIKit
 
 class StatsTableViewController: UITableViewController {
 
+    
+    @IBOutlet weak var outerView: UIView!
+    
     @IBOutlet weak var timeRangeSegment: UISegmentedControl!
     private var currentRange: StatsTimeRange = .week
     private var metrics: [SleepMetric] = []
@@ -14,6 +17,7 @@ class StatsTableViewController: UITableViewController {
         prefetchAllRanges()
         registerCells()
         loadSleepData()
+        outerView.backgroundColor = WakeWellTheme.background
     }
 
     override func viewDidLayoutSubviews() {
@@ -29,19 +33,14 @@ class StatsTableViewController: UITableViewController {
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
 
         timeRangeSegment?.selectedSegmentTintColor = WakeWellTheme.accentPurple
-        timeRangeSegment?.backgroundColor          = WakeWellTheme.cardElevated
+        timeRangeSegment?.backgroundColor          = WakeWellTheme.purpleTint
         timeRangeSegment?.setTitleTextAttributes(
             [.foregroundColor: UIColor.white,
              .font: UIFont.systemFont(ofSize: 13, weight: .semibold)], for: .selected)
         timeRangeSegment?.setTitleTextAttributes(
-            [.foregroundColor: WakeWellTheme.labelSecondary], for: .normal)
+            [.foregroundColor: WakeWellTheme.shadowColor], for: .normal)
     }
 
-    // MARK: - Data
-    // Previous period used for trend:
-    //   current .week  → compare vs .month
-    //   current .month → compare vs .year
-    //   current .year  → no previous (trend = 0)
     private func previousRange(for range: StatsTimeRange) -> StatsTimeRange? {
         switch range {
         case .week:  return .month

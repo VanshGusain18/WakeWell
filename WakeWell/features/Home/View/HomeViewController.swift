@@ -178,8 +178,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 withReuseIdentifier: AlarmCollectionViewCell.identifier,
                 for: indexPath
             ) as! AlarmCollectionViewCell
-            // Always pull the latest saved time — the model baked into allCards at init
-            // may be stale if the user set an alarm during this session.
+            
             let freshTime  = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
             let freshModel = AlarmModel(time: freshTime)
             cell.configure(with: AlarmViewModel(model: freshModel))

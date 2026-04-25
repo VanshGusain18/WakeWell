@@ -11,35 +11,39 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="AlarmCollectionViewCell" customModule="WakeWell" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="180" height="199"/>
+            <rect key="frame" x="0.0" y="0.0" width="234" height="199"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="180" height="199"/>
+                <rect key="frame" x="0.0" y="0.0" width="234" height="199"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="08p-zD-iVw">
-                        <rect key="frame" x="0.0" y="0.0" width="180" height="199"/>
+                        <rect key="frame" x="0.0" y="0.0" width="234" height="199"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="titleLabel" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fSD-fH-OyT">
-                                <rect key="frame" x="8" y="12" width="153" height="41"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="timeLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="P8U-xu-QVN">
-                                <rect key="frame" x="8" y="61" width="157" height="86"/>
+                                <rect key="frame" x="19" y="61" width="146" height="86"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="subtitleLabel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ASR-Er-he2">
-                                <rect key="frame" x="8" y="155" width="150" height="35"/>
+                                <rect key="frame" x="19" y="155" width="150" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" systemColor="tertiaryLabelColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="titleLabel" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fSD-fH-OyT">
+                                <rect key="frame" x="58" y="10" width="107" height="43"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="alarm" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="d8j-WI-OiV">
+                                <rect key="frame" x="19" y="10" width="31" height="42"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
@@ -52,16 +56,18 @@
                 <constraint firstAttribute="trailing" secondItem="08p-zD-iVw" secondAttribute="trailing" id="Wbp-ZI-TqY"/>
                 <constraint firstItem="08p-zD-iVw" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="pX2-5H-Seu"/>
             </constraints>
-            <size key="customSize" width="180" height="199"/>
+            <size key="customSize" width="234" height="199"/>
             <connections>
+                <outlet property="alarmIcon" destination="d8j-WI-OiV" id="mrB-jU-qnl"/>
                 <outlet property="subtitleLabel" destination="ASR-Er-he2" id="Kh8-wW-1L8"/>
                 <outlet property="timeLabel" destination="P8U-xu-QVN" id="VVX-d4-f9a"/>
                 <outlet property="titleLabel" destination="fSD-fH-OyT" id="bya-Fh-Pvm"/>
             </connections>
-            <point key="canvasLocation" x="-309.92366412213738" y="119.36619718309859"/>
+            <point key="canvasLocation" x="-389.3129770992366" y="119.36619718309859"/>
         </collectionViewCell>
     </objects>
     <resources>
+        <image name="alarm" catalog="system" width="123" height="128"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

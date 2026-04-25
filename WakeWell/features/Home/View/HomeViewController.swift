@@ -1,10 +1,12 @@
 import UIKit
+import SwiftUI
 
 class HomeViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
 
     private let viewModel = HomeViewModel()
+    private let demoButton = UIButton(type: .system)
 
     // MARK: - Lifecycle
     private var isAnimatingMetrics = false
@@ -15,6 +17,7 @@ class HomeViewController: UIViewController {
         collectionView.dataSource      = self
         collectionView.allowsSelection = true
         registerCells()
+        configureDemoButton()
 
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.estimatedItemSize       = .zero
@@ -74,6 +77,45 @@ class HomeViewController: UIViewController {
             UINib(nibName: "SleepSoundsCollectionViewCell", bundle: nil),
             forCellWithReuseIdentifier: "sleep_sounds_cell"
         )
+    }
+
+    private func configureDemoButton() {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "Start Smart Alarm Demo"
+        configuration.cornerStyle = .capsule
+        configuration.baseBackgroundColor = .systemBlue
+        configuration.baseForegroundColor = .white
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 20, bottom: 14, trailing: 20)
+
+        demoButton.configuration = configuration
+        demoButton.translatesAutoresizingMaskIntoConstraints = false
+        demoButton.addTarget(self, action: #selector(startDemoTapped), for: .touchUpInside)
+
+        view.addSubview(demoButton)
+
+        NSLayoutConstraint.activate([
+            demoButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            demoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            demoButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            demoButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 52)
+        ])
+
+        collectionView.contentInset.bottom = 100
+        collectionView.verticalScrollIndicatorInsets.bottom = 100
+    }
+
+    @objc private func startDemoTapped() {
+        WatchDataManager.shared.startDemo()
+
+        let debugView = SmartDebugView()
+        let controller = UIHostingController(rootView: debugView)
+
+        if let navigationController {
+            navigationController.pushViewController(controller, animated: true)
+        } else {
+            let wrapped = UINavigationController(rootViewController: controller)
+            present(wrapped, animated: true)
+        }
     }
 }
 

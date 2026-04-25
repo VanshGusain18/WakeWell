@@ -1,5 +1,43 @@
 import Foundation
 
+enum AlarmState: String {
+    case idle
+    case monitoring
+    case triggered
+}
+
+struct SmartAlarmDebugSnapshot {
+    let currentHR: Double
+    let currentHRV: Double
+    let currentMotion: Double
+    let avgHR: Double
+    let avgHRV: Double
+    let avgMotion: Double
+    let confidence: Double
+    let score: Double
+    let threshold: Double
+    let motionIncreasingCount: Int
+    let currentPhase: String
+    let alarmState: AlarmState
+    let decisionReason: String
+
+    static let empty = SmartAlarmDebugSnapshot(
+        currentHR: 0,
+        currentHRV: 0,
+        currentMotion: 0,
+        avgHR: 0,
+        avgHRV: 0,
+        avgMotion: 0,
+        confidence: 0,
+        score: 0,
+        threshold: 0.70,
+        motionIncreasingCount: 0,
+        currentPhase: "idle",
+        alarmState: .idle,
+        decisionReason: "waiting_for_alarm"
+    )
+}
+
 struct WakeDecision {
     let shouldTrigger: Bool
     let confidence: Double
@@ -40,14 +78,31 @@ final class SmartAlarmEngine {
     private var motionIncreasingCount = 0
     private var lastTriggerTime: Date?
     private var lastKnownAverages: VitalAverages?
+    private var latestLiveInput = InputSnapshot.zero
+    private var currentPhaseLabel = "idle"
 
     private var lastMotionValues: [Double] = []
     private var lastHRValues: [Double] = []
     private var lastHRVValues: [Double] = []
 
+    private(set) var alarmState: AlarmState = .idle
+    private(set) var debugSnapshot = SmartAlarmDebugSnapshot.empty
     private(set) var lastTriggerResult: TriggerResult?
 
     // MARK: - Public
+
+    func beginMonitoring() {
+        transitionState(to: .monitoring)
+    }
+
+    func recordCurrentInput(heartRate: Double, hrv: Double, motion: Double, phase: String) {
+        latestLiveInput = InputSnapshot(
+            motion: motion,
+            hr: heartRate,
+            hrv: hrv
+        )
+        currentPhaseLabel = phase
+    }
 
     func reset() {
         hasTriggered = false
@@ -56,11 +111,15 @@ final class SmartAlarmEngine {
         motionIncreasingCount = 0
         lastTriggerTime = nil
         lastKnownAverages = nil
+        latestLiveInput = .zero
+        currentPhaseLabel = "idle"
         lastMotionValues = []
         lastHRValues = []
         lastHRVValues = []
+        debugSnapshot = .empty
         lastTriggerResult = nil
-        print("[SmartAlarm] engine reset")
+        transitionState(to: .idle)
+        publishDebugSnapshot(debugSnapshot)
     }
 
     func evaluateWakeOpportunity() -> WakeDecision {
@@ -238,6 +297,7 @@ final class SmartAlarmEngine {
         if shouldTrigger {
             hasTriggered = true
             lastTriggerTime = now
+            transitionState(to: .triggered)
 
             lastTriggerResult = TriggerResult(
                 timestamp: now,
@@ -306,6 +366,10 @@ final class SmartAlarmEngine {
     }
 
     private func latestInput(from vitals: [WatchVitalsModel]) -> InputSnapshot {
+        if latestLiveInput != .zero {
+            return latestLiveInput
+        }
+
         guard let latest = vitals.last else { return .zero }
 
         return InputSnapshot(
@@ -579,6 +643,7 @@ final class SmartAlarmEngine {
         lastTriggerTime = now
         wakeConfidence = 1
         consecutiveHighScoreCount = 0
+        transitionState(to: .triggered)
 
         lastTriggerResult = TriggerResult(
             timestamp: now,
@@ -589,7 +654,7 @@ final class SmartAlarmEngine {
             reason: "fallback"
         )
 
-        print("⚠️ FALLBACK TRIGGER USED")
+        print("[FAILSAFE] Triggering due to time expiry")
         logTriggered(
             reason: "fallback",
             confidence: wakeConfidence,
@@ -714,15 +779,6 @@ final class SmartAlarmEngine {
         timeToAlarm: TimeInterval,
         decision: WakeDecision
     ) {
-        print("[SmartAlarm]")
-        print("- avgHR:", formatted(averages.avgHR))
-        print("- avgHRV:", formatted(averages.avgHRV))
-        print("- avgMotion:", formatted(averages.avgMotion))
-        print("- score:", formatted(score.finalScore))
-        print("- confidence:", formatted(decision.confidence))
-        print("- reason:", decision.reason)
-        print("- decision:", decision.shouldTrigger ? "trigger" : "wait")
-
         print("[CONFIDENCE]")
         print("- baseScore: \(formatted(components.baseScore))")
         print("- trendBonus: \(formatted(components.trendBonus))")
@@ -732,28 +788,38 @@ final class SmartAlarmEngine {
         print("- timePressureBonus: \(formatted(components.timePressureBonus))")
         print("- finalConfidence: \(formatted(decision.confidence))")
 
-        print("""
-          🧠 DECISION CHECK:
-          
-          * score: \(formatted(score.finalScore))
-          * confidence: \(formatted(decision.confidence))
-          * threshold: \(formatted(triggerEvaluation.thresholdUsed))
-          * motionSpike: \(signals.motionSpike)
-          * hrTrend: \(signals.hrTrend)
-          * motionIncreasing: \(analysis.motionIncreasing)
-          * motionIncreasingCount: \(motionIncreasingCount)
-          * consecutiveCount: \(consecutiveHighScoreCount)
-          * shouldTrigger: \(decision.shouldTrigger)
-          """)
-
         print("[DECISION]")
         print("- triggerType: \(triggerEvaluation.type.rawValue)")
         print("- reason: \(triggerEvaluation.reason)")
+        print("- score: \(formatted(score.finalScore))")
         print("- confidence: \(formatted(decision.confidence))")
         print("- thresholdUsed: \(formatted(triggerEvaluation.thresholdUsed))")
         print("- timeToAlarm: \(formattedMinutes(timeToAlarm))")
+        print("- avgHR: \(formatted(averages.avgHR))")
+        print("- avgMotion: \(formatted(averages.avgMotion))")
+        print("- motionSpike: \(signals.motionSpike)")
+        print("- hrTrend: \(signals.hrTrend)")
+        print("- motionIncreasing: \(analysis.motionIncreasing)")
         print("- motionIncreasingCount: \(motionIncreasingCount)")
         print("- shouldTrigger: \(decision.shouldTrigger)")
+
+        let snapshot = SmartAlarmDebugSnapshot(
+            currentHR: latestLiveInput.hr,
+            currentHRV: latestLiveInput.hrv,
+            currentMotion: latestLiveInput.motion,
+            avgHR: averages.avgHR,
+            avgHRV: averages.avgHRV,
+            avgMotion: averages.avgMotion,
+            confidence: decision.confidence,
+            score: score.finalScore,
+            threshold: triggerEvaluation.thresholdUsed,
+            motionIncreasingCount: motionIncreasingCount,
+            currentPhase: currentPhaseLabel,
+            alarmState: alarmState,
+            decisionReason: triggerEvaluation.reason
+        )
+        debugSnapshot = snapshot
+        publishDebugSnapshot(snapshot)
     }
 
     private func logTriggerPath(_ evaluation: TriggerEvaluation, confidence: Double) {
@@ -777,6 +843,32 @@ final class SmartAlarmEngine {
           * timeToAlarm: \(formattedMinutes(timeToAlarm))
           * usedFallback: \(usedFallback)
           """)
+    }
+
+    private func transitionState(to newState: AlarmState) {
+        guard alarmState != newState else { return }
+        print("[STATE] \(alarmState.rawValue) → \(newState.rawValue)")
+        alarmState = newState
+        debugSnapshot = SmartAlarmDebugSnapshot(
+            currentHR: debugSnapshot.currentHR,
+            currentHRV: debugSnapshot.currentHRV,
+            currentMotion: debugSnapshot.currentMotion,
+            avgHR: debugSnapshot.avgHR,
+            avgHRV: debugSnapshot.avgHRV,
+            avgMotion: debugSnapshot.avgMotion,
+            confidence: debugSnapshot.confidence,
+            score: debugSnapshot.score,
+            threshold: debugSnapshot.threshold,
+            motionIncreasingCount: debugSnapshot.motionIncreasingCount,
+            currentPhase: debugSnapshot.currentPhase,
+            alarmState: newState,
+            decisionReason: debugSnapshot.decisionReason
+        )
+        publishDebugSnapshot(debugSnapshot)
+    }
+
+    private func publishDebugSnapshot(_ snapshot: SmartAlarmDebugSnapshot) {
+        NotificationCenter.default.post(name: .smartAlarmDebugDidUpdate, object: snapshot)
     }
 
     // MARK: - Utilities
@@ -871,7 +963,7 @@ private struct TrendAnalysis {
     )
 }
 
-private struct InputSnapshot {
+private struct InputSnapshot: Equatable {
     let motion: Double
     let hr: Double
     let hrv: Double
@@ -915,4 +1007,8 @@ private enum TriggerType: String {
     case optimal = "OPTIMAL"
     case earlySafe = "EARLY_SAFE"
     case fallback = "FALLBACK"
+}
+
+extension Notification.Name {
+    static let smartAlarmDebugDidUpdate = Notification.Name("wakewell.smartAlarmDebugDidUpdate")
 }

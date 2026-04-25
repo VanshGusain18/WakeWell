@@ -25,6 +25,7 @@ final class AlarmManager {
         NotificationManager.shared.cancelAllScheduledAlarms()
         NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: time)
         SleepSessionManager.shared.startSession(alarmTime: time)
+        SmartAlarmEngine.shared.beginMonitoring()
 
         print("⏰ Alarm set for:", time)
     }

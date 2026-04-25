@@ -17,15 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        
         WatchDebugRunner.run()
-        WatchDataManager.shared.start()
-        AlarmManager.shared.setTestAlarm()
         AlarmManager.shared.loadSavedAlarm()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            let vitals = DatabaseManager.shared.fetchRecentVitals()
-            //print("Fetched vitals:", vitals)
-        }
         return true
     }
 

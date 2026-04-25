@@ -21,12 +21,13 @@ class StatsTableViewController: UITableViewController {
         tableView.tableHeaderView?.frame.size.height = 48
     }
 
+    // MARK: - Theme
+
     private func applyTheme() {
-        view.backgroundColor             = WakeWellTheme.background
-        tableView.backgroundColor        = WakeWellTheme.background
+        view.backgroundColor      = WakeWellTheme.background
+        tableView.backgroundColor = WakeWellTheme.background
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
 
-        // Segmented control — purple selected, matches screenshot
         timeRangeSegment?.selectedSegmentTintColor = WakeWellTheme.accentPurple
         timeRangeSegment?.backgroundColor          = WakeWellTheme.cardElevated
         timeRangeSegment?.setTitleTextAttributes(
@@ -36,19 +37,39 @@ class StatsTableViewController: UITableViewController {
             [.foregroundColor: WakeWellTheme.labelSecondary], for: .normal)
     }
 
+    // MARK: - Data
+    // Previous period used for trend:
+    //   current .week  → compare vs .month
+    //   current .month → compare vs .year
+    //   current .year  → no previous (trend = 0)
+    private func previousRange(for range: StatsTimeRange) -> StatsTimeRange? {
+        switch range {
+        case .week:  return .month
+        case .month: return .year
+        case .year:  return nil
+        }
+    }
+
     private func loadSleepData() {
-        let rawStats = SleepStatsAggregator.aggregate(for: currentRange)
-        let rounded  = SleepStats(
-            duration: rawStats.duration.rounded(), efficiency: rawStats.efficiency.rounded(),
-            architecture: rawStats.architecture.rounded(), consistency: rawStats.consistency.rounded(),
-            calmness: rawStats.calmness.rounded(), continuity: rawStats.continuity.rounded())
-        metrics = SleepStatsMapper.mapToMetrics(from: rounded)
+        let currentStats = SleepStatsAggregator.aggregate(for: currentRange)
+
+        let previousStats: SleepStats?
+        if let prevRange = previousRange(for: currentRange) {
+            previousStats = SleepStatsAggregator.aggregate(for: prevRange)
+        } else {
+            previousStats = nil
+        }
+
+        metrics = SleepStatsMapper.mapToMetrics(from: currentStats,
+                                                 previousStats: previousStats)
         tableView.reloadData()
     }
 
     private func registerCells() {
-        tableView.register(UINib(nibName: "SleepScoreChartCell",  bundle: nil), forCellReuseIdentifier: "SleepScoreChartCell")
-        tableView.register(UINib(nibName: "StatsMetricCardCell", bundle: nil), forCellReuseIdentifier: "StatsMetricCardCell")
+        tableView.register(UINib(nibName: "SleepScoreChartCell",  bundle: nil),
+                           forCellReuseIdentifier: "SleepScoreChartCell")
+        tableView.register(UINib(nibName: "StatsMetricCardCell", bundle: nil),
+                           forCellReuseIdentifier: "StatsMetricCardCell")
     }
 
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
@@ -57,9 +78,12 @@ class StatsTableViewController: UITableViewController {
         loadSleepData()
     }
 
+    // MARK: - TableView
+
     override func numberOfSections(in tableView: UITableView) -> Int { 2 }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView,
+                            numberOfRowsInSection section: Int) -> Int {
         section == 0 ? 1 : Int(ceil(Double(metrics.count) / 2.0))
     }
 
@@ -71,17 +95,27 @@ class StatsTableViewController: UITableViewController {
             cell.configure(for: currentRange)
             return cell
         }
+
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: "StatsMetricCardCell", for: indexPath) as? StatsMetricCardCell else {
             return UITableViewCell()
         }
-        let li = indexPath.row * 2; let ri = li + 1
-        let lm = metrics[li]; let rm = ri < metrics.count ? metrics[ri] : nil
+
+        let li = indexPath.row * 2
+        let ri = li + 1
+        let lm = metrics[li]
+        let rm = ri < metrics.count ? metrics[ri] : nil
+
         cell.configure(
-            leftTitle: lm.type.title, leftValue: lm.displayValue,
-            rightTitle: rm?.type.title, rightValue: rm?.displayValue,
+            leftTitle:  lm.type.title,
+            leftValue:  lm.displayValue,
+            leftTrend:  lm.trendPercent,
+            rightTitle: rm?.type.title,
+            rightValue: rm?.displayValue,
+            rightTrend: rm?.trendPercent ?? 0,
             leftAction:  { [weak self] in self?.openMetricScreen(lm.type) },
-            rightAction: rm != nil ? { [weak self] in self?.openMetricScreen(rm!.type) } : nil)
+            rightAction: rm != nil ? { [weak self] in self?.openMetricScreen(rm!.type) } : nil
+        )
         return cell
     }
 
@@ -90,7 +124,8 @@ class StatsTableViewController: UITableViewController {
         indexPath.section == 0 ? 260 : 120
     }
 
-    // MARK: - Navigation (logic unchanged)
+    // MARK: - Navigation
+
     private func openMetricScreen(_ metric: SleepMetricType) {
         let vc = makeViewController(for: metric)
         vc.timeRange = currentRange
@@ -99,7 +134,7 @@ class StatsTableViewController: UITableViewController {
 
     private func prefetchAllRanges() {
         let group = DispatchGroup()
-        for range in [StatsTimeRange.week, .month, .year] {
+        for range in StatsTimeRange.allCases {
             group.enter()
             HealthKitSleepRepository.shared.prefetch(for: range) { group.leave() }
         }

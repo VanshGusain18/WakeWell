@@ -12,21 +12,27 @@ class StatsMetricCardCell: UITableViewCell {
     var leftTapAction:  (() -> Void)?
     var rightTapAction: (() -> Void)?
 
+    // Trend labels added programmatically — no XIB change needed
+    private let leftTrendLabel  = UILabel()
+    private let rightTrendLabel = UILabel()
+
     override func awakeFromNib() {
         super.awakeFromNib()
-        backgroundColor = .clear
-        contentView.backgroundColor = .clear
         setupUI()
+        setupTrendLabels()
         setupGestures()
     }
 
+    // MARK: - Setup
+
     private func setupUI() {
-        // Title labels — secondary
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
+
         for lbl in [leftTitleLabel, rightTitleView] {
             lbl?.font      = .systemFont(ofSize: 14, weight: .medium)
             lbl?.textColor = WakeWellTheme.labelSecondary
         }
-        // Value labels — gold accent matching screenshot
         for lbl in [leftValueLabel, rightValueView] {
             lbl?.font      = .systemFont(ofSize: 26, weight: .semibold)
             lbl?.textColor = WakeWellTheme.accentGold
@@ -48,6 +54,21 @@ class StatsMetricCardCell: UITableViewCell {
         card.layer.masksToBounds  = false
     }
 
+    // Pin a small trend label to the bottom-right of each card
+    private func setupTrendLabels() {
+        for (trendLabel, card) in [(leftTrendLabel, leftCardView!),
+                                    (rightTrendLabel, rightCardView!)] {
+            trendLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+            trendLabel.textAlignment = .right
+            trendLabel.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(trendLabel)
+            NSLayoutConstraint.activate([
+                trendLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
+                trendLabel.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -10)
+            ])
+        }
+    }
+
     private func setupGestures() {
         leftCardView.addGestureRecognizer(
             UITapGestureRecognizer(target: self, action: #selector(leftCardTapped)))
@@ -55,17 +76,40 @@ class StatsMetricCardCell: UITableViewCell {
             UITapGestureRecognizer(target: self, action: #selector(rightCardTapped)))
     }
 
-    func configure(leftTitle: String, leftValue: String, rightTitle: String?,
-                   rightValue: String?, leftAction: (() -> Void)? = nil,
-                   rightAction: (() -> Void)? = nil) {
+    // MARK: - Configure
+
+    func configure(leftTitle: String, leftValue: String, leftTrend: Int = 0,
+                   rightTitle: String?, rightValue: String?, rightTrend: Int = 0,
+                   leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
         leftTitleLabel.text = leftTitle
         leftValueLabel.text = leftValue
+        applyTrend(leftTrend, to: leftTrendLabel)
+
         rightTitleView.text = rightTitle
         rightValueView.text = rightValue
+        applyTrend(rightTrend, to: rightTrendLabel)
+
         leftTapAction  = leftAction
         rightTapAction = rightAction
         rightCardView.alpha = (rightTitle == nil) ? 0 : 1
     }
+
+    // MARK: - Trend helper
+
+    private func applyTrend(_ percent: Int, to label: UILabel) {
+        if percent > 0 {
+            label.text      = "↑ \(percent)%"
+            label.textColor = .systemGreen
+        } else if percent < 0 {
+            label.text      = "↓ \(abs(percent))%"
+            label.textColor = .systemRed
+        } else {
+            label.text      = "→ 0%"
+            label.textColor = WakeWellTheme.labelTertiary
+        }
+    }
+
+    // MARK: - Actions
 
     @objc private func leftCardTapped() {
         UISelectionFeedbackGenerator().selectionChanged()

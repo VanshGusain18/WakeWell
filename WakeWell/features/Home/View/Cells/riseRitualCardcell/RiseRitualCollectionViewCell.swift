@@ -69,7 +69,7 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
         // Gold CTA — "Start Ritual"
         WakeWellTheme.stylePrimaryButton(startButton)
         startButton.setTitle("Start Ritual", for: .normal)
-        
+        startButton.tintColor = WakeWellTheme.accentPurple
         
         closeButton.tintColor = WakeWellTheme.labelTertiary
     }

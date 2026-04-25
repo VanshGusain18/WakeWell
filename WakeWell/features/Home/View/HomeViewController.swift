@@ -232,7 +232,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         switch viewModel.cards[indexPath.item] {
         case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
-        case .riseRitual:   return CGSize(width: fullWidth, height: 200)
+        case .riseRitual:   return CGSize(width: fullWidth, height: 150)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .metrics:      return CGSize(width: fullWidth, height: 200)

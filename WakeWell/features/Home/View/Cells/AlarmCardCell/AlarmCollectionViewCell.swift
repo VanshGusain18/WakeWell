@@ -18,6 +18,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
         addGestureRecognizer(tap)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshFromUserDefaults),
                                                 name: .alarmTimeDidChange, object: nil)
+        alarmIcon.tintColor = WakeWellTheme.accentPurple
     }
 
     deinit { NotificationCenter.default.removeObserver(self) }

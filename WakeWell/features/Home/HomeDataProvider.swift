@@ -3,37 +3,90 @@ import Foundation
 final class HomeDataProvider {
 
     static let shared = HomeDataProvider()
-
     private init() {}
 
+    // MARK: - Alarm
     func getAlarm() -> AlarmModel {
-        // Read the time the user last saved via AlarmOptionViewController.
-        // Falls back to nil (card shows "No alarm set") if nothing saved yet.
         let savedTime = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
         return AlarmModel(time: savedTime)
     }
 
+    // MARK: - Sleep Ring
     func getSleepRing() -> SleepRingModel {
-        return SleepRingModel(
-            score: 82,
-            subtitle: "Good Sleep"
-        )
+        return SleepRingModel(score: 82, subtitle: "Good Sleep")
     }
 
+    // MARK: - Metrics
+    // Current score  = average of this week's data points  (.week)
+    // Previous score = average of this month's data points (.month)
+    //                  The month includes the current week so the first
+    //                  half approximates "last week". We compare the two
+    //                  averages to derive a real trend direction and %.
     func getMetrics() -> SleepMetricsModel {
+
+        let current  = scoresFor(range: .week)
+        let previous = scoresFor(range: .month)
+
+        func trend(_ cur: Int, _ prev: Int) -> Int {
+            guard prev > 0 else { return 0 }
+            return Int(((Double(cur) - Double(prev)) / Double(prev) * 100).rounded())
+        }
+
+        let combined = Int(SleepScoreCalculator.combinedScore(
+            duration:     Double(current.duration),
+            efficiency:   Double(current.efficiency),
+            architecture: Double(current.architecture),
+            continuity:   Double(current.continuity),
+            calmness:     Double(current.calmness),
+            consistency:  Double(current.consistency)
+        ).rounded())
+
         return SleepMetricsModel(
-            sleepScore: 78,
+            sleepScore: combined,
             metrics: [
-                SleepMetricItem(title: "Duration",     score: 16, maxScore: 20, trendPercent:  5),
-                SleepMetricItem(title: "Efficiency",   score: 12, maxScore: 15, trendPercent:  3),
-                SleepMetricItem(title: "Sleep Stages", score: 18, maxScore: 25, trendPercent: -2),
-                SleepMetricItem(title: "Continuity",   score: 13, maxScore: 15, trendPercent:  1),
-                SleepMetricItem(title: "Calmness",     score: 11, maxScore: 15, trendPercent: -4),
-                SleepMetricItem(title: "Consistency",  score:  8, maxScore: 10, trendPercent:  2)
+                SleepMetricItem(title: "Duration",
+                                score: current.duration,
+                                trendPercent: trend(current.duration,     previous.duration)),
+                SleepMetricItem(title: "Efficiency",
+                                score: current.efficiency,
+                                trendPercent: trend(current.efficiency,   previous.efficiency)),
+                SleepMetricItem(title: "Architecture",
+                                score: current.architecture,
+                                trendPercent: trend(current.architecture, previous.architecture)),
+                SleepMetricItem(title: "Continuity",
+                                score: current.continuity,
+                                trendPercent: trend(current.continuity,   previous.continuity)),
+                SleepMetricItem(title: "Calmness",
+                                score: current.calmness,
+                                trendPercent: trend(current.calmness,     previous.calmness)),
+                SleepMetricItem(title: "Consistency",
+                                score: current.consistency,
+                                trendPercent: trend(current.consistency,  previous.consistency))
             ]
         )
     }
 
+    // MARK: - Private helper
+    // Returns all six metric scores (0–100) averaged over the given range.
+    private struct Scores {
+        let duration, efficiency, architecture, continuity, calmness, consistency: Int
+    }
+
+    private func scoresFor(range: StatsTimeRange) -> Scores {
+        func avg(_ metric: SleepMetricType) -> Int {
+            Int(SleepScoreEngine.calculateScore(for: metric, range: range).rounded())
+        }
+        return Scores(
+            duration:     avg(.duration),
+            efficiency:   avg(.efficiency),
+            architecture: avg(.architecture),
+            continuity:   avg(.continuity),
+            calmness:     avg(.calmness),
+            consistency:  avg(.consistency)
+        )
+    }
+
+    // MARK: - Sleep Debt
     func getSleepDebt() -> SleepDebtModel {
         let history = [
             SleepDebtModelItem(sleepDuration: 6, date: Date()),
@@ -44,32 +97,21 @@ final class HomeDataProvider {
         return SleepDebtModel(sleepHistory: history)
     }
 
-    func getGroggy() -> GroggyModel {
-        return GroggyModel(value: 5)
-    }
+    // MARK: - Groggy / Notes
+    func getGroggy()  -> GroggyModel      { GroggyModel(value: 5) }
+    func getNote()    -> MorningNoteModel  { MorningNoteModel(text: "", date: Date()) }
 
-    func getNote() -> MorningNoteModel {
-        return MorningNoteModel(text: "", date: Date())
-    }
-
+    // MARK: - Rise Ritual
     func getRiseRitual() -> RiseRitualModel {
-        // Read however many activities the user has picked.
-        // ActivityDeckViewController saves selected IDs under "wakewell.selectedActivityIDs".
         let savedIDs = UserDefaults.standard.stringArray(forKey: "wakewell.selectedActivityIDs")
                        ?? ["ritual_1", "ritual_3"]
         let count = savedIDs.count
-
         let desc: String
         switch count {
         case 0:  desc = "Add activities to build your personal morning ritual."
         case 1:  desc = "1 activity ready — tap Start Ritual to begin."
         default: desc = "\(count) activities ready — start your morning ritual."
         }
-
-        return RiseRitualModel(
-            title: "Rise Ritual",
-            category: "MORNING ROUTINE",
-            description: desc
-        )
+        return RiseRitualModel(title: "Rise Ritual", category: "MORNING ROUTINE", description: desc)
     }
 }

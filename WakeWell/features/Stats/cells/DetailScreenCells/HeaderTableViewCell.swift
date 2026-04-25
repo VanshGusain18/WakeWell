@@ -9,7 +9,7 @@ class HeaderTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle      = .none
-        backgroundColor     = .clear
+        backgroundColor     = WakeWellTheme.glassBackground
         contentView.backgroundColor = .clear
         WakeWellTheme.styleGlassCard(glassContainer, cornerRadius: 24)
 

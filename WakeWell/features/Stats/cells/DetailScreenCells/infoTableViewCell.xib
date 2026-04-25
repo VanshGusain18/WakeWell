@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -20,14 +20,14 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="egz-2E-wgU">
                         <rect key="frame" x="0.0" y="0.0" width="682" height="500"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fzr-fE-dSO">
-                                <rect key="frame" x="12" y="12" width="658" height="20.333333333333329"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fzr-fE-dSO">
+                                <rect key="frame" x="16" y="15.999999999999998" width="650" height="20.333333333333329"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="30" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F6t-uj-1L5">
-                                <rect key="frame" x="12" y="44.333333333333329" width="658" height="202.33333333333331"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="30" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F6t-uj-1L5">
+                                <rect key="frame" x="16" y="52.333333333333336" width="650" height="20.333333333333336"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -35,13 +35,13 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="Fzr-fE-dSO" secondAttribute="trailing" constant="12" id="Y92-bv-SIb"/>
-                            <constraint firstItem="Fzr-fE-dSO" firstAttribute="leading" secondItem="egz-2E-wgU" secondAttribute="leading" constant="12" id="bUv-sS-In2"/>
-                            <constraint firstItem="F6t-uj-1L5" firstAttribute="leading" secondItem="egz-2E-wgU" secondAttribute="leading" constant="12" id="gPz-jv-b0v"/>
-                            <constraint firstAttribute="trailing" secondItem="F6t-uj-1L5" secondAttribute="trailing" constant="12" id="hwD-Ad-onF"/>
-                            <constraint firstItem="F6t-uj-1L5" firstAttribute="top" secondItem="Fzr-fE-dSO" secondAttribute="bottom" constant="12" id="o8T-mu-cMf"/>
-                            <constraint firstItem="Fzr-fE-dSO" firstAttribute="top" secondItem="egz-2E-wgU" secondAttribute="top" constant="12" id="rUY-jZ-1eI"/>
-                            <constraint firstAttribute="bottom" secondItem="F6t-uj-1L5" secondAttribute="bottom" constant="20" id="xMJ-se-XON"/>
+                            <constraint firstAttribute="trailing" secondItem="F6t-uj-1L5" secondAttribute="trailing" constant="16" id="ILM-5A-BI6"/>
+                            <constraint firstAttribute="trailing" secondItem="Fzr-fE-dSO" secondAttribute="trailing" constant="16" id="IaO-Hi-TUk"/>
+                            <constraint firstItem="F6t-uj-1L5" firstAttribute="leading" secondItem="egz-2E-wgU" secondAttribute="leading" constant="16" id="M5E-OK-myL"/>
+                            <constraint firstItem="F6t-uj-1L5" firstAttribute="top" secondItem="Fzr-fE-dSO" secondAttribute="bottom" constant="16" id="OgZ-Fo-Wfs"/>
+                            <constraint firstItem="F6t-uj-1L5" firstAttribute="top" secondItem="Fzr-fE-dSO" secondAttribute="bottom" constant="16" id="fKv-kV-Eje"/>
+                            <constraint firstItem="Fzr-fE-dSO" firstAttribute="leading" secondItem="egz-2E-wgU" secondAttribute="leading" constant="16" id="fjH-2M-10J"/>
+                            <constraint firstItem="Fzr-fE-dSO" firstAttribute="top" secondItem="egz-2E-wgU" secondAttribute="top" constant="16" id="qAg-1I-sUB"/>
                         </constraints>
                     </view>
                 </subviews>

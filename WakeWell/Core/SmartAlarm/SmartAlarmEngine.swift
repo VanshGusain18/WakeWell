@@ -16,17 +16,15 @@ final class SmartAlarmEngine {
     private let analysisWindowSize = 10
     private let scoringWindowSize = 5
     private let requiredConsecutiveCount = 3
-    private let requiredMotionIncreaseCount = 4
+    private let requiredMotionIncreaseCount = 5
     private let triggerWakeWindow: TimeInterval = 15 * 60
     private let safetyTriggerWindow: TimeInterval = 5 * 60
     private let cooldownDuration: TimeInterval = 10 * 60
 
-    private let wakeConfidenceThreshold = 0.75
+    private let optimalTriggerThreshold = 0.70
+    private let earlySafeTriggerThreshold = 0.55
     private let minimumTriggerScore = 0.65
     private let confidenceSmoothingFactor = 0.45
-    private let strongSignalConfidenceThreshold = 0.65
-    private let trendTriggerConfidenceThreshold = 0.60
-    private let safetyTriggerConfidenceThreshold = 0.50
 
     private let motionSpikeThreshold = 0.55
     private let motionDeltaThreshold = 0.07
@@ -75,7 +73,12 @@ final class SmartAlarmEngine {
                 signals: SignalState.none,
                 analysis: TrendAnalysis.zero,
                 components: .zero,
-                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
+                triggerEvaluation: TriggerEvaluation(
+                    shouldTrigger: false,
+                    type: .none,
+                    thresholdUsed: optimalTriggerThreshold,
+                    reason: "cooldown_active"
+                ),
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: cooldownDecision
             )
@@ -95,7 +98,12 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
-                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
+                triggerEvaluation: TriggerEvaluation(
+                    shouldTrigger: false,
+                    type: .none,
+                    thresholdUsed: optimalTriggerThreshold,
+                    reason: "already_triggered"
+                ),
                 timeToAlarm: remainingTimeToAlarm(from: now) ?? 0,
                 decision: decision
             )
@@ -115,7 +123,12 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
-                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
+                triggerEvaluation: TriggerEvaluation(
+                    shouldTrigger: false,
+                    type: .none,
+                    thresholdUsed: optimalTriggerThreshold,
+                    reason: "no_alarm_set"
+                ),
                 timeToAlarm: 0,
                 decision: decision
             )
@@ -147,7 +160,12 @@ final class SmartAlarmEngine {
                 signals: .none,
                 analysis: .zero,
                 components: .zero,
-                triggerEvaluation: TriggerEvaluation(shouldTrigger: false, type: .none),
+                triggerEvaluation: TriggerEvaluation(
+                    shouldTrigger: false,
+                    type: .none,
+                    thresholdUsed: optimalTriggerThreshold,
+                    reason: "warming_up"
+                ),
                 timeToAlarm: timeToAlarm,
                 decision: decision
             )
@@ -176,6 +194,7 @@ final class SmartAlarmEngine {
             score: score,
             signals: signals,
             analysis: analysis,
+            timeToAlarm: timeToAlarm,
             withinWakeWindow: withinWakeWindow
         )
         wakeConfidence = updateConfidence(using: components)
@@ -367,19 +386,29 @@ final class SmartAlarmEngine {
         score: ScoreBreakdown,
         signals: SignalState,
         analysis: TrendAnalysis,
+        timeToAlarm: TimeInterval,
         withinWakeWindow: Bool
     ) -> ConfidenceComponents {
-        let baseScore = clamp((score.finalScore - 0.25) * 1.35, minValue: 0, maxValue: 0.55)
-        var trendBonus = signals.hrTrend ? 0.25 : 0
+        let baseScore = clamp((score.finalScore - 0.20) * 1.45, minValue: 0, maxValue: 0.58)
+        var trendBonus = signals.hrTrend ? 0.28 : 0
         if signals.hrTrend && analysis.motionIncreasing {
             trendBonus += 0.10
         }
         let spikeBonus = signals.motionSpike ? 0.22 : 0
         let consecutiveBonus = min(Double(consecutiveHighScoreCount) * 0.08, 0.24)
-        let motionIncreaseBonus = min(Double(motionIncreasingCount) * 0.03, 0.12)
+        let motionIncreaseBonus = min(Double(motionIncreasingCount) * 0.035, 0.16)
+        let hrvTransitionBonus = score.finalScore > 0.50 && analysis.motionIncreasing ? 0.05 : 0
         let wakeWindowBonus = withinWakeWindow ? 0.05 : 0
+        let timePressureBonus = timeToAlarm <= safetyTriggerWindow ? 0.05 : 0
         let targetConfidence = clamp(
-            baseScore + trendBonus + spikeBonus + consecutiveBonus + motionIncreaseBonus + wakeWindowBonus,
+            baseScore +
+                trendBonus +
+                spikeBonus +
+                consecutiveBonus +
+                motionIncreaseBonus +
+                hrvTransitionBonus +
+                wakeWindowBonus +
+                timePressureBonus,
             minValue: 0,
             maxValue: 1
         )
@@ -390,7 +419,9 @@ final class SmartAlarmEngine {
             spikeBonus: spikeBonus,
             consecutiveBonus: consecutiveBonus,
             motionIncreaseBonus: motionIncreaseBonus,
+            hrvTransitionBonus: hrvTransitionBonus,
             wakeWindowBonus: wakeWindowBonus,
+            timePressureBonus: timePressureBonus,
             targetConfidence: targetConfidence
         )
     }
@@ -408,26 +439,55 @@ final class SmartAlarmEngine {
         withinWakeWindow: Bool
     ) -> TriggerEvaluation {
         guard withinWakeWindow else {
-            return TriggerEvaluation(shouldTrigger: false, type: .none)
+            return TriggerEvaluation(
+                shouldTrigger: false,
+                type: .none,
+                thresholdUsed: optimalTriggerThreshold,
+                reason: "outside_wake_window"
+            )
         }
 
-        if signals.motionSpike && wakeConfidence > strongSignalConfidenceThreshold {
-            return TriggerEvaluation(shouldTrigger: true, type: .strongSignal)
+        if wakeConfidence >= optimalTriggerThreshold {
+            return TriggerEvaluation(
+                shouldTrigger: true,
+                type: .optimal,
+                thresholdUsed: optimalTriggerThreshold,
+                reason: "confidence_reached_optimal_threshold"
+            )
         }
 
-        if signals.hrTrend &&
-            analysis.motionIncreasing &&
-            motionIncreasingCount >= requiredMotionIncreaseCount &&
-            wakeConfidence > trendTriggerConfidenceThreshold {
-            return TriggerEvaluation(shouldTrigger: true, type: .trendBased)
+        if motionIncreasingCount >= requiredMotionIncreaseCount &&
+            wakeConfidence >= earlySafeTriggerThreshold &&
+            remainingTimeToAlarm <= safetyTriggerWindow {
+            return TriggerEvaluation(
+                shouldTrigger: true,
+                type: .earlySafe,
+                thresholdUsed: earlySafeTriggerThreshold,
+                reason: "motion_trend_confirmed_near_alarm"
+            )
         }
 
-        if remainingTimeToAlarm <= safetyTriggerWindow &&
-            wakeConfidence > safetyTriggerConfidenceThreshold {
-            return TriggerEvaluation(shouldTrigger: true, type: .safety)
+        let thresholdUsed = remainingTimeToAlarm <= safetyTriggerWindow
+            ? earlySafeTriggerThreshold
+            : optimalTriggerThreshold
+        let reason: String
+
+        if wakeConfidence < thresholdUsed {
+            reason = "confidence_below_threshold"
+        } else if motionIncreasingCount < requiredMotionIncreaseCount && remainingTimeToAlarm <= safetyTriggerWindow {
+            reason = "insufficient_motion_trend_for_early_safe"
+        } else if !signals.hrTrend && !analysis.motionIncreasing {
+            reason = "awaiting_wake_trends"
+        } else {
+            reason = "not_ready"
         }
 
-        return TriggerEvaluation(shouldTrigger: false, type: .none)
+        return TriggerEvaluation(
+            shouldTrigger: false,
+            type: .none,
+            thresholdUsed: thresholdUsed,
+            reason: reason
+        )
     }
 
     // MARK: - Signal Analysis
@@ -550,7 +610,12 @@ final class SmartAlarmEngine {
             signals: .none,
             analysis: .zero,
             components: .zero,
-            triggerEvaluation: TriggerEvaluation(shouldTrigger: true, type: .fallback),
+            triggerEvaluation: TriggerEvaluation(
+                shouldTrigger: true,
+                type: .fallback,
+                thresholdUsed: 1.0,
+                reason: "alarm_time_reached"
+            ),
             timeToAlarm: timeToAlarm,
             decision: decision
         )
@@ -568,6 +633,15 @@ final class SmartAlarmEngine {
             return "outside_wake_window"
         }
 
+        if wakeConfidence >= optimalTriggerThreshold {
+            return "confidence_reached_optimal_threshold"
+        }
+
+        if motionIncreasingCount >= requiredMotionIncreaseCount &&
+            wakeConfidence >= earlySafeTriggerThreshold {
+            return "motion_trend_confirmed_near_alarm"
+        }
+
         if signals.hrTrend && !analysis.motionIncreasing {
             return "awaiting_motion_rise"
         }
@@ -576,15 +650,15 @@ final class SmartAlarmEngine {
             return "score_below_threshold"
         }
 
-        if !signals.motionSpike && !signals.hrTrend {
-            return "awaiting_wake_signals"
+        if !signals.hrTrend && !analysis.motionIncreasing {
+            return "awaiting_wake_trends"
         }
 
         if motionIncreasingCount < requiredMotionIncreaseCount {
             return "building_motion_trend"
         }
 
-        if wakeConfidence < trendTriggerConfidenceThreshold {
+        if wakeConfidence < earlySafeTriggerThreshold {
             return "building_confidence"
         }
 
@@ -654,6 +728,8 @@ final class SmartAlarmEngine {
         print("- trendBonus: \(formatted(components.trendBonus))")
         print("- spikeBonus: \(formatted(components.spikeBonus))")
         print("- motionIncreaseBonus: \(formatted(components.motionIncreaseBonus))")
+        print("- hrvTransitionBonus: \(formatted(components.hrvTransitionBonus))")
+        print("- timePressureBonus: \(formatted(components.timePressureBonus))")
         print("- finalConfidence: \(formatted(decision.confidence))")
 
         print("""
@@ -661,7 +737,7 @@ final class SmartAlarmEngine {
           
           * score: \(formatted(score.finalScore))
           * confidence: \(formatted(decision.confidence))
-          * threshold: \(formatted(wakeConfidenceThreshold))
+          * threshold: \(formatted(triggerEvaluation.thresholdUsed))
           * motionSpike: \(signals.motionSpike)
           * hrTrend: \(signals.hrTrend)
           * motionIncreasing: \(analysis.motionIncreasing)
@@ -671,10 +747,12 @@ final class SmartAlarmEngine {
           """)
 
         print("[DECISION]")
-        print("- threshold: 0.75")
-        print("- confidence: \(formatted(decision.confidence))")
-        print("- motionIncreasingCount: \(motionIncreasingCount)")
         print("- triggerType: \(triggerEvaluation.type.rawValue)")
+        print("- reason: \(triggerEvaluation.reason)")
+        print("- confidence: \(formatted(decision.confidence))")
+        print("- thresholdUsed: \(formatted(triggerEvaluation.thresholdUsed))")
+        print("- timeToAlarm: \(formattedMinutes(timeToAlarm))")
+        print("- motionIncreasingCount: \(motionIncreasingCount)")
         print("- shouldTrigger: \(decision.shouldTrigger)")
     }
 
@@ -807,7 +885,9 @@ private struct ConfidenceComponents {
     let spikeBonus: Double
     let consecutiveBonus: Double
     let motionIncreaseBonus: Double
+    let hrvTransitionBonus: Double
     let wakeWindowBonus: Double
+    let timePressureBonus: Double
     let targetConfidence: Double
 
     static let zero = ConfidenceComponents(
@@ -816,7 +896,9 @@ private struct ConfidenceComponents {
         spikeBonus: 0,
         consecutiveBonus: 0,
         motionIncreaseBonus: 0,
+        hrvTransitionBonus: 0,
         wakeWindowBonus: 0,
+        timePressureBonus: 0,
         targetConfidence: 0
     )
 }
@@ -824,12 +906,13 @@ private struct ConfidenceComponents {
 private struct TriggerEvaluation {
     let shouldTrigger: Bool
     let type: TriggerType
+    let thresholdUsed: Double
+    let reason: String
 }
 
 private enum TriggerType: String {
     case none = "NONE"
-    case strongSignal = "STRONG_SIGNAL"
-    case trendBased = "TREND_BASED"
-    case safety = "SAFETY"
+    case optimal = "OPTIMAL"
+    case earlySafe = "EARLY_SAFE"
     case fallback = "FALLBACK"
 }

@@ -94,18 +94,18 @@ class SoundTableViewController: UITableViewController {
 
         durationLabel.text = formatDuration(Int(duration))
         durationLabel.font = .systemFont(ofSize: 14)
-        durationLabel.textColor = .secondaryLabel
+        durationLabel.textColor = WakeWellTheme.labelSecondary
         durationLabel.sizeToFit()
         cell.accessoryView = durationLabel
 
         if sound.fileName == currentlyPlayingFileName {
-            cell.backgroundColor = UIColor.systemGray6
+            cell.backgroundColor = WakeWellTheme.purpleTint
             cell.textLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-            durationLabel.textColor = .systemBlue
+            durationLabel.textColor = WakeWellTheme.accentPurple
         } else {
             cell.backgroundColor = .clear
             cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            durationLabel.textColor = .secondaryLabel
+            durationLabel.textColor = WakeWellTheme.labelSecondary
         }
 
         return cell
@@ -239,8 +239,8 @@ class SoundTableViewController: UITableViewController {
     private func setupBackgroundGradient() {
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor.systemBackground.cgColor,
-            UIColor.systemGray6.cgColor
+            WakeWellTheme.background.cgColor,
+            WakeWellTheme.cardElevated.cgColor
         ]
         gradient.frame = view.bounds
 

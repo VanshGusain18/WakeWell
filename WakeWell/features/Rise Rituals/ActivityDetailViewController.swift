@@ -39,7 +39,7 @@ class ActivityDetailViewController: RoutineActivityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         setupUI()
         setupData()
         startCountdown()

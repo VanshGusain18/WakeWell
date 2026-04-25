@@ -1,55 +1,38 @@
-//
-//  infoTableViewCell.swift
-//  WakeWell
-//
-//  Created by geu on 23/03/26.
-//
-
 import UIKit
 
 class infoTableViewCell: UITableViewCell {
 
-    @IBOutlet weak var glassContainer: UIView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var glassContainer:    UIView!
+    @IBOutlet weak var titleLabel:        UILabel!
+    @IBOutlet weak var descriptionLabel:  UILabel!
+
     override func awakeFromNib() {
         super.awakeFromNib()
-        setupStyle()
-    }
-    private func setupStyle() {
-            glassContainer.backgroundColor = UIColor.white.withAlphaComponent(0.6)
-            glassContainer.layer.cornerRadius = 20
-            glassContainer.layer.borderWidth = 1.0
-            glassContainer.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
-            
-            glassContainer.layer.shadowColor = UIColor.black.cgColor
-            glassContainer.layer.shadowOpacity = 0.05
-            glassContainer.layer.shadowOffset = CGSize(width: 0, height: 4)
-            glassContainer.layer.shadowRadius = 10
-            
-            selectionStyle = .none
-            backgroundColor = .clear
-            
-            titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-            titleLabel.textColor = .label
-            
-            descriptionLabel.font = .systemFont(ofSize: 14, weight: .regular)
-            descriptionLabel.textColor = .secondaryLabel
-            descriptionLabel.numberOfLines = 0
-        }
-        func configure(title: String, description: String) {
-            titleLabel.text = title
-            descriptionLabel.text = description
-        }
+        selectionStyle      = .none
+        backgroundColor     = .clear
+        contentView.backgroundColor = .clear
+        WakeWellTheme.styleGlassCard(glassContainer, cornerRadius: 20)
 
-        override func prepareForReuse() {
-            super.prepareForReuse()
-            titleLabel.text = nil
-            descriptionLabel.text = nil
-        }
+        titleLabel.font       = .systemFont(ofSize: 16, weight: .semibold)
+        titleLabel.textColor  = WakeWellTheme.labelPrimary
+
+        descriptionLabel.font          = .systemFont(ofSize: 14, weight: .regular)
+        descriptionLabel.textColor     = WakeWellTheme.labelSecondary
+        descriptionLabel.numberOfLines = 0
+    }
+
+    func configure(title: String, description: String) {
+        titleLabel.text       = title
+        descriptionLabel.text = description
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.text       = nil
+        descriptionLabel.text = nil
+    }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-    
 }

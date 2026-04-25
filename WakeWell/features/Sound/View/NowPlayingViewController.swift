@@ -48,8 +48,8 @@ class NowPlayingViewController: UIViewController {
         setupMainImage(image)
         setupPlayPauseButton()
         startTimer()
-        progressLabel.minimumTrackTintColor = .systemBlue
-        progressLabel.maximumTrackTintColor = .systemGray4
+        progressLabel.minimumTrackTintColor = WakeWellTheme.accentPurple
+        progressLabel.maximumTrackTintColor = WakeWellTheme.border
         progressLabel.setThumbImage(UIImage(systemName: "circle.fill"), for: .normal)
         
 

@@ -128,10 +128,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 }
             }
 
-            // ── View Rise Tab → just switch to the Rise tab ──────────────────
-            cell.onViewRiseTab = { [weak self] in
-                self?.tabBarController?.selectedIndex = 2
-            }
+            
 
             cell.onClose = { [weak self] in
                 guard let self else { return }

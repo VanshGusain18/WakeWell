@@ -52,14 +52,6 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="efT-9r-nwR">
-                                <rect key="frame" x="317" y="142" width="75" height="46"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
-                                <connections>
-                                    <action selector="viewRiseTabbutton:" destination="gTV-IL-0wX" eventType="touchUpInside" id="JeM-Db-nbg"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Hd-eL-5Iu">
                                 <rect key="frame" x="16" y="142" width="96" height="46"/>
                                 <state key="normal" title="Button"/>
@@ -81,9 +73,7 @@
                             <constraint firstAttribute="trailing" secondItem="V73-QJ-vjG" secondAttribute="trailing" constant="16" id="Ee9-gh-3a1"/>
                             <constraint firstItem="V73-QJ-vjG" firstAttribute="top" secondItem="gRL-TY-Utn" secondAttribute="top" constant="12" id="aJc-EF-90V"/>
                             <constraint firstAttribute="bottom" secondItem="9Hd-eL-5Iu" secondAttribute="bottom" constant="20" id="fqb-Jg-4BI"/>
-                            <constraint firstAttribute="trailing" secondItem="efT-9r-nwR" secondAttribute="trailing" constant="16" id="kf3-D5-Bej"/>
                             <constraint firstItem="9Hd-eL-5Iu" firstAttribute="leading" secondItem="gRL-TY-Utn" secondAttribute="leading" constant="16" id="r0c-Ku-L9d"/>
-                            <constraint firstAttribute="bottom" secondItem="efT-9r-nwR" secondAttribute="bottom" constant="20" id="w0i-uF-0VE"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -102,9 +92,8 @@
                 <outlet property="descriptionLabel" destination="869-xT-QYo" id="fAR-Vd-x4C"/>
                 <outlet property="iconContainerView" destination="WJw-59-Z9R" id="W2b-4t-cHl"/>
                 <outlet property="iconImageView" destination="SKi-ol-kLs" id="zTE-kg-gFW"/>
-                <outlet property="startButton" destination="9Hd-eL-5Iu" id="MUF-bc-dAd"/>
+                <outlet property="startButton" destination="9Hd-eL-5Iu" id="EXZ-BO-Zjn"/>
                 <outlet property="titleLabel" destination="Jlf-U1-jcd" id="lEM-1X-tjX"/>
-                <outlet property="viewTabButton" destination="efT-9r-nwR" id="6Bo-cD-ok8"/>
             </connections>
             <point key="canvasLocation" x="-154.19847328244273" y="107.04225352112677"/>
         </collectionViewCell>

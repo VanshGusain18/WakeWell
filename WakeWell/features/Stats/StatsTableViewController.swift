@@ -1,13 +1,15 @@
 // statstable view controller file
 import UIKit
+
 class StatsTableViewController: UITableViewController {
-    
+
     @IBOutlet weak var timeRangeSegment: UISegmentedControl!
     private var currentRange: StatsTimeRange = .week
     private var metrics: [SleepMetric] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        applyTheme()
         tableView.separatorStyle = .none
         prefetchAllRanges()
         registerCells()
@@ -19,16 +21,27 @@ class StatsTableViewController: UITableViewController {
         tableView.tableHeaderView?.frame.size.height = 48
     }
 
+    private func applyTheme() {
+        view.backgroundColor             = WakeWellTheme.background
+        tableView.backgroundColor        = WakeWellTheme.background
+        navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
+
+        // Segmented control — purple selected, matches screenshot
+        timeRangeSegment?.selectedSegmentTintColor = WakeWellTheme.accentPurple
+        timeRangeSegment?.backgroundColor          = WakeWellTheme.cardElevated
+        timeRangeSegment?.setTitleTextAttributes(
+            [.foregroundColor: UIColor.white,
+             .font: UIFont.systemFont(ofSize: 13, weight: .semibold)], for: .selected)
+        timeRangeSegment?.setTitleTextAttributes(
+            [.foregroundColor: WakeWellTheme.labelSecondary], for: .normal)
+    }
+
     private func loadSleepData() {
         let rawStats = SleepStatsAggregator.aggregate(for: currentRange)
-        let rounded = SleepStats(
-            duration:     rawStats.duration.rounded(),
-            efficiency:   rawStats.efficiency.rounded(),
-            architecture: rawStats.architecture.rounded(),
-            consistency:  rawStats.consistency.rounded(),
-            calmness:     rawStats.calmness.rounded(),
-            continuity:   rawStats.continuity.rounded()
-        )
+        let rounded  = SleepStats(
+            duration: rawStats.duration.rounded(), efficiency: rawStats.efficiency.rounded(),
+            architecture: rawStats.architecture.rounded(), consistency: rawStats.consistency.rounded(),
+            calmness: rawStats.calmness.rounded(), continuity: rawStats.continuity.rounded())
         metrics = SleepStatsMapper.mapToMetrics(from: rounded)
         tableView.reloadData()
     }
@@ -50,88 +63,63 @@ class StatsTableViewController: UITableViewController {
         section == 0 ? 1 : Int(ceil(Double(metrics.count) / 2.0))
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView,
+                            cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: "SleepScoreChartCell", for: indexPath) as! SleepScoreChartCell
             cell.configure(for: currentRange)
             return cell
         }
-
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: "StatsMetricCardCell", for: indexPath) as? StatsMetricCardCell else {
             return UITableViewCell()
         }
-
-        let leftIndex  = indexPath.row * 2
-        let rightIndex = leftIndex + 1
-        let leftMetric  = metrics[leftIndex]
-        let rightMetric = rightIndex < metrics.count ? metrics[rightIndex] : nil
-
+        let li = indexPath.row * 2; let ri = li + 1
+        let lm = metrics[li]; let rm = ri < metrics.count ? metrics[ri] : nil
         cell.configure(
-            leftTitle:  leftMetric.type.title,
-            leftValue:  leftMetric.displayValue,
-            rightTitle: rightMetric?.type.title,
-            rightValue: rightMetric?.displayValue,
-            leftAction: { [weak self] in
-                self?.openMetricScreen(leftMetric.type)
-            },
-            rightAction: rightMetric != nil ? { [weak self] in
-                self?.openMetricScreen(rightMetric!.type)
-            } : nil
-        )
+            leftTitle: lm.type.title, leftValue: lm.displayValue,
+            rightTitle: rm?.type.title, rightValue: rm?.displayValue,
+            leftAction:  { [weak self] in self?.openMetricScreen(lm.type) },
+            rightAction: rm != nil ? { [weak self] in self?.openMetricScreen(rm!.type) } : nil)
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView,
+                            heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.section == 0 ? 260 : 120
     }
 
-    // MARK: - Navigation
+    // MARK: - Navigation (logic unchanged)
     private func openMetricScreen(_ metric: SleepMetricType) {
         let vc = makeViewController(for: metric)
         vc.timeRange = currentRange
         present(vc, animated: true)
     }
+
     private func prefetchAllRanges() {
-        let ranges: [StatsTimeRange] = [.week, .month, .year]
         let group = DispatchGroup()
-
-        for range in ranges {
+        for range in [StatsTimeRange.week, .month, .year] {
             group.enter()
-            HealthKitSleepRepository.shared.prefetch(for: range) {
-                group.leave()
-            }
+            HealthKitSleepRepository.shared.prefetch(for: range) { group.leave() }
         }
-
-        group.notify(queue: .main) { [weak self] in
-            // All ranges cached — reload whichever table is currently visible
-            self?.tableView.reloadData()
-        }
+        group.notify(queue: .main) { [weak self] in self?.tableView.reloadData() }
     }
+
     func didChangeRange(_ range: StatsTimeRange) {
         HealthKitSleepRepository.shared.prefetch(for: range) { [weak self] in
             self?.tableView.reloadData()
         }
     }
+
     private func makeViewController(for metric: SleepMetricType) -> BaseMetricTableViewController {
         switch metric {
-        case .duration:
-            return DurationTableViewController()
-        case .efficiency:
-            return EfficiencyTableViewController()
-        case .continuity:
-            return ContinuityTableViewController()
-        case .calmness:
-            return CalmnessTableViewController()
-        case .architecture:
-            return ArchitectureTableViewController()
-        case .consistency:
-            return ConsistencyTableViewController()
+        case .duration:     return DurationTableViewController()
+        case .efficiency:   return EfficiencyTableViewController()
+        case .continuity:   return ContinuityTableViewController()
+        case .calmness:     return CalmnessTableViewController()
+        case .architecture: return ArchitectureTableViewController()
+        case .consistency:  return ConsistencyTableViewController()
         }
     }
 }
-
-
-
-    

@@ -26,11 +26,11 @@ class ActivityCardViewCell: UICollectionViewCell {
         let btn = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
         btn.setImage(UIImage(systemName: "ellipsis", withConfiguration: config), for: .normal)
-        btn.tintColor = .label
-        btn.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.88)
+        btn.tintColor = WakeWellTheme.labelPrimary
+        btn.backgroundColor = WakeWellTheme.cardBackground.withAlphaComponent(0.9)
         btn.layer.cornerRadius = 16
         btn.layer.borderWidth = 1
-        btn.layer.borderColor = UIColor.systemGray5.cgColor
+        btn.layer.borderColor = WakeWellTheme.border.cgColor
         btn.layer.shadowColor = UIColor.black.withAlphaComponent(0.08).cgColor
         btn.layer.shadowOpacity = 1
         btn.layer.shadowRadius = 10
@@ -67,7 +67,7 @@ class ActivityCardViewCell: UICollectionViewCell {
 
     func setupUI() {
         contentView.layer.cornerRadius = 20
-        contentView.backgroundColor = .secondarySystemBackground
+        contentView.backgroundColor = WakeWellTheme.cardElevated
         contentView.clipsToBounds = true
 
         imageView.contentMode = .scaleAspectFill
@@ -156,7 +156,7 @@ class AddActivityCardCell: UICollectionViewCell {
         let lbl = UILabel()
         lbl.text          = "+"
         lbl.font          = UIFont.systemFont(ofSize: 44, weight: .thin)
-        lbl.textColor     = .secondaryLabel
+        lbl.textColor = WakeWellTheme.labelSecondary
         lbl.textAlignment = .center
         lbl.translatesAutoresizingMaskIntoConstraints = false
         return lbl
@@ -166,7 +166,7 @@ class AddActivityCardCell: UICollectionViewCell {
         let lbl = UILabel()
         lbl.text          = "Add Activity"
         lbl.font          = UIFont.systemFont(ofSize: 14, weight: .regular)
-        lbl.textColor     = .secondaryLabel
+        lbl.textColor = WakeWellTheme.labelSecondary
         lbl.textAlignment = .center
         lbl.translatesAutoresizingMaskIntoConstraints = false
         return lbl
@@ -189,7 +189,7 @@ class AddActivityCardCell: UICollectionViewCell {
 
         // Dashed border
         let dashedBorder       = CAShapeLayer()
-        dashedBorder.strokeColor = UIColor.tertiaryLabel.cgColor
+        dashedBorder.strokeColor = WakeWellTheme.border.cgColor
         dashedBorder.fillColor   = UIColor.clear.cgColor
         dashedBorder.lineDashPattern = [8, 5]
         dashedBorder.lineWidth   = 1.5
@@ -226,7 +226,7 @@ class ShowMoreFooterView: UICollectionReusableView {
         let btn = UIButton(type: .system)
         btn.setTitle("Show More", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        btn.tintColor = .systemBlue
+        btn.tintColor = WakeWellTheme.accentPurple
         let config = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
         btn.setImage(UIImage(systemName: "chevron.down", withConfiguration: config), for: .normal)
         btn.semanticContentAttribute = .forceRightToLeft

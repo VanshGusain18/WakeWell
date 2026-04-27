@@ -26,8 +26,7 @@ class SoundTableViewController: UITableViewController {
         segmentView?.addTarget(self,
                               action: #selector(segmentChanged(_:)),
                               for: .valueChanged)
- 
-//        outerviewSound.backgroundColor = WakeWellTheme.background
+
         setupAudioSession()
         setupBackgroundGradient()
         setupMiniPlayer()
@@ -50,15 +49,20 @@ class SoundTableViewController: UITableViewController {
 
     }
     private func applyTheme() {
-        
+        view.backgroundColor = WakeWellTheme.background
+        tableView.backgroundColor = .clear
+        tableView.tableHeaderView?.backgroundColor = .clear
+        outerviewSound?.backgroundColor = .clear
 
         segmentView?.selectedSegmentTintColor = WakeWellTheme.accentPurple
-        segmentView?.backgroundColor          = WakeWellTheme.purpleTint
+        segmentView?.backgroundColor          = WakeWellTheme.cardElevated
+        segmentView?.layer.cornerRadius      = 16
+        segmentView?.clipsToBounds           = true
         segmentView?.setTitleTextAttributes(
             [.foregroundColor: UIColor.white,
              .font: UIFont.systemFont(ofSize: 13, weight: .semibold)], for: .selected)
         segmentView?.setTitleTextAttributes(
-            [.foregroundColor: WakeWellTheme.shadowColor], for: .normal)
+            [.foregroundColor: WakeWellTheme.labelPrimary], for: .normal)
     }
 
    // Segment Control
@@ -265,5 +269,3 @@ class SoundTableViewController: UITableViewController {
         tableView.backgroundView = backgroundView
     }
 }
-
-

@@ -11,6 +11,7 @@ class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        applyTheme()
         collectionView.delegate        = self
         collectionView.dataSource      = self
         collectionView.allowsSelection = true
@@ -31,6 +32,11 @@ class HomeViewController: UIViewController {
         )
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        applyTheme()
+    }
+
     @objc private func reloadAlarmCard() {
         guard let alarmIndex = viewModel.cards.firstIndex(where: {
             if case .alarm = $0 { return true }
@@ -41,6 +47,12 @@ class HomeViewController: UIViewController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+
+    private func applyTheme() {
+        view.backgroundColor = WakeWellTheme.background
+        collectionView.backgroundColor = WakeWellTheme.background
+        navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
 
     private func registerCells() {
@@ -247,5 +259,4 @@ extension HomeViewController: UICollectionViewDelegate {
         present(vc, animated: true)
     }
 }
-
 

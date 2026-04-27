@@ -37,6 +37,7 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
     private func setupUI() {
         contentView.backgroundColor       = .clear
         containerView.backgroundColor     = WakeWellTheme.cardBackground
+        ringContainerView.backgroundColor = .clear
         containerView.layer.cornerRadius  = 20
         containerView.layer.masksToBounds = true
         layer.masksToBounds  = false

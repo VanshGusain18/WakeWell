@@ -27,7 +27,7 @@ class SoundTableViewController: UITableViewController {
                               action: #selector(segmentChanged(_:)),
                               for: .valueChanged)
  
-        outerviewSound.backgroundColor = WakeWellTheme.background
+//        outerviewSound.backgroundColor = WakeWellTheme.background
         setupAudioSession()
         setupBackgroundGradient()
         setupMiniPlayer()
@@ -50,9 +50,7 @@ class SoundTableViewController: UITableViewController {
 
     }
     private func applyTheme() {
-        view.backgroundColor      = WakeWellTheme.background
-        tableView.backgroundColor = WakeWellTheme.background
-        navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
+        
 
         segmentView?.selectedSegmentTintColor = WakeWellTheme.accentPurple
         segmentView?.backgroundColor          = WakeWellTheme.purpleTint

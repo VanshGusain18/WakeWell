@@ -39,6 +39,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
 
     private func setupUI() {
         contentView.backgroundColor     = WakeWellTheme.cardBackground
+        contentView.subviews.first?.backgroundColor = WakeWellTheme.cardBackground
         contentView.layer.cornerRadius  = 20
         contentView.layer.masksToBounds = true
         layer.masksToBounds             = false
@@ -58,4 +59,3 @@ class AlarmCollectionViewCell: UICollectionViewCell {
             : WakeWellTheme.accentGold
     }
 }
-

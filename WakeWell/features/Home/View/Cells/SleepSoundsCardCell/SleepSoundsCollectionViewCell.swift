@@ -17,6 +17,7 @@ class SleepSoundsCollectionViewCell: UICollectionViewCell {
 
     private func setupUI() {
         contentView.backgroundColor     = WakeWellTheme.cardBackground
+        contentView.subviews.first?.backgroundColor = WakeWellTheme.cardBackground
         contentView.layer.cornerRadius  = 24
         contentView.layer.masksToBounds = true
         layer.masksToBounds  = false

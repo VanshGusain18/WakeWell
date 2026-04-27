@@ -32,6 +32,7 @@ class RiseRitualCollectionViewCell: UICollectionViewCell {
     // ── Card ───────────────────────────────────────────────────────────────
     private func setupCard() {
         contentView.backgroundColor     = WakeWellTheme.cardBackground
+        contentView.subviews.first?.backgroundColor = WakeWellTheme.cardBackground
         contentView.layer.cornerRadius  = 24
         contentView.layer.masksToBounds = true
         layer.masksToBounds  = false

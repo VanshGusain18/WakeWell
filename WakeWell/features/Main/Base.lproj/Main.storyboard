@@ -17,14 +17,38 @@
             </objects>
             <point key="canvasLocation" x="1815" y="-63"/>
         </scene>
-        <!--rise-->
+        <!--Rise Ritual-->
         <scene sceneID="WWT-mv-A3c">
             <objects>
-                <viewControllerPlaceholder storyboardIdentifier="rise" storyboardName="Rise" referencedIdentifier="rise" id="lfl-Oe-Lp1" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="ppw-ai-g3F"/>
-                    <navigationItem key="navigationItem" id="cWe-sX-GuQ"/>
-                </viewControllerPlaceholder>
+                <viewController title="Rise Ritual" id="CrS-g6-cfU" customClass="RiseRitualViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Haa-63-ZQ6">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="hWY-xh-7yj"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Rise Ritual" id="cWe-sX-GuQ"/>
+                </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="96V-cp-UwH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2741" y="61"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="DRb-b0-eFu">
+            <objects>
+                <navigationController storyboardIdentifier="rise" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="lfl-Oe-Lp1" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBarItem key="tabBarItem" title="Rise" image="sun.max.fill" catalog="system" id="ppw-ai-g3F"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="1dN-RJ-bWc">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="CrS-g6-cfU" kind="relationship" relationship="rootViewController" id="0n0-8t-5Y1"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mQd-CQ-0sm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1906" y="61"/>
         </scene>
@@ -81,4 +105,10 @@
             <point key="canvasLocation" x="1830" y="360"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="sun.max.fill" catalog="system" width="128" height="121"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

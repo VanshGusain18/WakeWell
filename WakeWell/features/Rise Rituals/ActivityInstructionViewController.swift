@@ -13,7 +13,7 @@ final class ActivityInstructionViewController: RoutineActivityViewController, UI
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         navigationItem.title = "Step \(currentIndex + 1)/\(routineQueue.count)"
         setupTableView()
         setupContinueButton()
@@ -27,12 +27,14 @@ final class ActivityInstructionViewController: RoutineActivityViewController, UI
         tableView.dataSource = self
         tableView.delegate = self
         tableView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 110, right: 0)
+
+        // Register classes directly — cells are fully programmatic (no XIB)
         tableView.register(
-            UINib(nibName: ActivityTextBlockCell.identifier, bundle: nil),
+            ActivityTextBlockCell.self,
             forCellReuseIdentifier: ActivityTextBlockCell.identifier
         )
         tableView.register(
-            UINib(nibName: ActivityStepListCell.identifier, bundle: nil),
+            ActivityStepListCell.self,
             forCellReuseIdentifier: ActivityStepListCell.identifier
         )
 
@@ -50,7 +52,7 @@ final class ActivityInstructionViewController: RoutineActivityViewController, UI
         continueButton.setTitle("Continue", for: .normal)
         continueButton.setTitleColor(.white, for: .normal)
         continueButton.titleLabel?.font = .boldSystemFont(ofSize: 18)
-        continueButton.backgroundColor = .systemBlue
+        continueButton.backgroundColor = WakeWellTheme.accentGold
         continueButton.layer.cornerRadius = 16
         continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
 
@@ -112,7 +114,7 @@ final class ActivityInstructionViewController: RoutineActivityViewController, UI
 
         container.backgroundColor = .clear
         card.translatesAutoresizingMaskIntoConstraints = false
-        card.backgroundColor = UIColor.secondarySystemBackground
+        card.backgroundColor = WakeWellTheme.cardElevated
         card.layer.cornerRadius = 24
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -125,7 +127,7 @@ final class ActivityInstructionViewController: RoutineActivityViewController, UI
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.text = activity.activityType == .informational ? "Self-paced activity" : "Step-based activity"
         subtitleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.textColor = WakeWellTheme.labelSecondary
 
         container.addSubview(card)
         card.addSubview(titleLabel)

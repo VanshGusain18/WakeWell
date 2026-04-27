@@ -23,7 +23,7 @@ final class ShortWalkActivityViewController: RoutineActivityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         navigationItem.title = "Step \(currentIndex + 1)/\(routineQueue.count)"
         setupUI()
         startTracking()
@@ -54,14 +54,14 @@ final class ShortWalkActivityViewController: RoutineActivityViewController {
 
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.font = .systemFont(ofSize: 17)
-        statusLabel.textColor = .secondaryLabel
+        statusLabel.textColor = WakeWellTheme.labelSecondary
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 0
         statusLabel.text = "Start walking and keep a steady pace."
 
         progressView.translatesAutoresizingMaskIntoConstraints = false
-        progressView.trackTintColor = .systemGray5
-        progressView.progressTintColor = .systemBlue
+        progressView.trackTintColor = WakeWellTheme.border
+        progressView.progressTintColor = WakeWellTheme.accentPurple
         progressView.transform = CGAffineTransform(scaleX: 1, y: 4)
         progressView.progress = 0
 
@@ -69,7 +69,7 @@ final class ShortWalkActivityViewController: RoutineActivityViewController {
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.white, for: .normal)
         skipButton.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        skipButton.backgroundColor = .systemBlue
+        skipButton.backgroundColor = WakeWellTheme.accentGold
         skipButton.layer.cornerRadius = 16
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
 

@@ -19,11 +19,10 @@ class HomeViewController: UIViewController {
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.estimatedItemSize       = .zero
             layout.minimumLineSpacing      = 16
-            layout.minimumInteritemSpacing = 8   // horizontal gap between the two half-width cards
+            layout.minimumInteritemSpacing = 8
             layout.sectionInset            = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         }
 
-        // Reload the alarm card whenever the user saves a new time in AlarmOptionViewController.
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(reloadAlarmCard),
@@ -53,7 +52,6 @@ class HomeViewController: UIViewController {
             UINib(nibName: RiseRitualCollectionViewCell.identifier, bundle: nil),
             forCellWithReuseIdentifier: RiseRitualCollectionViewCell.identifier
         )
-        // Individual cells registered directly — no wrapper pair cell needed.
         collectionView.register(
             UINib(nibName: SleepRingCollectionViewCell.identifier, bundle: nil),
             forCellWithReuseIdentifier: SleepRingCollectionViewCell.identifier
@@ -92,7 +90,7 @@ extension HomeViewController: UICollectionViewDataSource {
         let card = viewModel.cards[indexPath.item]
 
         switch card {
-            
+
         case .sleepDebt(let model):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: SleepDebtViewCardCell.identifier,
@@ -107,7 +105,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 }
             }
             return cell
-            
+
         case .riseRitual(let model):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: RiseRitualCollectionViewCell.identifier,
@@ -115,20 +113,16 @@ extension HomeViewController: UICollectionViewDataSource {
             ) as! RiseRitualCollectionViewCell
             cell.configure(with: RiseRitualViewModel(model: model))
 
-            // ── Start Ritual → switch to Rise tab (index 2) and trigger startRoutineTapped ──
             cell.onStartRitual = { [weak self] in
                 guard let self else { return }
                 self.tabBarController?.selectedIndex = 2
-                // Give the tab a tick to finish appearing, then fire the routine
                 DispatchQueue.main.async {
                     if let nav  = self.tabBarController?.selectedViewController as? UINavigationController,
-                       let deck = nav.topViewController as? ActivityDeckViewController {
-                        deck.startRoutineTapped()
+                       let rise = nav.topViewController as? RiseRitualViewController {
+                        rise.startTodayActivity()
                     }
                 }
             }
-
-            
 
             cell.onClose = { [weak self] in
                 guard let self else { return }
@@ -156,7 +150,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 let shouldExpand = !self.viewModel.showMetricsCard
                 self.viewModel.toggleMetricsCard()
                 cell.animateChevron(expanded: shouldExpand)
-                
+
                 guard let ringIndex = self.viewModel.cards.firstIndex(where: {
                     if case .sleepRing = $0 { return true }
                     return false
@@ -178,7 +172,7 @@ extension HomeViewController: UICollectionViewDataSource {
                 withReuseIdentifier: AlarmCollectionViewCell.identifier,
                 for: indexPath
             ) as! AlarmCollectionViewCell
-            
+
             let freshTime  = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
             let freshModel = AlarmModel(time: freshTime)
             cell.configure(with: AlarmViewModel(model: freshModel))
@@ -253,3 +247,5 @@ extension HomeViewController: UICollectionViewDelegate {
         present(vc, animated: true)
     }
 }
+
+

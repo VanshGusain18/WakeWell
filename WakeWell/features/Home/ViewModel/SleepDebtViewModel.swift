@@ -34,6 +34,10 @@ class SleepDebtViewModel {
     func debtMessage() -> String {
 
         let debt = calculateSleepDebt()
+        if debt == 0 {
+            return "Good job you have no sleep debt."
+        }
+
         let formatted = String(format: "%.1f", debt)
 
         return "You have a sleep debt of \(formatted) hrs"

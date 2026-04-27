@@ -26,7 +26,7 @@ final class ReactionTapViewController: RoutineActivityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         navigationItem.title = "Step \(currentIndex + 1)/\(routineQueue.count)"
         setupUI()
         startGame()
@@ -54,16 +54,16 @@ final class ReactionTapViewController: RoutineActivityViewController {
         timerLabel.translatesAutoresizingMaskIntoConstraints = false
         timerLabel.font = .monospacedDigitSystemFont(ofSize: 18, weight: .semibold)
         timerLabel.textAlignment = .center
-        timerLabel.textColor = .secondaryLabel
+        timerLabel.textColor = WakeWellTheme.labelSecondary
 
         arenaView.translatesAutoresizingMaskIntoConstraints = false
-        arenaView.backgroundColor = UIColor.secondarySystemBackground
+        arenaView.backgroundColor = WakeWellTheme.cardElevated
         arenaView.layer.cornerRadius = 28
         arenaView.clipsToBounds = true
 
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.font = .systemFont(ofSize: 16)
-        statusLabel.textColor = .secondaryLabel
+        statusLabel.textColor = WakeWellTheme.labelSecondary
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 0
         statusLabel.text = "Tap the dot as soon as it appears. Missed dots score 0."
@@ -78,7 +78,7 @@ final class ReactionTapViewController: RoutineActivityViewController {
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.white, for: .normal)
         skipButton.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        skipButton.backgroundColor = .systemBlue
+        skipButton.backgroundColor = WakeWellTheme.accentGold
         skipButton.layer.cornerRadius = 16
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
 

@@ -74,14 +74,12 @@ class SleepDebtViewCardCell: UICollectionViewCell {
 
     @objc private func closeTapped() { dismissWithAnimation() }
 
-    // ── Configure — highlight hours in gold ───────────────────────────────
     func configure(with viewModel: SleepDebtViewModel) {
         let text = viewModel.debtMessage()
         let attr = NSMutableAttributedString(
             string: text,
             attributes: [.foregroundColor: WakeWellTheme.labelPrimary,
                          .font: UIFont.systemFont(ofSize: 15, weight: .semibold)])
-        // Colour numbers + "hrs" in gold to match screenshot
         if let regex = try? NSRegularExpression(pattern: #"[0-9]+\.?[0-9]* hrs?"#) {
             regex.enumerateMatches(in: text, range: NSRange(text.startIndex..., in: text)) { m, _, _ in
                 if let r = m?.range {

@@ -40,19 +40,19 @@ class CircularTimePicker: UIControl {
     
     private func setupView() {
         // Outer Circle Layer
-        outerCircleLayer.strokeColor = UIColor.systemGray4.cgColor
+        outerCircleLayer.strokeColor = WakeWellTheme.border.cgColor
         outerCircleLayer.fillColor = UIColor.clear.cgColor
         outerCircleLayer.lineWidth = 10
         layer.addSublayer(outerCircleLayer)
         
         // Track Layer (Background Circle)
-        trackLayer.strokeColor = UIColor.systemGray6.cgColor
+        trackLayer.strokeColor = WakeWellTheme.cardBackground.cgColor
         trackLayer.fillColor = UIColor.clear.cgColor
         trackLayer.lineWidth = 40
         layer.addSublayer(trackLayer)
 
-        // Progress Layer (Orange Bar)
-        progressLayer.strokeColor = UIColor.systemOrange.cgColor
+        // Progress Layer
+        progressLayer.strokeColor = WakeWellTheme.accentGold.cgColor
         progressLayer.fillColor = UIColor.clear.cgColor
         progressLayer.lineWidth = 40
         progressLayer.lineCap = .round
@@ -101,20 +101,7 @@ class CircularTimePicker: UIControl {
         let progressPath = UIBezierPath(arcCenter: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
         progressLayer.path = progressPath.cgPath
         
-        // change colours acc to the duration o fsleep hours
-        var diff = endAngle - startAngle
-            if diff < 0 { diff += 2 * .pi }
-            
-            let durationHours = (diff / (2 * .pi)) * 24
-            
-            // 3. Update Colors based on duration
-            if durationHours > 11 || durationHours < 5{
-                progressLayer.strokeColor = UIColor.systemRed.cgColor
-            } else if durationHours > 7 && durationHours < 9 {
-                progressLayer.strokeColor = UIColor.systemGreen.cgColor
-            } else if (durationHours > 5 && durationHours < 7 ) || (durationHours > 9 && durationHours < 11) {
-                progressLayer.strokeColor = UIColor.systemOrange.cgColor
-            }
+        progressLayer.strokeColor = WakeWellTheme.accentGold.cgColor
 
         bedHandle.position = position(for: startAngle, in: self.bounds, margin: 30)
         sunHandle.position = position(for: endAngle, in: self.bounds, margin: 30)
@@ -197,7 +184,7 @@ class CircularTimePicker: UIControl {
             let label = UILabel()
             label.text = text
             label.font = .systemFont(ofSize: 12, weight: .semibold)
-            label.textColor = .secondaryLabel
+            label.textColor = WakeWellTheme.labelSecondary
             label.sizeToFit()
             
             // Positions labels inside the ring
@@ -215,12 +202,22 @@ class CircularTimePicker: UIControl {
         
         tickLayer.path = path.cgPath
         tickLayer.fillColor = UIColor.clear.cgColor
-        tickLayer.strokeColor = UIColor.systemGray4.cgColor
+        tickLayer.strokeColor = WakeWellTheme.border.cgColor
         tickLayer.lineWidth = 8
         
         // This creates the dash effect (2pt line, 6pt gap)
         tickLayer.lineDashPattern = [2, 6]
         
         layer.insertSublayer(tickLayer, below: progressLayer)
+    }
+
+    func applyTheme() {
+        backgroundColor = WakeWellTheme.cardElevated
+        outerCircleLayer.strokeColor = WakeWellTheme.border.cgColor
+        trackLayer.strokeColor = WakeWellTheme.cardBackground.cgColor
+        progressLayer.strokeColor = WakeWellTheme.accentGold.cgColor
+        layer.cornerRadius = 20
+        clipsToBounds = true
+        updateUI()
     }
 }

@@ -26,7 +26,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
 
     private let backgroundView: UIView = {
         let v = UIView()
-        v.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.08, alpha: 1)
+        v.backgroundColor = WakeWellTheme.background
         v.translatesAutoresizingMaskIntoConstraints = false
         return v
     }()
@@ -43,7 +43,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private let subtitleLabel: UILabel = {
         let l = UILabel()
         l.font          = UIFont.systemFont(ofSize: 16, weight: .regular)
-        l.textColor     = UIColor.white.withAlphaComponent(0.6)
+        l.textColor     = WakeWellTheme.labelSecondary
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -53,7 +53,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let l = UILabel()
         l.text            = "✦ Smart Alarm — light sleep detected"
         l.font            = UIFont.systemFont(ofSize: 13, weight: .medium)
-        l.textColor       = UIColor(red: 1, green: 0.85, blue: 0.4, alpha: 1)
+        l.textColor       = WakeWellTheme.accentGold
         l.textAlignment   = .center
         l.isHidden        = true
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +63,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     /// The pill at the bottom with "slide to stop" affordance
     private let slideTrack: UIView = {
         let v = UIView()
-        v.backgroundColor    = UIColor.white.withAlphaComponent(0.12)
+        v.backgroundColor    = WakeWellTheme.cardElevated
         v.layer.cornerRadius = 36
         v.translatesAutoresizingMaskIntoConstraints = false
         return v
@@ -71,7 +71,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
 
     private let slideThumb: UIView = {
         let v = UIView()
-        v.backgroundColor    = .white
+        v.backgroundColor    = WakeWellTheme.cardBackground
         v.layer.cornerRadius = 28
         v.translatesAutoresizingMaskIntoConstraints = false
         return v
@@ -81,7 +81,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let l = UILabel()
         l.text      = "›"
         l.font      = UIFont.systemFont(ofSize: 36, weight: .thin)
-        l.textColor = UIColor(red: 0.05, green: 0.05, blue: 0.08, alpha: 0.8)
+        l.textColor = WakeWellTheme.labelPrimary
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -90,7 +90,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let l = UILabel()
         l.text          = "slide to stop"
         l.font          = UIFont.systemFont(ofSize: 14, weight: .regular)
-        l.textColor     = UIColor.white.withAlphaComponent(0.4)
+        l.textColor     = WakeWellTheme.labelSecondary
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l

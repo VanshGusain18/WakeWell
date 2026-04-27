@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -170,7 +170,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gTd-ff-BxK">
-                                                    <rect key="frame" x="239" y="8" width="98" height="35"/>
+                                                    <rect key="frame" x="259" y="8" width="78" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Button" titleAlignment="trailing"/>
@@ -263,7 +263,7 @@
                                         <rect key="frame" x="20" y="859" width="353" height="51"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DEm-xj-wXe" id="zhm-p0-ifN">
-                                            <rect key="frame" x="0.0" y="0.0" width="334.66666666666669" height="51"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="322.66666666666669" height="51"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Sound &amp; Haptics" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SCn-y8-0tO">
@@ -328,14 +328,16 @@
                     </navigationItem>
                     <connections>
                         <outlet property="bedTimeToggle" destination="dP8-kR-HZT" id="rrS-dV-iTd"/>
+                        <outlet property="bedTimeVolumeSlider" destination="FVN-Cu-FUK" id="eP6-bY-f9T"/>
                         <outlet property="bedtimeLabel" destination="Ycl-3v-TNL" id="Qoo-Tt-jZC"/>
                         <outlet property="buttonWindow" destination="gTd-ff-BxK" id="m47-qj-Nl4"/>
                         <outlet property="doneTapped" destination="Pay-3M-ykO" id="M4a-Qv-Qjd"/>
                         <outlet property="durationLabel" destination="E3D-Vv-vbB" id="1TT-kP-VBB"/>
                         <outlet property="selectedSoundLabel" destination="OVG-pT-SPH" id="tdQ-F7-QKj"/>
-                        <outlet property="selectedSoundLabel2" destination="HhJ-my-OM5" id="9j4-G8-rT5"/>
+                        <outlet property="selectedSoundLabel2" destination="hlo-rp-ecs" id="9j4-G8-rT5"/>
                         <outlet property="timePicker" destination="NXL-jV-X5i" id="QHb-jj-Esd"/>
                         <outlet property="wakeUpToggle" destination="4r3-1m-Sy6" id="U7w-6t-a71"/>
+                        <outlet property="wakeUpVolumeSlider" destination="Z05-P1-QdV" id="Qqg-5W-0VM"/>
                         <outlet property="wakeupLabel" destination="eHb-Bm-7lP" id="JEP-je-jnk"/>
                     </connections>
                 </tableViewController>
@@ -542,6 +544,9 @@
                     <navigationItem key="navigationItem" title="Sound &amp; Haptics" id="Gr2-Wa-Ps7">
                         <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.left" catalog="system" id="nXo-B6-hq2"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="selectedHapticLabel" destination="7T3-fD-OD8" id="Hzc-zT-Ts7"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="s55-HJ-oJA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -550,7 +555,7 @@
         <!--Haptics-->
         <scene sceneID="iSF-GO-jdp">
             <objects>
-                <tableViewController id="Exp-6X-og4" sceneMemberID="viewController">
+                <tableViewController id="Exp-6X-og4" customClass="HapticPickerViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="NvK-Xg-04B">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="793"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -19,11 +19,15 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
     @IBOutlet weak var wakeupLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var doneTapped: UIBarButtonItem!
+    @IBOutlet weak var wakeUpVolumeSlider: UISlider!
+    @IBOutlet weak var bedTimeVolumeSlider: UISlider!
 
     private let wakeUpOptionRows = [1, 2, 3]
     private let bedtimeOptionRows = [1, 2]
     var selectedWindow = "30 min"
     var activeSection: Int = 1
+    private var wakeUpSoundSelection = (sound: "Early Riser(Default)", haptic: "None (Default)")
+    private var bedtimeSoundSelection = (sound: "Early Riser(Default)", haptic: "None (Default)")
 
     // HealthKit store — used to read sleep stages from Apple Watch
     private let healthStore = HKHealthStore()
@@ -31,12 +35,80 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.isScrollEnabled = true
+        applyTheme()
         buttonWindow.setTitle(selectedWindow, for: .normal)
         setupSmartAlarmMenu()
         timePicker.addTarget(self, action: #selector(pickerChanged), for: .valueChanged)
+        updateSoundLabels()
 
         // Ask for notification permission on first launch
         requestNotificationPermission()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        applyTheme()
+        updateSoundLabels()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        layoutSummaryLabel(selectedSoundLabel)
+        layoutSummaryLabel(selectedSoundLabel2)
+    }
+
+    private func applyTheme() {
+        view.backgroundColor = WakeWellTheme.background
+        tableView.backgroundColor = WakeWellTheme.background
+        navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+
+        [selectedSoundLabel, selectedSoundLabel2, bedtimeLabel, wakeupLabel, durationLabel].forEach {
+            $0?.textColor = WakeWellTheme.labelPrimary
+        }
+        [selectedSoundLabel, selectedSoundLabel2].forEach {
+            $0?.textAlignment = .right
+            $0?.adjustsFontSizeToFitWidth = true
+            $0?.minimumScaleFactor = 0.7
+            $0?.lineBreakMode = .byTruncatingTail
+        }
+
+        doneTapped.tintColor = WakeWellTheme.accentPurple
+        buttonWindow.setTitleColor(WakeWellTheme.accentPurple, for: .normal)
+        wakeUpToggle.onTintColor = WakeWellTheme.accentPurple
+        bedTimeToggle.onTintColor = WakeWellTheme.accentPurple
+        timePicker.applyTheme()
+        [wakeUpVolumeSlider, bedTimeVolumeSlider].forEach { styleVolumeSlider($0) }
+        tableView.reloadData()
+    }
+
+    private func updateSoundLabels() {
+        selectedSoundLabel.text = "\(wakeUpSoundSelection.sound) • \(wakeUpSoundSelection.haptic)"
+        selectedSoundLabel2.text = "\(bedtimeSoundSelection.sound) • \(bedtimeSoundSelection.haptic)"
+    }
+
+    private func layoutSummaryLabel(_ label: UILabel?) {
+        guard let label, let container = label.superview else { return }
+        let availableWidth = min(150, max(110, container.bounds.width * 0.38))
+        var frame = label.frame
+        frame.size.width = availableWidth
+        frame.origin.x = container.bounds.width - 44 - availableWidth
+        label.frame = frame.integral
+    }
+
+    private func styleVolumeSlider(_ slider: UISlider?) {
+        guard let slider else { return }
+        slider.minimumTrackTintColor = WakeWellTheme.accentPurple
+        slider.maximumTrackTintColor = WakeWellTheme.border
+        slider.thumbTintColor = WakeWellTheme.accentGold
+        slider.minimumValueImage = slider.minimumValueImage?.withTintColor(WakeWellTheme.labelSecondary, renderingMode: .alwaysOriginal)
+        slider.maximumValueImage = slider.maximumValueImage?.withTintColor(WakeWellTheme.labelSecondary, renderingMode: .alwaysOriginal)
+        slider.setValue(max(slider.value, 0.5), animated: false)
+        slider.setThumbImage(makeSliderThumbImage(), for: .normal)
+        slider.setThumbImage(makeSliderThumbImage(), for: .highlighted)
+        slider.setMinimumTrackImage(makeSliderTrackImage(color: WakeWellTheme.accentPurple), for: .normal)
+        slider.setMaximumTrackImage(makeSliderTrackImage(color: WakeWellTheme.border), for: .normal)
     }
 
     private func requestNotificationPermission() {
@@ -335,6 +407,37 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         return UITableView.automaticDimension
     }
 
+    // MARK: - SoundPickerDelegate
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let destinationVC = segue.destination as? SoundPickerViewController {
+            destinationVC.delegate = self
+            if let indexPath = tableView.indexPathForSelectedRow {
+                activeSection = indexPath.section
+            }
+            let selection = activeSection == 1 ? wakeUpSoundSelection : bedtimeSoundSelection
+            destinationVC.selectedSoundName = selection.sound
+            destinationVC.selectedHaptic = selection.haptic
+        }
+    }
+
+    func didSelectSound(_ name: String, haptic: String) {
+        if activeSection == 1 {
+            wakeUpSoundSelection = (name, haptic)
+        } else {
+            bedtimeSoundSelection = (name, haptic)
+        }
+        updateSoundLabels()
+    }
+
+    override func tableView(_ tableView: UITableView,
+                            willDisplayHeaderView view: UIView,
+                            forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+        header.tintColor = WakeWellTheme.background
+        header.textLabel?.textColor = WakeWellTheme.labelSecondary
+    }
+
     override func tableView(_ tableView: UITableView,
                             willDisplay cell: UITableViewCell,
                             forRowAt indexPath: IndexPath) {
@@ -347,29 +450,67 @@ class AlarmOptionViewController: UITableViewController, SoundPickerDelegate {
         } else {
             cell.isHidden = false
         }
+
+        cell.backgroundColor = WakeWellTheme.cardBackground
+        cell.contentView.backgroundColor = WakeWellTheme.cardBackground
+        cell.tintColor = WakeWellTheme.accentPurple
+        cell.textLabel?.textColor = WakeWellTheme.labelPrimary
+        cell.detailTextLabel?.textColor = WakeWellTheme.labelSecondary
+        cell.selectionStyle = .none
+        let selectedView = UIView()
+        selectedView.backgroundColor = WakeWellTheme.cardBackground
+        cell.selectedBackgroundView = selectedView
+        cell.accessoryView?.tintColor = WakeWellTheme.labelSecondary
+        applyTheme(to: cell.contentView)
     }
 
-    // MARK: - SoundPickerDelegate
+    private func applyTheme(to view: UIView) {
+        for subview in view.subviews {
+            switch subview {
+            case let label as UILabel:
+                label.textColor = WakeWellTheme.labelPrimary
+            case let button as UIButton:
+                button.setTitleColor(WakeWellTheme.accentPurple, for: .normal)
+                button.tintColor = WakeWellTheme.accentPurple
+            case let imageView as UIImageView:
+                imageView.tintColor = WakeWellTheme.labelSecondary
+            case let picker as CircularTimePicker:
+                picker.applyTheme()
+            case let container as UIView:
+                if container.backgroundColor != .clear {
+                    container.backgroundColor = WakeWellTheme.cardBackground
+                }
+            default:
+                break
+            }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let destinationVC = segue.destination as? SoundPickerViewController {
-            destinationVC.delegate = self
-            if let indexPath = tableView.indexPathForSelectedRow {
-                activeSection = indexPath.section
-                destinationVC.selectedSoundName = (activeSection == 1)
-                    ? selectedSoundLabel.text ?? ""
-                    : selectedSoundLabel2.text ?? ""
+            if subview !== selectedSoundLabel && subview !== selectedSoundLabel2 {
+                applyTheme(to: subview)
             }
         }
     }
 
-    func didSelectSound(_ name: String, haptic: String) {
-        if activeSection == 1 {
-            selectedSoundLabel.text  = "\(name) • \(haptic)"
-        } else {
-            selectedSoundLabel2.text = "\(name) • \(haptic)"
+    private func makeSliderThumbImage() -> UIImage? {
+        let size = CGSize(width: 22, height: 22)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            let rect = CGRect(origin: .zero, size: size)
+            context.cgContext.setFillColor(WakeWellTheme.accentGold.cgColor)
+            context.cgContext.fillEllipse(in: rect)
         }
-        tableView.reloadData()
+    }
+
+    private func makeSliderTrackImage(color: UIColor) -> UIImage? {
+        let size = CGSize(width: 8, height: 8)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { context in
+            let rect = CGRect(origin: .zero, size: size)
+            let path = UIBezierPath(roundedRect: rect, cornerRadius: size.height / 2)
+            color.setFill()
+            path.fill()
+        }
+        let inset = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+        return image.resizableImage(withCapInsets: inset, resizingMode: .stretch)
     }
 }
 

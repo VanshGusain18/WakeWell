@@ -12,7 +12,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D62B6D952F9CB83900A886FE /* WakeWellWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WakeWellWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D67C6D732F2CC9F4004ECCDB /* WakeWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WakeWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D67C6D8B2F2CCA88004ECCDB /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		D6C5DC742F35C1C4002DE663 /* sounds_tab.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sounds_tab.xcodeproj; sourceTree = "<group>"; };
@@ -29,11 +28,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D62B6D962F9CB83900A886FE /* WakeWellWatch Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "WakeWellWatch Watch App";
-			sourceTree = "<group>";
-		};
 		D67C6D752F2CC9F4004ECCDB /* WakeWell */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -45,13 +39,6 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		D62B6D922F9CB83900A886FE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D67C6D702F2CC9F4004ECCDB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -68,7 +55,6 @@
 			children = (
 				D67C6D8B2F2CCA88004ECCDB /* readme.md */,
 				D67C6D752F2CC9F4004ECCDB /* WakeWell */,
-				D62B6D962F9CB83900A886FE /* WakeWellWatch Watch App */,
 				D67C6D742F2CC9F4004ECCDB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -77,7 +63,6 @@
 			isa = PBXGroup;
 			children = (
 				D67C6D732F2CC9F4004ECCDB /* WakeWell.app */,
-				D62B6D952F9CB83900A886FE /* WakeWellWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -92,28 +77,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D62B6D942F9CB83900A886FE /* WakeWellWatch Watch App */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D62B6D9D2F9CB83A00A886FE /* Build configuration list for PBXNativeTarget "WakeWellWatch Watch App" */;
-			buildPhases = (
-				D62B6D912F9CB83900A886FE /* Sources */,
-				D62B6D922F9CB83900A886FE /* Frameworks */,
-				D62B6D932F9CB83900A886FE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				D62B6D962F9CB83900A886FE /* WakeWellWatch Watch App */,
-			);
-			name = "WakeWellWatch Watch App";
-			packageProductDependencies = (
-			);
-			productName = "WakeWellWatch Watch App";
-			productReference = D62B6D952F9CB83900A886FE /* WakeWellWatch Watch App.app */;
-			productType = "com.apple.product-type.application";
-		};
 		D67C6D722F2CC9F4004ECCDB /* WakeWell */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D67C6D862F2CC9F4004ECCDB /* Build configuration list for PBXNativeTarget "WakeWell" */;
@@ -147,9 +110,6 @@
 				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
-					D62B6D942F9CB83900A886FE = {
-						CreatedOnToolsVersion = 26.2;
-					};
 					D67C6D722F2CC9F4004ECCDB = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -179,19 +139,11 @@
 			projectRoot = "";
 			targets = (
 				D67C6D722F2CC9F4004ECCDB /* WakeWell */,
-				D62B6D942F9CB83900A886FE /* WakeWellWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D62B6D932F9CB83900A886FE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D67C6D712F2CC9F4004ECCDB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -203,13 +155,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		D62B6D912F9CB83900A886FE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D67C6D6F2F2CC9F4004ECCDB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -220,76 +165,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		D62B6D9E2F9CB83A00A886FE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "WakeWellWatch Watch App/WakeWellWatch Watch App.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "WakeWellWatch-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = WakeWellWatch;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = .watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
-			};
-			name = Debug;
-		};
-		D62B6D9F2F9CB83A00A886FE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "WakeWellWatch Watch App/WakeWellWatch Watch App.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "WakeWellWatch-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = WakeWellWatch;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = .watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
-			};
-			name = Release;
-		};
 		D67C6D872F2CC9F4004ECCDB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -492,15 +367,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D62B6D9D2F9CB83A00A886FE /* Build configuration list for PBXNativeTarget "WakeWellWatch Watch App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D62B6D9E2F9CB83A00A886FE /* Debug */,
-				D62B6D9F2F9CB83A00A886FE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		D67C6D6E2F2CC9F4004ECCDB /* Build configuration list for PBXProject "WakeWell" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

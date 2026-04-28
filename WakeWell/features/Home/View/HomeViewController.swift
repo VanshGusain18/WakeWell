@@ -187,14 +187,14 @@ extension HomeViewController: UICollectionViewDataSource {
 
             let freshTime  = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
             let freshModel = AlarmModel(time: freshTime)
-            cell.configure(with: AlarmViewModel(model: freshModel))
+            cell.configure(with: HomeAlarmViewModel(model: freshModel))
             cell.onTapped = { [weak self] in
-                guard let self else { return }
-                let vc = UIStoryboard(name: "Main", bundle: nil)
-                    .instantiateViewController(withIdentifier: "alarm")
-                vc.modalPresentationStyle = .automatic
-                self.present(vc, animated: true)
-            }
+                  guard let self else { return }
+                  let vc  = AlarmOptionViewController()
+                  let nav = UINavigationController(rootViewController: vc)
+                  nav.modalPresentationStyle = .pageSheet
+                  self.present(nav, animated: true)
+              }
             return cell
 
         case .metrics(let model):
@@ -242,7 +242,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .metrics:      return CGSize(width: fullWidth, height: 200)
-        case .groggyNotes:  return CGSize(width: fullWidth, height: 280)
+        case .groggyNotes:  return CGSize(width: fullWidth, height: 250)
         case .sounds:       return CGSize(width: fullWidth, height: 60)
         }
     }

@@ -25,7 +25,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
 
     @objc private func refreshFromUserDefaults() {
         let savedTime = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
-        configure(with: AlarmViewModel(model: AlarmModel(time: savedTime)))
+        configure(with: HomeAlarmViewModel(model: AlarmModel(time: savedTime)))
     }
 
     override func layoutSubviews() {
@@ -47,10 +47,9 @@ class AlarmCollectionViewCell: UICollectionViewCell {
         layer.shadowOpacity             = WakeWellTheme.shadowOpacity
         layer.shadowRadius              = WakeWellTheme.shadowRadius
         layer.shadowOffset              = WakeWellTheme.shadowOffset
-
     }
 
-    func configure(with viewModel: AlarmViewModel) {
+    func configure(with viewModel: HomeAlarmViewModel) {
         titleLabel.text    = viewModel.title
         timeLabel.text     = viewModel.timeText
         subtitleLabel.text = viewModel.subtitleText

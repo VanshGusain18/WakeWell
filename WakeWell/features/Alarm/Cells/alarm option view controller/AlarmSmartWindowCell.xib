@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="cel-sw-001" customClass="AlarmSmartWindowCell" customModule="WakeWell" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="52"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cel-sw-001" id="ccv-sw-001">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="52"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Smart Wake Window" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-sw-ttl">
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" systemColor="labelColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-sw-001">
+                        <rect key="frame" x="305" y="12" width="72" height="28"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <state key="normal" title="30 min"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="72" id="con-sw-btn-w"/>
+                        </constraints>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="lbl-sw-ttl" firstAttribute="leading" secondItem="ccv-sw-001" secondAttribute="leading" constant="16" id="con-sw-ttl-l"/>
+                    <constraint firstItem="lbl-sw-ttl" firstAttribute="centerY" secondItem="ccv-sw-001" secondAttribute="centerY" id="con-sw-ttl-cy"/>
+                    <constraint firstItem="btn-sw-001" firstAttribute="trailing" secondItem="ccv-sw-001" secondAttribute="trailing" constant="-16" id="con-sw-btn-t"/>
+                    <constraint firstItem="btn-sw-001" firstAttribute="centerY" secondItem="ccv-sw-001" secondAttribute="centerY" id="con-sw-btn-cy"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="sag-sw-001"/>
+            <connections>
+                <outlet property="titleLabel" destination="lbl-sw-ttl" id="out-sw-ttl"/>
+                <outlet property="menuButton" destination="btn-sw-001" id="out-sw-btn"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -22,6 +22,16 @@ final class WatchDataManager {
         configureProviderCallback()
     }
 
+    func process(vitalData: VitalData) {
+        if Thread.isMainThread {
+            handleIncomingData(vitalData)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.handleIncomingData(vitalData)
+            }
+        }
+    }
+
     func start(resetData: Bool = true) {
         stop()
 

@@ -8,12 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var connectivity = WatchConnectivityManager.shared
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Streaming to iPhone...")
+                .font(.headline)
+            Text("HR: \(String(format: "%.1f", connectivity.lastHeartRate))")
+                .font(.title3.bold())
+            Text(connectivity.statusText)
+                .font(.caption)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
         }
         .padding()
     }

@@ -7,7 +7,7 @@ final class DatabaseManager {
 
     private init() {}
 
-    private var dbURL: URL {
+    var dbURL: URL {
 
         let fileManager = FileManager.default
 

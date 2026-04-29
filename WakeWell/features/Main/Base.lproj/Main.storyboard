@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="02f-Ci-su7">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="02f-Ci-su7">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--alarm-->
-        <scene sceneID="SZW-nW-BRd">
-            <objects>
-                <viewControllerPlaceholder storyboardIdentifier="alarm" storyboardName="Alarm" referencedIdentifier="alarm" id="9zz-RQ-VkM" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="By6-zf-p9r"/>
-                    <navigationItem key="navigationItem" id="fXw-DZ-qkY"/>
-                </viewControllerPlaceholder>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="uBv-1g-0Zj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1815" y="-63"/>
-        </scene>
         <!--Rise Ritual-->
         <scene sceneID="WWT-mv-A3c">
             <objects>
@@ -31,14 +22,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="96V-cp-UwH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2741" y="61"/>
+            <point key="canvasLocation" x="2816" y="-519"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Rise-->
         <scene sceneID="DRb-b0-eFu">
             <objects>
                 <navigationController storyboardIdentifier="rise" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="lfl-Oe-Lp1" sceneMemberID="viewController">
-                    <toolbarItems/>
                     <tabBarItem key="tabBarItem" title="Rise" image="sun.max.fill" catalog="system" id="ppw-ai-g3F"/>
+                    <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="1dN-RJ-bWc">
                         <rect key="frame" x="0.0" y="118" width="393" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -50,7 +41,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mQd-CQ-0sm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1906" y="61"/>
+            <point key="canvasLocation" x="2042" y="-519"/>
         </scene>
         <!--sound-->
         <scene sceneID="WWt-It-OSi">
@@ -61,7 +52,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ENm-bC-wxY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1892" y="178"/>
+            <point key="canvasLocation" x="1817" y="180"/>
         </scene>
         <!--stats-->
         <scene sceneID="m7V-Xq-eoF">
@@ -72,7 +63,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Z9a-O4-vRJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1863" y="281"/>
+            <point key="canvasLocation" x="1811" y="432"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="u66-sD-Vhp">
@@ -87,6 +78,7 @@
                         <segue destination="coc-yx-zpn" kind="relationship" relationship="viewControllers" id="DcI-Bg-S1N"/>
                         <segue destination="lqo-Lp-Coy" kind="relationship" relationship="viewControllers" id="G7T-y3-luG"/>
                         <segue destination="lfl-Oe-Lp1" kind="relationship" relationship="viewControllers" id="fZb-mJ-bdv"/>
+                        <segue destination="prf-NC-001" kind="relationship" relationship="viewControllers" id="prf-sg-001"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QMr-fu-O2q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -102,13 +94,50 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GgT-EX-dzY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1830" y="360"/>
+            <point key="canvasLocation" x="1453" y="602"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="prf-SC-001">
+            <objects>
+                <navigationController id="prf-NC-001" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Profile" image="person.crop.circle.fill" catalog="system" id="prf-tb-001"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="prf-nb-001">
+                        <rect key="frame" x="0.0" y="118" width="393" height="106"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="prf-TVC-001" kind="relationship" relationship="rootViewController" id="prf-rv-001"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="prf-FR-001" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="790" y="1062"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="prf-SC-002">
+            <objects>
+                <tableViewController title="Profile" id="prf-TVC-001" customClass="ProfileTableViewController" customModule="WakeWell" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="prf-TV-001">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="prf-sa-001"/>
+                        <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="prf-FR-002" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1584" y="1068"/>
         </scene>
     </scenes>
     <resources>
-        <image name="sun.max.fill" catalog="system" width="128" height="121"/>
+        <image name="person.crop.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="sun.max.fill" catalog="system" width="128" height="125"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGroupedBackgroundColor">
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

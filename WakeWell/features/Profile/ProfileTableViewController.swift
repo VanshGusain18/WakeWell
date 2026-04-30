@@ -1,52 +1,41 @@
 // ProfileTableViewController.swift
-// WakeWell
-//
-// Displays the logged-in user's profile in a grouped UITableViewController.
-// Fully storyboard-driven — no XIB needed.
+// SetSail
 
 import UIKit
 
-// MARK: - Section / Row model
-
 private enum ProfileSection: Int, CaseIterable {
-    case avatar      = 0   // single cell with avatar + name + email
-    case stats       = 1   // Age, Gender, Sleep Goal
-    case account     = 2   // Member Since
-    case actions     = 3   // Log Out
+    case avatar
+    case stats
+    case actions
 }
 
-private enum StatsRow: Int, CaseIterable {
-    case age, gender, sleepGoal
-    var title: String {
-        switch self {
-        case .age:       return "Age"
-        case .gender:    return "Gender"
-        case .sleepGoal: return "Sleep Goal"
-        }
-    }
+private struct StatRow {
+    let title:     String
+    let sfSymbol:  String
+    var value:     String
 }
-
-// MARK: - View Controller
 
 final class ProfileTableViewController: UITableViewController {
 
-    // MARK: Private state
+    // MARK: Data
 
-    private var profileName      = ""
-    private var profileEmail     = ""
-    private var profileInitials  = "?"
-    private var profileAge       = "—"
-    private var profileGender    = "—"
-    private var profileSleepGoal = "—"
+    private var stats: [StatRow] = [
+        StatRow(title: "Age",        sfSymbol: "birthday.cake",           value: "—"),
+        StatRow(title: "Sleep Goal", sfSymbol: "moon.zzz",                value: "—"),
+        StatRow(title: "Member Since", sfSymbol: "calendar.badge.clock",  value: "—")
+    ]
+
+    private var profileName     = ""
+    private var profileEmail    = ""
+    private var profileInitials = "?"
     private var profileMemberSince = ""
 
     // MARK: Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Profile"
         setupTableView()
-        applyTheme()
+        applyNavBar()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -58,74 +47,70 @@ final class ProfileTableViewController: UITableViewController {
     // MARK: Setup
 
     private func setupTableView() {
-        tableView.register(AvatarCell.self,       forCellReuseIdentifier: AvatarCell.reuseID)
-        tableView.register(DetailCell.self,       forCellReuseIdentifier: DetailCell.reuseID)
-        tableView.register(ActionCell.self,       forCellReuseIdentifier: ActionCell.reuseID)
-        tableView.separatorInset  = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
-        tableView.separatorColor  = WakeWellTheme.border
+        tableView.register(AvatarCell.self,  forCellReuseIdentifier: AvatarCell.reuseID)
+        tableView.register(DetailCell.self,  forCellReuseIdentifier: DetailCell.reuseID)
+        tableView.register(ActionCell.self,  forCellReuseIdentifier: ActionCell.reuseID)
+
+        tableView.separatorStyle  = .none
         tableView.backgroundColor = WakeWellTheme.background
-        tableView.contentInset    = UIEdgeInsets(top: 16, left: 0, bottom: 32, right: 0)
+        tableView.contentInset    = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
+        tableView.showsVerticalScrollIndicator = false
+
+        if #available(iOS 15.0, *) {
+            tableView.sectionHeaderTopPadding = 0
+        }
     }
 
-    private func applyTheme() {
+    private func applyNavBar() {
+        title = "Profile"
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
+
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor    = UIColor(hex: "#1C1A3A")
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.backgroundColor = UIColor(hex: "#F2F1FF")   // WakeWellTheme.background light
+        appearance.titleTextAttributes = [
+            .foregroundColor: WakeWellTheme.labelPrimary
+        ]
         appearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+            .foregroundColor: WakeWellTheme.labelPrimary,
+            .font: UIFont.systemFont(ofSize: 32, weight: .bold)
         ]
         navigationController?.navigationBar.standardAppearance   = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.tintColor = WakeWellTheme.accentGold
+        navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
 
-    // MARK: Data
+    // MARK: Data loading
 
     private func loadProfile() {
-        guard let profile = DatabaseManager.shared.fetchUserProfile() else {
-            profileName        = "No profile found"
-            profileEmail       = ""
-            profileInitials    = "?"
-            profileAge         = "—"
-            profileGender      = "—"
-            profileSleepGoal   = "—"
-            profileMemberSince = ""
-            return
-        }
+        guard let profile = DatabaseManager.shared.fetchUserProfile() else { return }
 
-        profileName   = profile.name
-        profileEmail  = profile.email
+        profileName  = profile.name
+        profileEmail = profile.email
 
         let parts = profile.name.split(separator: " ")
-        let inits = parts.prefix(2).compactMap { $0.first }.map { String($0) }.joined()
-        profileInitials = inits.isEmpty ? "?" : inits.uppercased()
+        profileInitials = parts.prefix(2).compactMap { $0.first }.map { String($0) }.joined()
 
-        profileAge       = "\(profile.age) years"
-        profileGender    = profile.gender.capitalized
-        profileSleepGoal = String(format: "%.1f hours", profile.sleepGoalHours)
-
-        let df = DateFormatter()
-        df.dateStyle = .medium
-        df.timeStyle = .none
+        let df = DateFormatter(); df.dateStyle = .medium
         profileMemberSince = df.string(from: profile.createdAt)
+
+        stats[0].value = "\(profile.age) years"
+        stats[1].value = String(format: "%.1f hours", profile.sleepGoalHours)
+        stats[2].value = profileMemberSince
     }
 
-    // MARK: UITableViewDataSource
+    // MARK: DataSource
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         ProfileSection.allCases.count
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView,
+                            numberOfRowsInSection section: Int) -> Int {
         switch ProfileSection(rawValue: section)! {
-        case .avatar:   return 1
-        case .stats:    return StatsRow.allCases.count
-        case .account:  return 1
-        case .actions:  return 1
+        case .avatar:  return 1
+        case .stats:   return stats.count
+        case .actions: return 1
         }
     }
 
@@ -136,6 +121,7 @@ final class ProfileTableViewController: UITableViewController {
         case .avatar:
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: AvatarCell.reuseID, for: indexPath) as! AvatarCell
+            styleCard(cell, isFirst: true, isLast: true)
             cell.configure(initials: profileInitials,
                            name: profileName,
                            email: profileEmail,
@@ -145,94 +131,141 @@ final class ProfileTableViewController: UITableViewController {
         case .stats:
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: DetailCell.reuseID, for: indexPath) as! DetailCell
-            let row = StatsRow(rawValue: indexPath.row)!
-            let value: String
-            switch row {
-            case .age:       value = profileAge
-            case .gender:    value = profileGender
-            case .sleepGoal: value = profileSleepGoal
-            }
-            cell.configure(title: row.title, value: value)
-            return cell
+            let isFirst = indexPath.row == 0
+            let isLast  = indexPath.row == stats.count - 1
+            styleCard(cell, isFirst: isFirst, isLast: isLast)
 
-        case .account:
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: DetailCell.reuseID, for: indexPath) as! DetailCell
-            cell.configure(title: "Member Since", value: profileMemberSince)
+            // Separator between rows (not after last)
+            if !isLast {
+                addSeparator(to: cell.contentView)
+            }
+
+            let row = stats[indexPath.row]
+            cell.configure(title: row.title, value: row.value, sfSymbol: row.sfSymbol)
             return cell
 
         case .actions:
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: ActionCell.reuseID, for: indexPath) as! ActionCell
             cell.configure(title: "Log Out", isDestructive: true)
+            cell.onTap = { [weak self] in self?.confirmLogout() }
             return cell
         }
     }
 
-    // MARK: UITableViewDelegate
+    // MARK: Delegate
 
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView,
+                            heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch ProfileSection(rawValue: indexPath.section)! {
-        case .avatar:  return 160
-        default:       return 56
+        case .avatar:  return 130
+        case .stats:   return 58
+        case .actions: return 76
         }
     }
 
     override func tableView(_ tableView: UITableView,
                             viewForHeaderInSection section: Int) -> UIView? {
         guard let title = sectionTitle(for: section) else { return nil }
-        return makeSectionHeader(title: title)
+        let header = UIView()
+        header.backgroundColor = .clear
+
+        let label = UILabel()
+        label.text      = title.uppercased()
+        label.font      = .systemFont(ofSize: 11, weight: .semibold)
+        label.textColor = WakeWellTheme.labelTertiary
+        label.translatesAutoresizingMaskIntoConstraints = false
+        header.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 28),
+            label.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -6)
+        ])
+        return header
     }
 
     override func tableView(_ tableView: UITableView,
                             heightForHeaderInSection section: Int) -> CGFloat {
-        sectionTitle(for: section) != nil ? 36 : 8
+        sectionTitle(for: section) == nil ? 12 : 36
     }
 
     override func tableView(_ tableView: UITableView,
-                            heightForFooterInSection section: Int) -> CGFloat { 8 }
+                            heightForFooterInSection section: Int) -> CGFloat { 0 }
 
     override func tableView(_ tableView: UITableView,
-                            viewForFooterInSection section: Int) -> UIView? { UIView() }
+                            viewForFooterInSection section: Int) -> UIView? { nil }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if ProfileSection(rawValue: indexPath.section) == .actions {
-            confirmLogout()
-        }
-    }
-
-    // MARK: Private helpers
+    // MARK: Helpers
 
     private func sectionTitle(for section: Int) -> String? {
         switch ProfileSection(rawValue: section)! {
         case .avatar:  return nil
-        case .stats:   return "Personal Info"
-        case .account: return "Account"
+        case .stats:   return "Details"
         case .actions: return nil
         }
     }
 
-    private func makeSectionHeader(title: String) -> UIView {
-        let container = UIView()
-        container.backgroundColor = .clear
-        let label = UILabel()
-        label.text      = title.uppercased()
-        label.textColor = WakeWellTheme.labelTertiary
-        label.font      = .systemFont(ofSize: 11, weight: .semibold)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 20),
-            label.centerYAnchor.constraint(equalTo: container.centerYAnchor)
-        ])
-        return container
+    /// Applies card styling to a cell — groups rows inside a single rounded card.
+    /// 16 pt horizontal inset ensures card edges are always visible against the background.
+    private func styleCard(_ cell: UITableViewCell, isFirst: Bool, isLast: Bool) {
+        cell.backgroundColor             = .clear
+        cell.contentView.backgroundColor = WakeWellTheme.cardBackground
+
+        // Only round corners on first/last of a group
+        var corners: CACornerMask = []
+        if isFirst { corners.formUnion([.layerMinXMinYCorner, .layerMaxXMinYCorner]) }
+        if isLast  { corners.formUnion([.layerMinXMaxYCorner, .layerMaxXMaxYCorner]) }
+
+        cell.contentView.layer.cornerRadius  = isFirst || isLast ? 18 : 0
+        cell.contentView.layer.maskedCorners = corners
+        cell.contentView.layer.masksToBounds = true
+
+        // Shadow only on last row of group (visually one card)
+        if isLast {
+            cell.layer.masksToBounds    = false
+            cell.layer.shadowColor      = WakeWellTheme.shadowColor.cgColor
+            cell.layer.shadowOpacity    = WakeWellTheme.shadowOpacity
+            cell.layer.shadowRadius     = WakeWellTheme.shadowRadius
+            cell.layer.shadowOffset     = WakeWellTheme.shadowOffset
+        } else {
+            cell.layer.shadowOpacity = 0
+        }
     }
 
+    // Apply 16 pt horizontal inset to contentView so the card floats with visible edges.
+    override func tableView(_ tableView: UITableView,
+                            willDisplay cell: UITableViewCell,
+                            forRowAt indexPath: IndexPath) {
+        let inset: CGFloat = 16
+        cell.contentView.frame = cell.contentView.frame.inset(
+            by: UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        )
+    }
+
+    private func addSeparator(to view: UIView) {
+        // Remove any previous separator
+        view.subviews.filter { $0.tag == 999 }.forEach { $0.removeFromSuperview() }
+
+        let sep = UIView()
+        sep.tag             = 999
+        sep.backgroundColor = WakeWellTheme.border
+        sep.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(sep)
+        NSLayoutConstraint.activate([
+            sep.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 62),
+            sep.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            sep.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            sep.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
+    }
+
+    // MARK: Actions
+
     private func confirmLogout() {
-        let alert = UIAlertController(title: "Log Out",
-                                      message: "Are you sure you want to log out?",
-                                      preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: "Log Out",
+            message: "Are you sure you want to log out?",
+            preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Log Out", style: .destructive) { [weak self] _ in
             self?.performLogout()
@@ -244,177 +277,8 @@ final class ProfileTableViewController: UITableViewController {
         UserDefaults.standard.set(false, forKey: "ww_logged_in")
         guard let window = view.window else { return }
         let onboarding = OnboardingContainerTableViewController()
-        UIView.transition(with: window, duration: 0.5,
+        UIView.transition(with: window, duration: 0.45,
                           options: .transitionFlipFromLeft,
                           animations: { window.rootViewController = onboarding })
-    }
-}
-
-// MARK: - AvatarCell
-
-private final class AvatarCell: UITableViewCell {
-    static let reuseID = "AvatarCell"
-
-    private let avatarContainer = UIView()
-    private let initialsLabel   = UILabel()
-    private let nameLabel       = UILabel()
-    private let emailLabel      = UILabel()
-    private let memberLabel     = UILabel()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
-    }
-    required init?(coder: NSCoder) { fatalError() }
-
-    private func setup() {
-        backgroundColor      = .clear
-        selectionStyle       = .none
-        contentView.backgroundColor = .clear
-
-        // Avatar circle
-        avatarContainer.backgroundColor    = WakeWellTheme.accentPurple
-        avatarContainer.layer.cornerRadius = 44
-        avatarContainer.clipsToBounds      = false
-        avatarContainer.layer.borderWidth  = 3
-        avatarContainer.layer.borderColor  = WakeWellTheme.accentGold.cgColor
-        avatarContainer.layer.shadowColor  = WakeWellTheme.shadowColor.cgColor
-        avatarContainer.layer.shadowOpacity = 0.35
-        avatarContainer.layer.shadowRadius = 12
-        avatarContainer.layer.shadowOffset = CGSize(width: 0, height: 6)
-        avatarContainer.translatesAutoresizingMaskIntoConstraints = false
-
-        // Inner clip view so shadow is outside
-        let innerClip = UIView(frame: CGRect(x: 0, y: 0, width: 88, height: 88))
-        innerClip.backgroundColor    = WakeWellTheme.accentPurple
-        innerClip.layer.cornerRadius = 44
-        innerClip.clipsToBounds      = true
-        avatarContainer.addSubview(innerClip)
-
-        initialsLabel.textColor     = .white
-        initialsLabel.font          = .systemFont(ofSize: 30, weight: .bold)
-        initialsLabel.textAlignment = .center
-        initialsLabel.translatesAutoresizingMaskIntoConstraints = false
-        innerClip.addSubview(initialsLabel)
-        NSLayoutConstraint.activate([
-            initialsLabel.centerXAnchor.constraint(equalTo: innerClip.centerXAnchor),
-            initialsLabel.centerYAnchor.constraint(equalTo: innerClip.centerYAnchor)
-        ])
-
-        nameLabel.textColor     = WakeWellTheme.labelPrimary
-        nameLabel.font          = .systemFont(ofSize: 20, weight: .bold)
-        nameLabel.textAlignment = .center
-
-        emailLabel.textColor     = WakeWellTheme.labelSecondary
-        emailLabel.font          = .systemFont(ofSize: 13)
-        emailLabel.textAlignment = .center
-
-        memberLabel.textColor     = WakeWellTheme.labelTertiary
-        memberLabel.font          = .systemFont(ofSize: 11)
-        memberLabel.textAlignment = .center
-
-        let stack = UIStackView(arrangedSubviews: [nameLabel, emailLabel, memberLabel])
-        stack.axis    = .vertical
-        stack.spacing = 3
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        let outerStack = UIStackView(arrangedSubviews: [avatarContainer, stack])
-        outerStack.axis      = .vertical
-        outerStack.alignment = .center
-        outerStack.spacing   = 12
-        outerStack.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(outerStack)
-
-        NSLayoutConstraint.activate([
-            avatarContainer.widthAnchor.constraint(equalToConstant: 88),
-            avatarContainer.heightAnchor.constraint(equalToConstant: 88),
-            outerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            outerStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
-            outerStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
-        ])
-
-        // Gradient card background
-        let grad = CAGradientLayer()
-        grad.colors = [UIColor(hex: "#1C1A3A").cgColor, UIColor(hex: "#2D2B55").cgColor]
-        grad.frame  = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 160)
-        contentView.layer.insertSublayer(grad, at: 0)
-    }
-
-    func configure(initials: String, name: String, email: String, memberSince: String) {
-        initialsLabel.text  = initials
-        nameLabel.text      = name
-        emailLabel.text     = email
-        memberLabel.text    = memberSince.isEmpty ? "" : "Member since \(memberSince)"
-    }
-}
-
-// MARK: - DetailCell
-
-private final class DetailCell: UITableViewCell {
-    static let reuseID = "DetailCell"
-
-    private let titleLbl  = UILabel()
-    private let valueLbl  = UILabel()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
-    }
-    required init?(coder: NSCoder) { fatalError() }
-
-    private func setup() {
-        backgroundColor       = WakeWellTheme.cardBackground
-        selectionStyle        = .none
-
-        titleLbl.textColor    = WakeWellTheme.labelSecondary
-        titleLbl.font         = .systemFont(ofSize: 15)
-        valueLbl.textColor    = WakeWellTheme.labelPrimary
-        valueLbl.font         = .systemFont(ofSize: 15, weight: .semibold)
-        valueLbl.textAlignment = .right
-
-        let stack = UIStackView(arrangedSubviews: [titleLbl, valueLbl])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            stack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
-    }
-
-    func configure(title: String, value: String) {
-        titleLbl.text = title
-        valueLbl.text = value
-    }
-}
-
-// MARK: - ActionCell
-
-private final class ActionCell: UITableViewCell {
-    static let reuseID = "ActionCell"
-
-    private let actionLabel = UILabel()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
-    }
-    required init?(coder: NSCoder) { fatalError() }
-
-    private func setup() {
-        backgroundColor = WakeWellTheme.cardBackground
-        actionLabel.textAlignment = .center
-        actionLabel.font = .systemFont(ofSize: 15, weight: .semibold)
-        actionLabel.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(actionLabel)
-        NSLayoutConstraint.activate([
-            actionLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            actionLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
-    }
-
-    func configure(title: String, isDestructive: Bool) {
-        actionLabel.text      = title
-        actionLabel.textColor = isDestructive ? UIColor(hex: "#FF6B6B") : WakeWellTheme.accentGold
     }
 }

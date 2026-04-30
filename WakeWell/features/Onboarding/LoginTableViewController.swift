@@ -1,13 +1,11 @@
 // LoginTableViewController.swift
-// WakeWell
+// SetSail
 //
-// Handles Sign In and Create Account in a UITableViewController.
-// Replaces LoginViewController + LoginView.xib.
-// No IBOutlets — fully code-driven.
+// Handles Sign In and Create Account. Fully code-driven.
 
 import UIKit
 
-// MARK: - Section / Row models
+// MARK: - Models
 
 private enum LoginMode {
     case signIn, register
@@ -17,50 +15,53 @@ private enum SignInRow: Int, CaseIterable {
     case email, password
     var placeholder: String {
         switch self {
-        case .email:    return "Email"
+        case .email:    return "Email address"
         case .password: return "Password"
         }
     }
     var isSecure: Bool { self == .password }
     var keyboardType: UIKeyboardType { self == .email ? .emailAddress : .default }
+    var sfSymbol: String {
+        switch self {
+        case .email:    return "envelope"
+        case .password: return "lock"
+        }
+    }
 }
 
 private enum RegisterRow: Int, CaseIterable {
-    case name, email, password, age, gender, sleepGoal
+    case name, email, password, age, sleepGoal
 }
 
 // MARK: - View Controller
 
 final class LoginTableViewController: UITableViewController {
 
-    // MARK: Private state
-
     private var mode: LoginMode = .signIn {
         didSet { guard oldValue != mode else { return }; reloadForm() }
     }
     private var sleepGoal: Double = 8.0
+    private var keyboardBottomInset: CGFloat = 40
 
-    // Live cell refs (weak — table recycles)
     private weak var segmentCell: ModeSegmentCell?
-    private weak var errorCell:   ErrorCell?
+    private weak var errorCell:   ErrorLabelCell?
 
-    // Field values (captured from cells before submission)
     private var nameText     = ""
     private var emailText    = ""
     private var passwordText = ""
     private var ageText      = ""
-    private var genderIndex  = 0
 
     // MARK: Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        applyGradientBackground()
+        applyBackground()
         setupTableView()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        updateContentInsets()
         if let grad = view.layer.sublayers?.first as? CAGradientLayer {
             grad.frame = view.bounds
         }
@@ -68,39 +69,40 @@ final class LoginTableViewController: UITableViewController {
 
     // MARK: Setup
 
-    private func applyGradientBackground() {
+    private func applyBackground() {
+        // Light gradient matching WakeWellTheme light palette — consistent with onboarding
         let grad = CAGradientLayer()
         grad.frame  = view.bounds
         grad.colors = [
-            UIColor(hex: "#1C1A3A").cgColor,
-            UIColor(hex: "#2D2B55").cgColor
+            UIColor(hex: "#F2F1FF").cgColor,
+            UIColor(hex: "#EAE8FF").cgColor,
+            UIColor(hex: "#E0DEFF").cgColor
         ]
-        grad.startPoint = .zero
-        grad.endPoint   = CGPoint(x: 0, y: 1)
+        grad.locations  = [0.0, 0.5, 1.0]
+        grad.startPoint = CGPoint(x: 0.5, y: 0)
+        grad.endPoint   = CGPoint(x: 0.5, y: 1)
         view.layer.insertSublayer(grad, at: 0)
-        tableView.backgroundColor = .clear
+        tableView.backgroundColor = WakeWellTheme.background
     }
 
     private func setupTableView() {
-        tableView.register(ModeSegmentCell.self,  forCellReuseIdentifier: ModeSegmentCell.reuseID)
-        tableView.register(FieldCell.self,         forCellReuseIdentifier: FieldCell.reuseID)
-        tableView.register(GenderCell.self,        forCellReuseIdentifier: GenderCell.reuseID)
-        tableView.register(SliderCell.self,        forCellReuseIdentifier: SliderCell.reuseID)
-        tableView.register(PrimaryButtonCell.self, forCellReuseIdentifier: PrimaryButtonCell.reuseID)
-        tableView.register(ErrorCell.self,         forCellReuseIdentifier: ErrorCell.reuseID)
+        tableView.register(HeaderCell.self,        forCellReuseIdentifier: HeaderCell.reuseID)
+        tableView.register(ModeSegmentCell.self,   forCellReuseIdentifier: ModeSegmentCell.reuseID)
+        tableView.register(FieldCell.self,          forCellReuseIdentifier: FieldCell.reuseID)
+        tableView.register(SliderCell.self,         forCellReuseIdentifier: SliderCell.reuseID)
+        tableView.register(PrimaryButtonCell.self,  forCellReuseIdentifier: PrimaryButtonCell.reuseID)
+        tableView.register(ErrorLabelCell.self,     forCellReuseIdentifier: ErrorLabelCell.reuseID)
 
-        tableView.separatorStyle  = .none
-        tableView.allowsSelection = false
-        tableView.keyboardDismissMode = .onDrag
-        tableView.contentInset = UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 0)
+        tableView.separatorStyle              = .none
+        tableView.allowsSelection             = false
+        tableView.keyboardDismissMode         = .onDrag
         tableView.showsVerticalScrollIndicator = false
+        tableView.contentInsetAdjustmentBehavior = .never
 
-        // Tap to dismiss keyboard
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
 
-        // Keyboard avoidance
         NotificationCenter.default.addObserver(
             self, selector: #selector(keyboardWillShow(_:)),
             name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -109,25 +111,27 @@ final class LoginTableViewController: UITableViewController {
             name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
-    // MARK: UITableViewDataSource
+    // MARK: DataSource
 
     override func numberOfSections(in tableView: UITableView) -> Int { 1 }
 
     override func tableView(_ tableView: UITableView,
                             numberOfRowsInSection section: Int) -> Int {
-        // mode segment + fields + button + error
-        switch mode {
-        case .signIn:   return 1 + SignInRow.allCases.count + 1 + 1
-        case .register: return 1 + RegisterRow.allCases.count + 1 + 1
-        }
+        // header + segment + fields + button + error
+        let fieldCount = mode == .signIn ? SignInRow.allCases.count : RegisterRow.allCases.count
+        return 2 + fieldCount + 1 + 1
     }
 
     override func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let row = indexPath.row
 
-        // Row 0 — mode switcher
         if row == 0 {
+            return tableView.dequeueReusableCell(
+                withIdentifier: HeaderCell.reuseID, for: indexPath)
+        }
+
+        if row == 1 {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: ModeSegmentCell.reuseID, for: indexPath) as! ModeSegmentCell
             cell.configure(selected: mode == .signIn ? 0 : 1)
@@ -138,59 +142,47 @@ final class LoginTableViewController: UITableViewController {
             return cell
         }
 
-        let fieldIndex = row - 1
+        let fieldIndex = row - 2
+        let fieldCount = mode == .signIn ? SignInRow.allCases.count : RegisterRow.allCases.count
 
-        switch mode {
-        case .signIn:
-            let signInRowCount = SignInRow.allCases.count
-            if fieldIndex < signInRowCount {
-                let r = SignInRow(rawValue: fieldIndex)!
-                return makeFieldCell(for: indexPath,
-                                     placeholder: r.placeholder,
-                                     isSecure: r.isSecure,
-                                     keyboardType: r.keyboardType,
-                                     tag: fieldIndex,
-                                     onChange: { [weak self] txt in
-                    if r == .email    { self?.emailText    = txt }
-                    if r == .password { self?.passwordText = txt }
-                })
-            } else if fieldIndex == signInRowCount {
-                return makePrimaryButtonCell(for: indexPath)
-            } else {
-                return makeErrorCell(for: indexPath)
-            }
-
-        case .register:
-            if fieldIndex < RegisterRow.allCases.count {
-                return makeRegisterCell(for: indexPath, rowIndex: fieldIndex)
-            } else if fieldIndex == RegisterRow.allCases.count {
-                return makePrimaryButtonCell(for: indexPath)
-            } else {
-                return makeErrorCell(for: indexPath)
-            }
+        if fieldIndex < fieldCount {
+            return mode == .signIn
+                ? makeSignInFieldCell(for: indexPath, fieldIndex: fieldIndex)
+                : makeRegisterCell(for: indexPath, rowIndex: fieldIndex)
+        } else if fieldIndex == fieldCount {
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: PrimaryButtonCell.reuseID, for: indexPath) as! PrimaryButtonCell
+            cell.configure(title: mode == .signIn ? "Sign In" : "Create Account")
+            cell.onTap = { [weak self] btn in self?.submit(button: btn) }
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: ErrorLabelCell.reuseID, for: indexPath) as! ErrorLabelCell
+            errorCell = cell
+            return cell
         }
     }
 
-    // MARK: UITableViewDelegate
+    // MARK: Delegate
 
     override func tableView(_ tableView: UITableView,
                             heightForRowAt indexPath: IndexPath) -> CGFloat {
         let row = indexPath.row
-        if row == 0 { return 64 }
+        if row == 0 { return 140 }
+        if row == 1 { return 60 }
 
-        let fieldIndex = row - 1
-        let totalFields = mode == .signIn ? SignInRow.allCases.count : RegisterRow.allCases.count
-        let isButtonRow = fieldIndex == totalFields
-        let isErrorRow  = fieldIndex == totalFields + 1
+        let fieldIndex = row - 2
+        let fieldCount = mode == .signIn ? SignInRow.allCases.count : RegisterRow.allCases.count
+        let isButton = fieldIndex == fieldCount
+        let isError  = fieldIndex == fieldCount + 1
 
-        if isButtonRow { return 72 }
-        if isErrorRow  { return 36 }
+        if isButton { return 76 }
+        if isError  { return 34 }
 
         if mode == .register, let r = RegisterRow(rawValue: fieldIndex) {
-            if r == .gender    { return 72 }
-            if r == .sleepGoal { return 80 }
+            if r == .sleepGoal { return 84 }
         }
-        return 60
+        return 64
     }
 
     override func tableView(_ tableView: UITableView,
@@ -200,45 +192,50 @@ final class LoginTableViewController: UITableViewController {
 
     // MARK: Cell factories
 
-    private func makeFieldCell(for indexPath: IndexPath,
-                                placeholder: String,
-                                isSecure: Bool,
-                                keyboardType: UIKeyboardType,
-                                tag: Int,
-                                onChange: @escaping (String) -> Void) -> UITableViewCell {
+    private func makeSignInFieldCell(for indexPath: IndexPath,
+                                     fieldIndex: Int) -> UITableViewCell {
+        let r = SignInRow(rawValue: fieldIndex)!
         let cell = tableView.dequeueReusableCell(
             withIdentifier: FieldCell.reuseID, for: indexPath) as! FieldCell
-        cell.configure(placeholder: placeholder, isSecure: isSecure,
-                        keyboardType: keyboardType, tag: tag)
-        cell.onChange = onChange
+        cell.configure(placeholder: r.placeholder, sfSymbol: r.sfSymbol,
+                        isSecure: r.isSecure, keyboardType: r.keyboardType)
+        cell.onChange = { [weak self] txt in
+            if r == .email    { self?.emailText    = txt }
+            if r == .password { self?.passwordText = txt }
+        }
         return cell
     }
 
-    private func makeRegisterCell(for indexPath: IndexPath,
-                                   rowIndex: Int) -> UITableViewCell {
+    private func makeRegisterCell(for indexPath: IndexPath, rowIndex: Int) -> UITableViewCell {
         let r = RegisterRow(rawValue: rowIndex)!
         switch r {
         case .name:
-            return makeFieldCell(for: indexPath, placeholder: "Full Name",
-                                  isSecure: false, keyboardType: .default, tag: rowIndex,
-                                  onChange: { [weak self] t in self?.nameText = t })
-        case .email:
-            return makeFieldCell(for: indexPath, placeholder: "Email",
-                                  isSecure: false, keyboardType: .emailAddress, tag: rowIndex,
-                                  onChange: { [weak self] t in self?.emailText = t })
-        case .password:
-            return makeFieldCell(for: indexPath, placeholder: "Password (≥ 6 chars)",
-                                  isSecure: true, keyboardType: .default, tag: rowIndex,
-                                  onChange: { [weak self] t in self?.passwordText = t })
-        case .age:
-            return makeFieldCell(for: indexPath, placeholder: "Age",
-                                  isSecure: false, keyboardType: .numberPad, tag: rowIndex,
-                                  onChange: { [weak self] t in self?.ageText = t })
-        case .gender:
             let cell = tableView.dequeueReusableCell(
-                withIdentifier: GenderCell.reuseID, for: indexPath) as! GenderCell
-            cell.configure(selected: genderIndex)
-            cell.onChange = { [weak self] idx in self?.genderIndex = idx }
+                withIdentifier: FieldCell.reuseID, for: indexPath) as! FieldCell
+            cell.configure(placeholder: "Full name", sfSymbol: "person",
+                            isSecure: false, keyboardType: .default)
+            cell.onChange = { [weak self] t in self?.nameText = t }
+            return cell
+        case .email:
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: FieldCell.reuseID, for: indexPath) as! FieldCell
+            cell.configure(placeholder: "Email address", sfSymbol: "envelope",
+                            isSecure: false, keyboardType: .emailAddress)
+            cell.onChange = { [weak self] t in self?.emailText = t }
+            return cell
+        case .password:
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: FieldCell.reuseID, for: indexPath) as! FieldCell
+            cell.configure(placeholder: "Password (≥ 6 chars)", sfSymbol: "lock",
+                            isSecure: true, keyboardType: .default)
+            cell.onChange = { [weak self] t in self?.passwordText = t }
+            return cell
+        case .age:
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: FieldCell.reuseID, for: indexPath) as! FieldCell
+            cell.configure(placeholder: "Age", sfSymbol: "calendar",
+                            isSecure: false, keyboardType: .numberPad)
+            cell.onChange = { [weak self] t in self?.ageText = t }
             return cell
         case .sleepGoal:
             let cell = tableView.dequeueReusableCell(
@@ -251,27 +248,12 @@ final class LoginTableViewController: UITableViewController {
         }
     }
 
-    private func makePrimaryButtonCell(for indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: PrimaryButtonCell.reuseID, for: indexPath) as! PrimaryButtonCell
-        cell.configure(title: mode == .signIn ? "Sign In" : "Create Account")
-        cell.onTap = { [weak self] btn in self?.submit(button: btn) }
-        return cell
-    }
-
-    private func makeErrorCell(for indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: ErrorCell.reuseID, for: indexPath) as! ErrorCell
-        errorCell = cell
-        return cell
-    }
-
     // MARK: Form logic
 
     private func reloadForm() {
-        // Reset captured text
-        nameText = ""; emailText = ""; passwordText = ""; ageText = ""; genderIndex = 0
+        nameText = ""; emailText = ""; passwordText = ""; ageText = ""
         tableView.reloadData()
+        updateContentInsets()
     }
 
     private func submit(button: UIButton) {
@@ -282,10 +264,11 @@ final class LoginTableViewController: UITableViewController {
     private func handleSignIn(button: UIButton) {
         guard !emailText.trimmingCharacters(in: .whitespaces).isEmpty,
               !passwordText.isEmpty
-        else { showError("Please enter email and password.", button: button); return }
+        else { showError("Please enter your email and password.", button: button); return }
 
-        if DatabaseManager.shared.validateLogin(email: emailText.trimmingCharacters(in: .whitespaces),
-                                                password: passwordText) {
+        if DatabaseManager.shared.validateLogin(
+            email: emailText.trimmingCharacters(in: .whitespaces),
+            password: passwordText) {
             UserDefaults.standard.set(true, forKey: "ww_logged_in")
             navigateToMainApp()
         } else {
@@ -299,21 +282,13 @@ final class LoginTableViewController: UITableViewController {
         guard !name.isEmpty, !email.isEmpty,
               passwordText.count >= 6,
               let age = Int(ageText), age > 0
-        else {
-            showError("Please fill all fields. Password must be ≥ 6 characters.", button: button)
-            return
-        }
+        else { showError("Please fill all fields. Password must be ≥ 6 chars.", button: button); return }
 
         let genderOptions = ["male", "female", "other"]
-        let gender = genderOptions[genderIndex]
-
         guard DatabaseManager.shared.insertUserProfile(
             name: name, email: email, password: passwordText,
-            age: age, gender: gender, sleepGoalHours: sleepGoal) != nil
-        else {
-            showError("An account with this email already exists.", button: button)
-            return
-        }
+            age: age, gender: genderOptions[0], sleepGoalHours: sleepGoal) != nil
+        else { showError("An account with this email already exists.", button: button); return }
 
         UserDefaults.standard.set(true, forKey: "ww_logged_in")
         navigateToMainApp()
@@ -321,20 +296,18 @@ final class LoginTableViewController: UITableViewController {
 
     private func navigateToMainApp() {
         guard let window = view.window else { return }
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let tabBar = storyboard.instantiateInitialViewController()!
-        UIView.transition(with: window, duration: 0.5,
+        let tabBar = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
+        UIView.transition(with: window, duration: 0.45,
                           options: .transitionCrossDissolve,
                           animations: { window.rootViewController = tabBar })
     }
 
     private func showError(_ msg: String, button: UIButton) {
         errorCell?.show(message: msg)
-        // Shake button
         let anim = CAKeyframeAnimation(keyPath: "transform.translation.x")
         anim.timingFunction = CAMediaTimingFunction(name: .linear)
-        anim.duration = 0.4
-        anim.values   = [-8, 8, -6, 6, -4, 4, 0]
+        anim.duration = 0.38
+        anim.values   = [-7, 7, -5, 5, -3, 3, 0]
         button.layer.add(anim, forKey: "shake")
     }
 
@@ -344,14 +317,82 @@ final class LoginTableViewController: UITableViewController {
 
     @objc private func keyboardWillShow(_ n: Notification) {
         guard let frame = n.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        tableView.contentInset.bottom = frame.height + 20
-        tableView.scrollIndicatorInsets.bottom = frame.height
+        keyboardBottomInset = frame.height + 20
+        updateContentInsets()
     }
 
     @objc private func keyboardWillHide(_ n: Notification) {
-        tableView.contentInset.bottom = 40
-        tableView.scrollIndicatorInsets.bottom = 0
+        keyboardBottomInset = 40
+        updateContentInsets()
     }
+
+    private func updateContentInsets() {
+        let available = tableView.bounds.height
+        guard available > 0 else { return }
+        let headerH: CGFloat = 140
+        let segH: CGFloat    = 60
+        let fieldH: CGFloat  = mode == .signIn
+            ? CGFloat(SignInRow.allCases.count) * 64
+            : CGFloat(RegisterRow.allCases.count - 1) * 64 + 84
+        let btnH: CGFloat = 76
+        let errH: CGFloat = 34
+        let total = headerH + segH + fieldH + btnH + errH
+        let visible = max(0, available - keyboardBottomInset)
+        let topInset = max(24, (visible - total) / 2)
+        let inset = UIEdgeInsets(top: topInset, left: 0,
+                                  bottom: topInset + keyboardBottomInset, right: 0)
+        if tableView.contentInset != inset { tableView.contentInset = inset }
+    }
+}
+
+// MARK: - HeaderCell
+
+private final class HeaderCell: UITableViewCell {
+    static let reuseID = "HeaderCell"
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor             = .clear
+        contentView.backgroundColor = .clear
+        selectionStyle              = .none
+
+        // App logo image — uses the SETSAIL logo asset
+        let logoImageView = UIImageView()
+        if let logoImage = UIImage(named: "SetSailLogo") ?? UIImage(named: "AppIcon") {
+            logoImageView.image = logoImage
+        } else {
+            // Fallback: styled badge with sailboat symbol if asset not found
+            logoImageView.image = UIImage(systemName: "sailboat.fill")?
+                .withTintColor(WakeWellTheme.accentPurple, renderingMode: .alwaysOriginal)
+        }
+        logoImageView.contentMode       = .scaleAspectFit
+        logoImageView.layer.cornerRadius = 18
+        logoImageView.clipsToBounds     = true
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Title
+        let title = UILabel()
+        title.text          = "SetSail"
+        title.font          = .systemFont(ofSize: 32, weight: .bold)
+        title.textColor     = WakeWellTheme.labelPrimary   // dark on light background
+        title.textAlignment = .center
+        title.translatesAutoresizingMaskIntoConstraints = false
+
+        contentView.addSubview(logoImageView)
+        contentView.addSubview(title)
+
+        NSLayoutConstraint.activate([
+            logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 64),
+            logoImageView.heightAnchor.constraint(equalToConstant: 64),
+
+            title.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 10),
+            title.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            title.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+        ])
+    }
+    required init?(coder: NSCoder) { fatalError() }
 }
 
 // MARK: - ModeSegmentCell
@@ -364,13 +405,15 @@ private final class ModeSegmentCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
+        backgroundColor             = .clear
         contentView.backgroundColor = .clear
-        selectionStyle  = .none
+        selectionStyle              = .none
 
+        segment.selectedSegmentIndex    = 0
         segment.selectedSegmentTintColor = WakeWellTheme.accentPurple
         segment.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         segment.setTitleTextAttributes([.foregroundColor: WakeWellTheme.labelSecondary], for: .normal)
+        segment.backgroundColor = WakeWellTheme.cardBackground
         segment.translatesAutoresizingMaskIntoConstraints = false
         segment.addTarget(self, action: #selector(changed), for: .valueChanged)
         contentView.addSubview(segment)
@@ -378,7 +421,8 @@ private final class ModeSegmentCell: UITableViewCell {
         NSLayoutConstraint.activate([
             segment.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             segment.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            segment.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24)
+            segment.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            segment.heightAnchor.constraint(equalToConstant: 38)
         ])
     }
     required init?(coder: NSCoder) { fatalError() }
@@ -393,91 +437,73 @@ private final class FieldCell: UITableViewCell {
     static let reuseID = "FieldCell"
     var onChange: ((String) -> Void)?
 
-    private let field = UITextField()
+    private let containerView = UIView()
+    private let iconView      = UIImageView()
+    private let field         = UITextField()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
+        backgroundColor             = .clear
         contentView.backgroundColor = .clear
-        selectionStyle  = .none
+        selectionStyle              = .none
 
-        field.backgroundColor    = WakeWellTheme.cardBackground.withAlphaComponent(0.5)
-        field.textColor          = WakeWellTheme.labelPrimary
-        field.tintColor          = WakeWellTheme.accentPurple
-        field.layer.cornerRadius = 12
-        field.layer.borderWidth  = 1
-        field.layer.borderColor  = WakeWellTheme.border.cgColor
-        field.leftView           = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
-        field.leftViewMode       = .always
-        field.rightView          = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
-        field.rightViewMode      = .always
+        // Container card
+        containerView.backgroundColor    = WakeWellTheme.cardBackground
+        containerView.layer.cornerRadius = 14
+        containerView.layer.borderWidth  = 1
+        containerView.layer.borderColor  = WakeWellTheme.border.cgColor
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Icon
+        iconView.contentMode = .scaleAspectFit
+        iconView.tintColor   = WakeWellTheme.accentPurple
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Text field
+        field.textColor           = WakeWellTheme.labelPrimary
+        field.tintColor           = WakeWellTheme.accentPurple
+        field.font                = .systemFont(ofSize: 15, weight: .regular)
+        field.autocapitalizationType = .none
+        field.autocorrectionType  = .no
         field.translatesAutoresizingMaskIntoConstraints = false
         field.addTarget(self, action: #selector(textChanged), for: .editingChanged)
-        contentView.addSubview(field)
+
+        containerView.addSubview(iconView)
+        containerView.addSubview(field)
+        contentView.addSubview(containerView)
 
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            field.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
-            field.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            field.heightAnchor.constraint(equalToConstant: 44)
+            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            containerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            containerView.heightAnchor.constraint(equalToConstant: 50),
+
+            iconView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 14),
+            iconView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 18),
+            iconView.heightAnchor.constraint(equalToConstant: 18),
+
+            field.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 10),
+            field.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -14),
+            field.topAnchor.constraint(equalTo: containerView.topAnchor),
+            field.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
     }
     required init?(coder: NSCoder) { fatalError() }
 
-    func configure(placeholder: String, isSecure: Bool, keyboardType: UIKeyboardType, tag: Int) {
+    func configure(placeholder: String, sfSymbol: String,
+                   isSecure: Bool, keyboardType: UIKeyboardType) {
         field.isSecureTextEntry  = isSecure
         field.keyboardType       = keyboardType
-        field.tag                = tag
         field.text               = ""
         field.attributedPlaceholder = NSAttributedString(
             string: placeholder,
             attributes: [.foregroundColor: WakeWellTheme.labelTertiary])
+        let cfg = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        iconView.image = UIImage(systemName: sfSymbol, withConfiguration: cfg)
     }
 
     @objc private func textChanged() { onChange?(field.text ?? "") }
-}
-
-// MARK: - GenderCell
-
-private final class GenderCell: UITableViewCell {
-    static let reuseID = "GenderCell"
-    var onChange: ((Int) -> Void)?
-
-    private let label   = UILabel()
-    private let segment = UISegmentedControl(items: ["Male", "Female", "Other"])
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
-        contentView.backgroundColor = .clear
-        selectionStyle  = .none
-
-        label.text      = "Gender"
-        label.textColor = WakeWellTheme.labelSecondary
-        label.font      = .systemFont(ofSize: 12, weight: .medium)
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        segment.selectedSegmentIndex    = 0
-        segment.selectedSegmentTintColor = WakeWellTheme.accentGold
-        segment.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-        segment.setTitleTextAttributes([.foregroundColor: WakeWellTheme.labelSecondary], for: .normal)
-        segment.translatesAutoresizingMaskIntoConstraints = false
-        segment.addTarget(self, action: #selector(changed), for: .valueChanged)
-
-        contentView.addSubview(label)
-        contentView.addSubview(segment)
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            segment.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 6),
-            segment.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            segment.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24)
-        ])
-    }
-    required init?(coder: NSCoder) { fatalError() }
-
-    func configure(selected: Int) { segment.selectedSegmentIndex = selected }
-    @objc private func changed() { onChange?(segment.selectedSegmentIndex) }
 }
 
 // MARK: - SliderCell
@@ -487,30 +513,41 @@ private final class SliderCell: UITableViewCell {
     var onChange: ((Float) -> Void)?
 
     private let label  = UILabel()
+    private let valueLabel = UILabel()
     private let slider = UISlider()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
+        backgroundColor             = .clear
         contentView.backgroundColor = .clear
-        selectionStyle  = .none
+        selectionStyle              = .none
 
+        label.text      = "Sleep Goal"
         label.textColor = WakeWellTheme.labelSecondary
-        label.font      = .systemFont(ofSize: 13, weight: .medium)
+        label.font      = .systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        slider.minimumValue      = 4
-        slider.maximumValue      = 12
+        valueLabel.textColor = WakeWellTheme.accentPurple
+        valueLabel.font      = .systemFont(ofSize: 12, weight: .semibold)
+        valueLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        slider.minimumValue          = 4
+        slider.maximumValue          = 12
         slider.minimumTrackTintColor = WakeWellTheme.accentGold
-        slider.maximumTrackTintColor = WakeWellTheme.labelTertiary
+        slider.maximumTrackTintColor = WakeWellTheme.border
         slider.translatesAutoresizingMaskIntoConstraints = false
         slider.addTarget(self, action: #selector(sliderChanged), for: .valueChanged)
 
         contentView.addSubview(label)
+        contentView.addSubview(valueLabel)
         contentView.addSubview(slider)
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+
+            valueLabel.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            valueLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+
             slider.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8),
             slider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             slider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24)
@@ -519,12 +556,12 @@ private final class SliderCell: UITableViewCell {
     required init?(coder: NSCoder) { fatalError() }
 
     func configure(value: Float) {
-        slider.value = value
-        label.text   = String(format: "Sleep Goal: %.1f hrs", value)
+        slider.value   = value
+        valueLabel.text = String(format: "%.1f hrs", value)
     }
 
     @objc private func sliderChanged() {
-        label.text = String(format: "Sleep Goal: %.1f hrs", slider.value)
+        valueLabel.text = String(format: "%.1f hrs", slider.value)
         onChange?(slider.value)
     }
 }
@@ -539,11 +576,15 @@ private final class PrimaryButtonCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
+        backgroundColor             = .clear
         contentView.backgroundColor = .clear
-        selectionStyle  = .none
+        selectionStyle              = .none
 
-        WakeWellTheme.stylePrimaryButton(button, cornerRadius: 26)
+        button.backgroundColor      = WakeWellTheme.accentGold
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font     = .systemFont(ofSize: 16, weight: .semibold)
+        button.layer.cornerRadius   = 26
+        button.clipsToBounds        = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(tapped), for: .touchUpInside)
         contentView.addSubview(button)
@@ -561,18 +602,18 @@ private final class PrimaryButtonCell: UITableViewCell {
     @objc private func tapped() { onTap?(button) }
 }
 
-// MARK: - ErrorCell
+// MARK: - ErrorLabelCell
 
-private final class ErrorCell: UITableViewCell {
-    static let reuseID = "ErrorCell"
+private final class ErrorLabelCell: UITableViewCell {
+    static let reuseID = "ErrorLabelCell"
 
     private let label = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .clear
+        backgroundColor             = .clear
         contentView.backgroundColor = .clear
-        selectionStyle  = .none
+        selectionStyle              = .none
 
         label.textColor     = UIColor(hex: "#FF6B6B")
         label.font          = .systemFont(ofSize: 13)
@@ -581,7 +622,6 @@ private final class ErrorCell: UITableViewCell {
         label.alpha         = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(label)
-
         NSLayoutConstraint.activate([
             label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
@@ -597,7 +637,7 @@ private final class ErrorCell: UITableViewCell {
     }
 }
 
-// MARK: - Double rounding helper
+// MARK: - Double rounding
 
 private extension Double {
     func rounded(toPlaces places: Int) -> Double {

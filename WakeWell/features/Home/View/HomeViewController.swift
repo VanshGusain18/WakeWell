@@ -16,6 +16,7 @@ class HomeViewController: UIViewController {
         collectionView.dataSource      = self
         collectionView.allowsSelection = true
         registerCells()
+        addProfileButton()
 
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.estimatedItemSize       = .zero
@@ -23,6 +24,19 @@ class HomeViewController: UIViewController {
             layout.minimumInteritemSpacing = 8
             layout.sectionInset            = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         }
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow(_:)),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
 
         NotificationCenter.default.addObserver(
             self,
@@ -49,11 +63,70 @@ class HomeViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
+    // MARK: - Theme
+
     private func applyTheme() {
         view.backgroundColor = WakeWellTheme.background
         collectionView.backgroundColor = WakeWellTheme.background
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
+
+    // MARK: - Profile Button
+
+    private func addProfileButton() {
+        let btn = UIButton(type: .system)
+        let cfg = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
+        btn.setImage(UIImage(systemName: "person.crop.circle.fill", withConfiguration: cfg), for: .normal)
+        btn.tintColor = WakeWellTheme.accentGold
+        btn.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: btn)
+    }
+
+    @objc private func profileButtonTapped() {
+        let profileVC = ProfileTableViewController(style: .plain)
+        let nav = UINavigationController(rootViewController: profileVC)
+        nav.modalPresentationStyle = .pageSheet
+        if #available(iOS 16.0, *) {
+            if let sheet = nav.sheetPresentationController {
+                sheet.detents               = [.large()]
+                sheet.prefersGrabberVisible = true
+                sheet.preferredCornerRadius = 24
+            }
+        }
+        present(nav, animated: true)
+    }
+
+    // MARK: - Helpers
+
+    private var groggyNotesIndexPath: IndexPath? {
+        guard let index = viewModel.cards.firstIndex(where: {
+            if case .groggyNotes = $0 { return true }
+            return false
+        }) else { return nil }
+        return IndexPath(item: index, section: 0)
+    }
+
+    private func updateKeyboardInsets(bottom: CGFloat) {
+        collectionView.contentInset.bottom        = bottom
+        collectionView.scrollIndicatorInsets.bottom = bottom
+    }
+
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        updateKeyboardInsets(bottom: frame.height + 24)
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        updateKeyboardInsets(bottom: 0)
+    }
+
+    private func focusGroggyNotesCard() {
+        guard let indexPath = groggyNotesIndexPath else { return }
+        collectionView.layoutIfNeeded()
+        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+    }
+
+    // MARK: - Cell Registration
 
     private func registerCells() {
         collectionView.register(
@@ -86,6 +159,8 @@ class HomeViewController: UIViewController {
         )
     }
 }
+
+// MARK: - UICollectionViewDataSource
 
 extension HomeViewController: UICollectionViewDataSource {
 
@@ -124,7 +199,6 @@ extension HomeViewController: UICollectionViewDataSource {
                 for: indexPath
             ) as! RiseRitualCollectionViewCell
             cell.configure(with: RiseRitualViewModel(model: model))
-
             cell.onStartRitual = { [weak self] in
                 guard let self else { return }
                 self.tabBarController?.selectedIndex = 2
@@ -135,7 +209,6 @@ extension HomeViewController: UICollectionViewDataSource {
                     }
                 }
             }
-
             cell.onClose = { [weak self] in
                 guard let self else { return }
                 guard let currentIndex = self.viewModel.cards.firstIndex(where: {
@@ -184,17 +257,16 @@ extension HomeViewController: UICollectionViewDataSource {
                 withReuseIdentifier: AlarmCollectionViewCell.identifier,
                 for: indexPath
             ) as! AlarmCollectionViewCell
-
             let freshTime  = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
             let freshModel = AlarmModel(time: freshTime)
             cell.configure(with: HomeAlarmViewModel(model: freshModel))
             cell.onTapped = { [weak self] in
-                  guard let self else { return }
-                  let vc  = AlarmOptionViewController()
-                  let nav = UINavigationController(rootViewController: vc)
-                  nav.modalPresentationStyle = .pageSheet
-                  self.present(nav, animated: true)
-              }
+                guard let self else { return }
+                let vc  = AlarmOptionViewController()
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .pageSheet
+                self.present(nav, animated: true)
+            }
             return cell
 
         case .metrics(let model):
@@ -210,6 +282,9 @@ extension HomeViewController: UICollectionViewDataSource {
                 withReuseIdentifier: GroggyNotesCollectionViewCell.identifier,
                 for: indexPath
             ) as! GroggyNotesCollectionViewCell
+            cell.onBeginEditing = { [weak self] in
+                self?.focusGroggyNotesCard()
+            }
             cell.configure(
                 groggy: GroggySliderViewModel(model: groggyModel),
                 notes:  MorningNotesViewModel(model: notesModel)
@@ -226,6 +301,8 @@ extension HomeViewController: UICollectionViewDataSource {
         }
     }
 }
+
+// MARK: - UICollectionViewDelegateFlowLayout
 
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
@@ -248,6 +325,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UICollectionViewDelegate
+
 extension HomeViewController: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView,
@@ -259,4 +338,3 @@ extension HomeViewController: UICollectionViewDelegate {
         present(vc, animated: true)
     }
 }
-

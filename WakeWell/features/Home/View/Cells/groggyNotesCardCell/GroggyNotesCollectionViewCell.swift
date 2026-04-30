@@ -3,6 +3,9 @@ import UIKit
 class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
 
     static let identifier = "GroggyNotesCollectionViewCell"
+    var onBeginEditing: (() -> Void)?
+    var onEndEditing: (() -> Void)?
+    var onTextChange: ((String) -> Void)?
 
     @IBOutlet weak var groggyTitleLabel: UILabel!
     @IBOutlet weak var groggySlider:     UISlider!
@@ -63,6 +66,10 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         notesTextView.font             = .systemFont(ofSize: 14)
         notesTextView.textColor        = WakeWellTheme.labelSecondary
         notesTextView.backgroundColor  = .clear
+        notesTextView.isScrollEnabled  = true
+        notesTextView.alwaysBounceVertical = true
+        notesTextView.textContainerInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        notesTextView.textContainer.lineFragmentPadding = 0
         notesTextView.layer.cornerRadius = 0
     }
 
@@ -72,6 +79,9 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
             textView.text      = ""
             textView.textColor = WakeWellTheme.labelPrimary
         }
+        textView.setContentOffset(.zero, animated: false)
+        textView.scrollRangeToVisible(NSRange(location: textView.text.count, length: 0))
+        onBeginEditing?()
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -79,6 +89,11 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
             textView.text      = "Write how you feel today..."
             textView.textColor = WakeWellTheme.labelSecondary
         }
+        onEndEditing?()
+    }
+
+    func textViewDidChange(_ textView: UITextView) {
+        onTextChange?(textView.text)
     }
 
     func configure(groggy groggyVM: GroggySliderViewModel,
@@ -95,5 +110,12 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
             notesTextView.text      = notesVM.text
             notesTextView.textColor = WakeWellTheme.labelPrimary
         }
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        onBeginEditing = nil
+        onEndEditing = nil
+        onTextChange = nil
     }
 }

@@ -56,7 +56,7 @@ class DetailCell: UITableViewCell {
         contentView.addSubview(valueLabel)
 
         NSLayoutConstraint.activate([
-            // Icon container
+            // Icon container — 16 pt from card edge
             iconContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             iconContainer.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             iconContainer.widthAnchor.constraint(equalToConstant: 34),
@@ -72,7 +72,7 @@ class DetailCell: UITableViewCell {
             titleLabel.leadingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: 12),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 
-            // Value — pinned right
+            // Value — pinned 16 pt from right edge
             valueLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             valueLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             valueLabel.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 8)

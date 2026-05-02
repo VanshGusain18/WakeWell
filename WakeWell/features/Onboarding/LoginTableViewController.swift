@@ -356,7 +356,6 @@ private final class HeaderCell: UITableViewCell {
         contentView.backgroundColor = .clear
         selectionStyle              = .none
 
-        // App logo image — uses the SETSAIL logo asset
         let logoImageView = UIImageView()
         if let logoImage = UIImage(named: "SetSailLogo") ?? UIImage(named: "AppIcon") {
             logoImageView.image = logoImage

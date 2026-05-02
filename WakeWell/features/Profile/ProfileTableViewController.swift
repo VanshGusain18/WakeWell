@@ -1,5 +1,3 @@
-// ProfileTableViewController.swift
-// SetSail
 
 import UIKit
 
@@ -16,9 +14,6 @@ private struct StatRow {
 }
 
 final class ProfileTableViewController: UITableViewController {
-
-    // MARK: Data
-
     private var stats: [StatRow] = [
         StatRow(title: "Age",        sfSymbol: "birthday.cake",           value: "—"),
         StatRow(title: "Sleep Goal", sfSymbol: "moon.zzz",                value: "—"),
@@ -29,9 +24,6 @@ final class ProfileTableViewController: UITableViewController {
     private var profileEmail    = ""
     private var profileInitials = "?"
     private var profileMemberSince = ""
-
-    // MARK: Lifecycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
@@ -43,9 +35,6 @@ final class ProfileTableViewController: UITableViewController {
         loadProfile()
         tableView.reloadData()
     }
-
-    // MARK: Setup
-
     private func setupTableView() {
         tableView.register(AvatarCell.self,  forCellReuseIdentifier: AvatarCell.reuseID)
         tableView.register(DetailCell.self,  forCellReuseIdentifier: DetailCell.reuseID)
@@ -55,6 +44,10 @@ final class ProfileTableViewController: UITableViewController {
         tableView.backgroundColor = WakeWellTheme.background
         tableView.contentInset    = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
         tableView.showsVerticalScrollIndicator = false
+
+        // Apply horizontal card spacing via table layout margins
+        tableView.layoutMargins        = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        tableView.cellLayoutMarginsFollowReadableWidth = false
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -67,7 +60,7 @@ final class ProfileTableViewController: UITableViewController {
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(hex: "#F2F1FF")   // WakeWellTheme.background light
+        appearance.backgroundColor = UIColor(hex: "#F2F1FF")
         appearance.titleTextAttributes = [
             .foregroundColor: WakeWellTheme.labelPrimary
         ]
@@ -79,9 +72,6 @@ final class ProfileTableViewController: UITableViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
-
-    // MARK: Data loading
-
     private func loadProfile() {
         guard let profile = DatabaseManager.shared.fetchUserProfile() else { return }
 
@@ -98,9 +88,6 @@ final class ProfileTableViewController: UITableViewController {
         stats[1].value = String(format: "%.1f hours", profile.sleepGoalHours)
         stats[2].value = profileMemberSince
     }
-
-    // MARK: DataSource
-
     override func numberOfSections(in tableView: UITableView) -> Int {
         ProfileSection.allCases.count
     }
@@ -152,9 +139,6 @@ final class ProfileTableViewController: UITableViewController {
             return cell
         }
     }
-
-    // MARK: Delegate
-
     override func tableView(_ tableView: UITableView,
                             heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch ProfileSection(rawValue: indexPath.section)! {
@@ -178,7 +162,7 @@ final class ProfileTableViewController: UITableViewController {
         header.addSubview(label)
 
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 28),
+            label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 24),
             label.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -6)
         ])
         return header
@@ -195,8 +179,6 @@ final class ProfileTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView,
                             viewForFooterInSection section: Int) -> UIView? { nil }
 
-    // MARK: Helpers
-
     private func sectionTitle(for section: Int) -> String? {
         switch ProfileSection(rawValue: section)! {
         case .avatar:  return nil
@@ -204,14 +186,9 @@ final class ProfileTableViewController: UITableViewController {
         case .actions: return nil
         }
     }
-
-    /// Applies card styling to a cell — groups rows inside a single rounded card.
-    /// 16 pt horizontal inset ensures card edges are always visible against the background.
     private func styleCard(_ cell: UITableViewCell, isFirst: Bool, isLast: Bool) {
         cell.backgroundColor             = .clear
         cell.contentView.backgroundColor = WakeWellTheme.cardBackground
-
-        // Only round corners on first/last of a group
         var corners: CACornerMask = []
         if isFirst { corners.formUnion([.layerMinXMinYCorner, .layerMaxXMinYCorner]) }
         if isLast  { corners.formUnion([.layerMinXMaxYCorner, .layerMaxXMaxYCorner]) }
@@ -219,8 +196,6 @@ final class ProfileTableViewController: UITableViewController {
         cell.contentView.layer.cornerRadius  = isFirst || isLast ? 18 : 0
         cell.contentView.layer.maskedCorners = corners
         cell.contentView.layer.masksToBounds = true
-
-        // Shadow only on last row of group (visually one card)
         if isLast {
             cell.layer.masksToBounds    = false
             cell.layer.shadowColor      = WakeWellTheme.shadowColor.cgColor
@@ -231,14 +206,13 @@ final class ProfileTableViewController: UITableViewController {
             cell.layer.shadowOpacity = 0
         }
     }
-
-    // Apply 16 pt horizontal inset to contentView so the card floats with visible edges.
     override func tableView(_ tableView: UITableView,
                             willDisplay cell: UITableViewCell,
                             forRowAt indexPath: IndexPath) {
-        let inset: CGFloat = 16
+        // Use table's layoutMargins for consistent left/right card spacing (20 pt each side)
+        let hInset = tableView.layoutMargins.left
         cell.contentView.frame = cell.contentView.frame.inset(
-            by: UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+            by: UIEdgeInsets(top: 0, left: hInset, bottom: 0, right: hInset)
         )
     }
 
@@ -258,9 +232,6 @@ final class ProfileTableViewController: UITableViewController {
             sep.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
-
-    // MARK: Actions
-
     private func confirmLogout() {
         let alert = UIAlertController(
             title: "Log Out",

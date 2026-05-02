@@ -24,12 +24,10 @@ final class OnboardingPageTableViewController: UIViewController {
 
     // MARK: Private views
 
-    private let appBadgeView     = UIView()
-    private let badgeIconView    = UIImageView()
     private let illustrationView = UIImageView()
     private let glowView         = UIView()
     private let titleLabel       = UILabel()
-    private let subtitleLabel    = UILabel()   // kept for page subtitles (not the tagline)
+    private let subtitleLabel    = UILabel()
 
     // MARK: Lifecycle
 
@@ -43,31 +41,6 @@ final class OnboardingPageTableViewController: UIViewController {
     // MARK: Layout
 
     private func buildLayout() {
-        // ── App badge (top-centre) ──────────────────────────────────────────
-        appBadgeView.backgroundColor    = .white
-        appBadgeView.layer.cornerRadius = 22
-        appBadgeView.layer.borderWidth  = 1.5
-        appBadgeView.layer.borderColor  = WakeWellTheme.accentPurple.withAlphaComponent(0.25).cgColor
-        appBadgeView.layer.shadowColor  = WakeWellTheme.accentPurple.cgColor
-        appBadgeView.layer.shadowOpacity = 0.20
-        appBadgeView.layer.shadowRadius = 12
-        appBadgeView.layer.shadowOffset = CGSize(width: 0, height: 4)
-        appBadgeView.translatesAutoresizingMaskIntoConstraints = false
-
-        // Use SETSAIL logo asset; fall back to SF Symbol if asset missing
-        if let logoImage = UIImage(named: "SetSailLogo") ?? UIImage(named: "AppIcon") {
-            badgeIconView.image = logoImage
-        } else {
-            let badgeCfg = UIImage.SymbolConfiguration(pointSize: 26, weight: .medium)
-            badgeIconView.image = UIImage(systemName: "sailboat.fill", withConfiguration: badgeCfg)?
-                                     .withTintColor(WakeWellTheme.accentPurple, renderingMode: .alwaysOriginal)
-        }
-        badgeIconView.contentMode = .scaleAspectFit
-        badgeIconView.layer.cornerRadius = 14
-        badgeIconView.clipsToBounds = true
-        badgeIconView.translatesAutoresizingMaskIntoConstraints = false
-        appBadgeView.addSubview(badgeIconView)
-
         // ── Glow halo behind illustration ───────────────────────────────────
         glowView.backgroundColor = .clear
         glowView.translatesAutoresizingMaskIntoConstraints = false
@@ -78,43 +51,30 @@ final class OnboardingPageTableViewController: UIViewController {
 
         // ── Title ────────────────────────────────────────────────────────────
         titleLabel.font          = .systemFont(ofSize: 30, weight: .bold)
-        titleLabel.textColor     = WakeWellTheme.labelPrimary   // dark on light bg
+        titleLabel.textColor     = WakeWellTheme.labelPrimary
         titleLabel.numberOfLines = 0
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         // ── Subtitle ─────────────────────────────────────────────────────────
         subtitleLabel.font          = .systemFont(ofSize: 16, weight: .regular)
-        subtitleLabel.textColor     = WakeWellTheme.labelSecondary  // dark-secondary on light bg
+        subtitleLabel.textColor     = WakeWellTheme.labelSecondary
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
         subtitleLabel.lineBreakMode = .byWordWrapping
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         // ── Add to hierarchy ──────────────────────────────────────────────────
-        view.addSubview(appBadgeView)
         view.addSubview(glowView)
         view.addSubview(illustrationView)
         view.addSubview(titleLabel)
         view.addSubview(subtitleLabel)
 
         NSLayoutConstraint.activate([
-            // Badge — centred, 40 pts from top
-            appBadgeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 28),
-            appBadgeView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            appBadgeView.widthAnchor.constraint(equalToConstant: 64),
-            appBadgeView.heightAnchor.constraint(equalToConstant: 64),
-
-            // Icon inside badge
-            badgeIconView.centerXAnchor.constraint(equalTo: appBadgeView.centerXAnchor),
-            badgeIconView.centerYAnchor.constraint(equalTo: appBadgeView.centerYAnchor),
-            badgeIconView.widthAnchor.constraint(equalToConstant: 32),
-            badgeIconView.heightAnchor.constraint(equalToConstant: 32),
-
-            // Glow — same centre as illustration
+            // Glow — anchored directly to safe area top
             glowView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            glowView.topAnchor.constraint(equalTo: appBadgeView.bottomAnchor, constant: 20),
-            glowView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
+            glowView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            glowView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.65),
             glowView.heightAnchor.constraint(equalTo: glowView.widthAnchor),
 
             // Illustration — inside the glow layer
@@ -139,24 +99,19 @@ final class OnboardingPageTableViewController: UIViewController {
     private func applyContent() {
         guard let page = page else { return }
 
-        // Illustration
-        let cfg = UIImage.SymbolConfiguration(pointSize: 100, weight: .thin)
-        illustrationView.image = UIImage(systemName: page.sfSymbol, withConfiguration: cfg)?
-                                   .withTintColor(page.accentColor, renderingMode: .alwaysOriginal)
+        // Illustration — page 0 uses the SetSail logo PNG (same reference as login page);
+        // all other pages use their SF Symbol.
+        if pageIndex == 0, let logoImage = UIImage(named: "SetSailLogo") ?? UIImage(named: "AppIcon") {
+            illustrationView.image       = logoImage
+            illustrationView.contentMode = .scaleAspectFit
+        } else {
+            let cfg = UIImage.SymbolConfiguration(pointSize: 100, weight: .thin)
+            illustrationView.image = UIImage(systemName: page.sfSymbol, withConfiguration: cfg)?
+                                       .withTintColor(page.accentColor, renderingMode: .alwaysOriginal)
+        }
 
         // Glow circle matching accent
         drawGlow(color: page.accentColor)
-
-        // Badge border accent — subtle on light bg
-        appBadgeView.layer.borderColor = page.accentColor.withAlphaComponent(0.30).cgColor
-        appBadgeView.layer.shadowColor = page.accentColor.cgColor
-
-        // Badge icon: keep SETSAIL logo if asset available; otherwise use page symbol
-        if UIImage(named: "SetSailLogo") == nil && UIImage(named: "AppIcon") == nil {
-            let badgeCfg = UIImage.SymbolConfiguration(pointSize: 26, weight: .medium)
-            badgeIconView.image = UIImage(systemName: page.sfSymbol, withConfiguration: badgeCfg)?
-                                   .withTintColor(page.accentColor, renderingMode: .alwaysOriginal)
-        }
 
         titleLabel.text    = page.title
         subtitleLabel.text = page.subtitle

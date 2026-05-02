@@ -108,9 +108,9 @@ class AvatarCell: UITableViewCell {
             glowWrapper.widthAnchor.constraint(equalToConstant: 88),
             glowWrapper.heightAnchor.constraint(equalToConstant: 88),
 
-            // hStack pinned to contentView with padding
-            hStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            hStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            // hStack pinned to contentView — use 16 pt inner padding (card already has 20 pt outer inset)
+            hStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            hStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             hStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             hStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])

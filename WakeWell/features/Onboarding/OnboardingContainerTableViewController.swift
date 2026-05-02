@@ -84,7 +84,7 @@ final class OnboardingContainerTableViewController: UITableViewController {
         grad.startPoint = CGPoint(x: 0.5, y: 0)
         grad.endPoint   = CGPoint(x: 0.5, y: 1)
         view.layer.insertSublayer(grad, at: 0)
-        tableView.backgroundColor = WakeWellTheme.background
+        tableView.backgroundColor = WakeWellTheme.background 
     }
 
     private func setupTableView() {

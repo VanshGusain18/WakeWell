@@ -9,6 +9,7 @@ class ActionCell: UITableViewCell {
 
     // MARK: Private views
 
+    private let cardView     = UIView()
     private let actionButton = UIButton(type: .system)
 
     // MARK: Callback
@@ -30,6 +31,17 @@ class ActionCell: UITableViewCell {
     // MARK: Layout
 
     private func buildUI() {
+        // Card container — floats with horizontal spacing handled by willDisplay inset
+        cardView.backgroundColor    = WakeWellTheme.cardBackground
+        cardView.layer.cornerRadius = 18
+        cardView.layer.shadowColor  = WakeWellTheme.shadowColor.cgColor
+        cardView.layer.shadowOpacity = WakeWellTheme.shadowOpacity
+        cardView.layer.shadowRadius  = WakeWellTheme.shadowRadius
+        cardView.layer.shadowOffset  = WakeWellTheme.shadowOffset
+        cardView.layer.masksToBounds = false
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Button
         actionButton.backgroundColor    = .clear
         actionButton.layer.cornerRadius = 14
         actionButton.layer.borderWidth  = 1.5
@@ -38,11 +50,20 @@ class ActionCell: UITableViewCell {
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
 
-        contentView.addSubview(actionButton)
+        cardView.addSubview(actionButton)
+        contentView.addSubview(cardView)
+
         NSLayoutConstraint.activate([
-            actionButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            actionButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            actionButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            // Card fills contentView (horizontal inset applied via willDisplay)
+            cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
+
+            // Button inside card with inner padding
+            actionButton.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 16),
+            actionButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -16),
+            actionButton.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
             actionButton.heightAnchor.constraint(equalToConstant: 48)
         ])
     }

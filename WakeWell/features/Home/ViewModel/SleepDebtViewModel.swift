@@ -46,6 +46,6 @@ class SleepDebtViewModel {
     // MARK: - Visibility
 
     func shouldShowCard() -> Bool {
-        return calculateSleepDebt() > 0
+        return !model.sleepHistory.isEmpty && calculateSleepDebt() > 0
     }
 }

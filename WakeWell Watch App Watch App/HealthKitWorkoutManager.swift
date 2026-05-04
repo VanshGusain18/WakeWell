@@ -90,7 +90,7 @@ final class HealthKitWorkoutManager: NSObject {
             let startDate = Date()
             session.startActivity(with: startDate)
             builder.beginCollection(withStart: startDate) { success, error in
-                print("HK WORKOUT STARTED", success, error?.localizedDescription ?? "")
+                print("Workout started", success, error?.localizedDescription ?? "")
                 DispatchQueue.main.async {
                     self.isWorkoutActive = success
                 }
@@ -251,5 +251,50 @@ extension HealthKitWorkoutManager: HKLiveWorkoutBuilderDelegate {
     func workoutBuilder(
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
-    ) {}
+    ) {
+        for sampleType in collectedTypes {
+            guard let quantityType = sampleType as? HKQuantityType else { continue }
+
+            switch quantityType.identifier {
+            case HKQuantityTypeIdentifier.heartRate.rawValue:
+                guard let statistics = workoutBuilder.statistics(for: quantityType) else { continue }
+                let unit = HKUnit.count().unitDivided(by: .minute())
+                let value = statistics.mostRecentQuantity()?.doubleValue(for: unit)
+                    ?? statistics.averageQuantity()?.doubleValue(for: unit)
+
+                guard let value, value > 0 else { continue }
+                DispatchQueue.main.async {
+                    print("REAL HR RECEIVED", value)
+                    self.onHeartRate?(value)
+                }
+
+            case HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue:
+                guard let statistics = workoutBuilder.statistics(for: quantityType),
+                      let value = statistics.mostRecentQuantity()?.doubleValue(for: HKUnit.secondUnit(with: .milli)),
+                      value > 0 else {
+                    continue
+                }
+
+                DispatchQueue.main.async {
+                    print("REAL HRV RECEIVED", value)
+                    self.onHRV?(value, Date())
+                }
+
+            case HKQuantityTypeIdentifier.respiratoryRate.rawValue:
+                guard let statistics = workoutBuilder.statistics(for: quantityType),
+                      let value = statistics.mostRecentQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute())),
+                      value > 0 else {
+                    continue
+                }
+
+                DispatchQueue.main.async {
+                    print("REAL RESPIRATORY RATE RECEIVED", value)
+                    self.onRespiratoryRate?(value, Date())
+                }
+
+            default:
+                continue
+            }
+        }
+    }
 }

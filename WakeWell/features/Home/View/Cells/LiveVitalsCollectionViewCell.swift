@@ -39,6 +39,12 @@ final class LiveVitalsCollectionViewCell: UICollectionViewCell {
             name: .liveVitalsDidChange,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refresh),
+            name: .watchConnectionDidChange,
+            object: nil
+        )
         refresh()
     }
 
@@ -55,8 +61,10 @@ final class LiveVitalsCollectionViewCell: UICollectionViewCell {
             respiratoryRateValueLabel.text = "--"
         }
 
-        statusLabel.text = connection.state == .connected ? "Watch connected" : "Watch not connected"
-        statusLabel.textColor = connection.state == .connected ? WakeWellTheme.accentPurple : WakeWellTheme.labelSecondary
+        statusLabel.text = connection.displayStatus
+        statusLabel.textColor = connection.displayStatus == "Receiving Data"
+            ? WakeWellTheme.accentPurple
+            : WakeWellTheme.labelSecondary
 
         if let lastUpdated = vitals.lastUpdated {
             lastUpdateLabel.text = "Last update \(Self.timeFormatter.string(from: lastUpdated))"

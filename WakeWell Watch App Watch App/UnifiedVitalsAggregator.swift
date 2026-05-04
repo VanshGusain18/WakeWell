@@ -6,7 +6,7 @@ final class UnifiedVitalsAggregator {
     var onVitalsReady: ((WatchVitals) -> Void)?
 
     private let aggregationWindow: TimeInterval = 10
-    private let sendInterval: TimeInterval = 2
+    private let sendInterval: TimeInterval = 5
     private var heartRateSamples: [(timestamp: Date, value: Double)] = []
     private var motionSamples: [(timestamp: Date, value: Double)] = []
     private var lastHRVValue: Double?
@@ -86,7 +86,8 @@ final class UnifiedVitalsAggregator {
             return
         }
 
-        guard !heartRateSamples.isEmpty || !motionSamples.isEmpty else {
+        guard !heartRateSamples.isEmpty else {
+            print("Waiting for real HealthKit heart rate before sending vitals")
             return
         }
 

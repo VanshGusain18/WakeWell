@@ -63,7 +63,6 @@ final class SmartAlarmEngine {
 
     private let optimalTriggerThreshold = 0.70
     private let earlySafeTriggerThreshold = 0.55
-    private let earlyOverrideThreshold = 0.60
     private let minimumTriggerScore = 0.65
     private let confidenceSmoothingFactor = 0.45
 
@@ -105,6 +104,16 @@ final class SmartAlarmEngine {
             hrv: hrv
         )
         currentPhaseLabel = phase
+    }
+
+    func process(vital data: VitalData) -> WakeDecision {
+        recordCurrentInput(
+            heartRate: data.heartRate,
+            hrv: data.hrv,
+            motion: data.motion,
+            phase: data.phase
+        )
+        return evaluateWakeOpportunity()
     }
 
     func reset() {
@@ -558,20 +567,6 @@ final class SmartAlarmEngine {
             )
         }
 
-        // Demo safety valve: when HR is rising and motion is steadily increasing,
-        // allow an earlier wake even before the stricter optimal threshold is reached.
-        if wakeConfidence > earlyOverrideThreshold &&
-            motionIncreasingCount >= 3 &&
-            signals.hrTrend {
-            print("⚡ Early trigger override activated")
-            return TriggerEvaluation(
-                shouldTrigger: true,
-                type: .earlyOverride,
-                thresholdUsed: earlyOverrideThreshold,
-                reason: "early_override_hr_and_motion_trend"
-            )
-        }
-
         if motionIncreasingCount >= requiredMotionIncreaseCount &&
             wakeConfidence >= earlySafeTriggerThreshold &&
             remainingTimeToAlarm <= safetyTriggerWindow {
@@ -827,12 +822,6 @@ final class SmartAlarmEngine {
 
         if wakeConfidence >= optimalTriggerThreshold {
             return "confidence_reached_optimal_threshold"
-        }
-
-        if wakeConfidence > earlyOverrideThreshold &&
-            motionIncreasingCount >= 3 &&
-            signals.hrTrend {
-            return "early_override_hr_and_motion_trend"
         }
 
         if motionIncreasingCount >= requiredMotionIncreaseCount &&

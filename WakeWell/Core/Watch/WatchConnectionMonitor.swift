@@ -26,6 +26,24 @@ final class WatchConnectionMonitor {
         state == .connected && !isStaleData
     }
 
+    var displayStatus: String {
+        guard WCSession.isSupported() else { return "Waiting for Apple Watch" }
+
+        #if os(iOS)
+        guard WCSession.default.isWatchAppInstalled else { return "Waiting for Apple Watch" }
+        #endif
+
+        if state == .connected && !isStaleData {
+            return "Receiving Data"
+        }
+
+        if state == .disconnected {
+            return "Disconnected"
+        }
+
+        return "Waiting for Apple Watch"
+    }
+
     func markPayloadReceived(at date: Date = Date()) {
         lastReceivedTimestamp = date
         isReachable = WCSession.default.isReachable
@@ -40,6 +58,7 @@ final class WatchConnectionMonitor {
     private func transition(to nextState: WatchConnectionState) {
         guard nextState != state else { return }
         state = nextState
+        NotificationCenter.default.post(name: .watchConnectionDidChange, object: nil)
 
         switch nextState {
         case .connected:
@@ -50,4 +69,8 @@ final class WatchConnectionMonitor {
             break
         }
     }
+}
+
+extension Notification.Name {
+    static let watchConnectionDidChange = Notification.Name("wakewell.watchConnectionDidChange")
 }

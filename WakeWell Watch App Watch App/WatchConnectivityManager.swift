@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import WatchKit
 import WatchConnectivity
 
 final class WatchConnectivityManager: NSObject, ObservableObject {
@@ -15,16 +16,23 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     @Published var hasSentPayload = false
     @Published var hasHealthDataAccess = true
     @Published var statusText = "LIVE HEALTH DATA MODE"
+    @Published var alarmTime: Date?
+    @Published var hasReceivedHeartRate = false
+    @Published var hasReceivedMotion = false
+    @Published var hasReceivedHRV = false
+    @Published var hasReceivedRespiratoryRate = false
+    @Published var shouldOpenRiseRitual = false
 
     private let session = WCSession.default
     private let aggregator = UnifiedVitalsAggregator.shared
     private var isActivated = false
     private var pendingVitals: WatchVitals?
+    private var isStreaming = false
+    private var pendingBackgroundTasks: [WKRefreshBackgroundTask] = []
 
     private override init() {
         super.init()
         activateSession()
-        startStreaming()
     }
 
     private func activateSession() {
@@ -34,11 +42,24 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         }
 
         session.delegate = self
-        session.activate()
-        isReachable = session.isReachable
+        switch session.activationState {
+        case .activated:
+            isActivated = true
+            isReachable = session.isReachable
+            handleReceivedApplicationContextIfAvailable()
+        case .notActivated:
+            session.activate()
+        case .inactive:
+            session.activate()
+        @unknown default:
+            session.activate()
+        }
     }
 
     func startStreaming() {
+        guard !isStreaming else { return }
+        isStreaming = true
+
         HealthKitManager.shared.requestPermissions { [weak self] success in
             guard let self else { return }
 
@@ -49,10 +70,12 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
                 HealthKitWorkoutManager.shared.stop()
                 HRVManager.shared.stop()
                 self.aggregator.stop()
+                self.isStreaming = false
                 return
             }
 
             self.statusText = "LIVE HEALTH DATA MODE"
+            print("Streaming started")
 
             self.aggregator.onVitalsReady = { [weak self] vitals in
                 self?.handleAggregatedVitals(vitals)
@@ -61,15 +84,18 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
             HealthKitWorkoutManager.shared.onHeartRate = { [weak self] heartRate in
                 self?.lastHeartRate = heartRate
+                self?.hasReceivedHeartRate = true
                 self?.aggregator.addHeartRate(heartRate)
             }
             HealthKitWorkoutManager.shared.onHRV = { [weak self] hrv, timestamp in
                 self?.lastHRV = hrv
                 self?.lastHRVUpdatedAt = timestamp
+                self?.hasReceivedHRV = true
                 self?.aggregator.updateHRV(hrv, timestamp: timestamp)
             }
             HealthKitWorkoutManager.shared.onRespiratoryRate = { [weak self] respiratoryRate, timestamp in
                 self?.lastRespiratoryRate = respiratoryRate
+                self?.hasReceivedRespiratoryRate = true
                 self?.aggregator.updateRespiratoryRate(respiratoryRate, timestamp: timestamp)
             }
             HealthKitWorkoutManager.shared.start()
@@ -86,9 +112,34 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
             MotionManager.shared.start { [weak self] motion in
                 self?.lastMotion = motion
+                self?.hasReceivedMotion = true
                 self?.aggregator.addMotion(motion)
             }
         }
+    }
+
+    private func handleCommand(_ payload: [String: Any]) {
+        guard let action = payload["action"] as? String else { return }
+
+        if action == "open_rise_ritual" {
+            shouldOpenRiseRitual = true
+            completeBackgroundTasks()
+            return
+        }
+
+        guard action == "start_session" else { return }
+
+        if let alarmTimestamp = payload["alarmTime"] as? Double {
+            alarmTime = Date(timeIntervalSince1970: alarmTimestamp)
+        }
+
+        startStreaming()
+        completeBackgroundTasks()
+    }
+
+    func handle(backgroundTasks: Set<WKRefreshBackgroundTask>) {
+        pendingBackgroundTasks.append(contentsOf: backgroundTasks)
+        activateSession()
     }
 
     private func handleAggregatedVitals(_ vitals: WatchVitals) {
@@ -123,6 +174,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
             try session.updateApplicationContext(payload)
             hasSentPayload = true
             statusText = "LIVE HEALTH DATA MODE"
+            completeBackgroundTasks()
         } catch {
             statusText = "Context failed: \(error.localizedDescription)"
             hasSentPayload = false
@@ -135,6 +187,25 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
             }
         }
     }
+
+    private func completeBackgroundTasks() {
+        guard !pendingBackgroundTasks.isEmpty else { return }
+
+        let tasks = pendingBackgroundTasks
+        pendingBackgroundTasks.removeAll()
+
+        for task in tasks {
+            task.setTaskCompletedWithSnapshot(false)
+        }
+    }
+
+    private func handleReceivedApplicationContextIfAvailable() {
+        guard session.activationState == .activated else { return }
+
+        let context = session.receivedApplicationContext
+        guard !context.isEmpty else { return }
+        handleCommand(context)
+    }
 }
 
 extension WatchConnectivityManager: WCSessionDelegate {
@@ -145,10 +216,12 @@ extension WatchConnectivityManager: WCSessionDelegate {
             } else {
                 self.isActivated = true
                 self.isReachable = session.isReachable
+                self.handleReceivedApplicationContextIfAvailable()
                 if let pendingVitals = self.pendingVitals {
                     self.pendingVitals = nil
                     self.send(vitals: pendingVitals)
                 }
+                self.completeBackgroundTasks()
             }
         }
     }
@@ -156,6 +229,24 @@ extension WatchConnectivityManager: WCSessionDelegate {
     func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
             self.isReachable = session.isReachable
+        }
+    }
+
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        DispatchQueue.main.async {
+            self.handleCommand(message)
+        }
+    }
+
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        DispatchQueue.main.async {
+            self.handleCommand(applicationContext)
+        }
+    }
+
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        DispatchQueue.main.async {
+            self.handleCommand(userInfo)
         }
     }
 }

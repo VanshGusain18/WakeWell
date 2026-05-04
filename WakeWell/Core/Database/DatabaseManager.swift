@@ -360,7 +360,7 @@ final class DatabaseManager {
             print("Failed to ensure sleep_sessions table:", errorMsg)
         }
 
-        // Demo-safe migration: if an older bundled DB is missing columns, add them in place.
+        // Preserve existing installs by adding newly required columns in place.
         ensureSleepSessionColumn(named: "start_time", type: "DATETIME", db: db)
         ensureSleepSessionColumn(named: "end_time", type: "DATETIME", db: db)
         ensureSleepSessionColumn(named: "alarm_time", type: "DATETIME", db: db)

@@ -26,22 +26,7 @@ final class WatchDataManager {
         SmartAlarmEngine.shared.beginMonitoring()
     }
 
-    func startDebugSession() {
-        resetMonitoringState()
-        start(resetData: false)
-    }
-
-    func resetDebugEnvironment() {
-        resetMonitoringState()
-    }
-
     func stop() {}
-
-    private func resetMonitoringState() {
-        NotificationManager.shared.cancelAllScheduledAlarms()
-        DatabaseManager.shared.clearVitals()
-        SmartAlarmEngine.shared.reset()
-    }
 
     private func handleIncomingData(_ data: VitalData) {
         LiveVitalsViewModel.shared.update(
@@ -52,16 +37,9 @@ final class WatchDataManager {
             hrvStatus: data.hrv == nil ? "unavailable" : "HealthKit"
         )
 
-        SmartAlarmEngine.shared.recordCurrentInput(
-            heartRate: data.heartRate,
-            hrv: data.hrv,
-            motion: data.motion,
-            phase: data.phase
-        )
-
         DatabaseManager.shared.insertWatchVitals(data.watchVitalsModel)
 
-        let decision = SmartAlarmEngine.shared.evaluateWakeOpportunity()
+        let decision = SmartAlarmEngine.shared.process(vital: data)
 
         if decision.shouldTrigger {
             LiveVitalsViewModel.shared.updateAlertStatus("Alert triggered")

@@ -28,6 +28,7 @@ final class AlarmManager {
         NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: time)
         SleepSessionManager.shared.startSession(alarmTime: time)
         SmartAlarmEngine.shared.beginMonitoring()
+        WatchConnectivityReceiver.shared.sendStartSession(alarmTime: time)
 
         print("⏰ Alarm set for:", time)
     }
@@ -38,14 +39,6 @@ final class AlarmManager {
 
     func getWakeTime() -> Date? {
         currentAlarm?.time
-    }
-
-    // MARK: - Dev Helper
-
-    func setTestAlarm() {
-        let testTime = Date().addingTimeInterval(5 * 60)
-        currentAlarm = AlarmModel(time: testTime)
-        print("🧪 Test alarm set for:", testTime)
     }
 
     func loadSavedAlarm() {
@@ -61,6 +54,11 @@ final class AlarmManager {
 
         currentAlarm = AlarmModel(time: date)
         NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: date)
+        if date > Date() {
+            SleepSessionManager.shared.startSession(alarmTime: date)
+            SmartAlarmEngine.shared.beginMonitoring()
+            WatchConnectivityReceiver.shared.sendStartSession(alarmTime: date)
+        }
         print("📦 Loaded saved alarm:", date)
     }
 }

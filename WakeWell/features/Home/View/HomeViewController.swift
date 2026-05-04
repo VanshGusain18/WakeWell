@@ -44,6 +44,8 @@ class HomeViewController: UIViewController {
             name: .alarmTimeDidChange,
             object: nil
         )
+
+        refreshSleepDebtFromHealthKit()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -57,6 +59,14 @@ class HomeViewController: UIViewController {
             return false
         }) else { return }
         collectionView.reloadItems(at: [IndexPath(item: alarmIndex, section: 0)])
+    }
+
+    private func refreshSleepDebtFromHealthKit() {
+        HealthKitSleepRepository.shared.prefetch(for: .week) { [weak self] in
+            guard let self else { return }
+            self.viewModel.reloadSleepDebtFromHealthKit()
+            self.collectionView.reloadData()
+        }
     }
 
     deinit {
@@ -205,13 +215,15 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: RiseRitualViewModel(model: model))
             cell.onStartRitual = { [weak self] in
                 guard let self else { return }
-                self.tabBarController?.selectedIndex = 2
-                DispatchQueue.main.async {
-                    if let nav  = self.tabBarController?.selectedViewController as? UINavigationController,
-                       let rise = nav.topViewController as? RiseRitualViewController {
-                        rise.startTodayActivity()
-                    }
-                }
+                WatchConnectivityReceiver.shared.openRiseRitualOnWatch()
+
+                let alert = UIAlertController(
+                    title: "Opening on Apple Watch",
+                    message: "WakeWell sent Rise Ritual to your watch.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
             }
             cell.onClose = { [weak self] in
                 guard let self else { return }
@@ -237,20 +249,34 @@ extension HomeViewController: UICollectionViewDataSource {
                 self.isAnimatingMetrics = true
 
                 let shouldExpand = !self.viewModel.showMetricsCard
-                self.viewModel.toggleMetricsCard()
+                let metricsIndex: Int?
+                if shouldExpand {
+                    self.viewModel.toggleMetricsCard()
+                    metricsIndex = self.viewModel.cards.firstIndex {
+                        if case .metrics = $0 { return true }
+                        return false
+                    }
+                } else {
+                    metricsIndex = self.viewModel.cards.firstIndex {
+                        if case .metrics = $0 { return true }
+                        return false
+                    }
+                    self.viewModel.toggleMetricsCard()
+                }
                 cell.animateChevron(expanded: shouldExpand)
 
-                guard let ringIndex = self.viewModel.cards.firstIndex(where: {
-                    if case .sleepRing = $0 { return true }
-                    return false
-                }) else { self.isAnimatingMetrics = false; return }
+                guard let metricsIndex else {
+                    self.collectionView.reloadData()
+                    self.isAnimatingMetrics = false
+                    return
+                }
 
                 self.collectionView.performBatchUpdates {
-                    let metricsIndex = IndexPath(item: ringIndex + 2, section: 0)
+                    let indexPath = IndexPath(item: metricsIndex, section: 0)
                     if shouldExpand {
-                        self.collectionView.insertItems(at: [metricsIndex])
+                        self.collectionView.insertItems(at: [indexPath])
                     } else {
-                        self.collectionView.deleteItems(at: [metricsIndex])
+                        self.collectionView.deleteItems(at: [indexPath])
                     }
                 } completion: { _ in self.isAnimatingMetrics = false }
             }

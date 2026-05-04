@@ -1,10 +1,8 @@
 import Foundation
 
-class HomeViewModel {
+final class HomeViewModel {
 
     private let provider = HomeDataProvider.shared
-
-    let sleepDebtViewModel: SleepDebtViewModel
 
     private var allCards: [HomeCardModel] = []
     private(set) var showMetricsCard: Bool = false
@@ -23,22 +21,17 @@ class HomeViewModel {
     var cardCount: Int { cards.count }
 
     init() {
-        let sleepDebtModel = provider.getSleepDebt()
-        sleepDebtViewModel = SleepDebtViewModel(model: sleepDebtModel)
-
         allCards = [
-            .riseRitual(provider.getRiseRitual()),
             .sleepRing(provider.getSleepRing()),  
             .alarm(provider.getAlarm()),
             .liveVitals,
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
-            .sounds
+            .sounds,
+            .riseRitual(provider.getRiseRitual())
         ]
 
-        if sleepDebtViewModel.shouldShowCard() {
-            allCards.insert(.sleepDebt(sleepDebtModel), at: 0)
-        }
+        updateSleepDebtCard(with: provider.getSleepDebt())
     }
 
     func removeRiseRitualCard() {
@@ -49,7 +42,20 @@ class HomeViewModel {
         allCards.removeAll { if case .sleepDebt = $0 { return true }; return false }
     }
 
+    func reloadSleepDebtFromHealthKit() {
+        updateSleepDebtCard(with: provider.getSleepDebt())
+    }
+
     func toggleMetricsCard() {
         showMetricsCard.toggle()
+    }
+
+    private func updateSleepDebtCard(with model: SleepDebtModel) {
+        removeSleepDebtCard()
+
+        let sleepDebtViewModel = SleepDebtViewModel(model: model)
+        guard sleepDebtViewModel.shouldShowCard() else { return }
+
+        allCards.insert(.sleepDebt(model), at: 0)
     }
 }

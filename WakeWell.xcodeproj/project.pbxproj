@@ -44,6 +44,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D63861D02FA1D0A0000487988 /* Exceptions for "WakeWell Watch App Watch App" folder in "WakeWell Watch App Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D63861B72FA1C4B500487988 /* WakeWell Watch App Watch App */;
+		};
 		D67C6D852F2CC9F4004ECCDB /* Exceptions for "WakeWell" folder in "WakeWell" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -56,6 +63,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D63861B92FA1C4B500487988 /* WakeWell Watch App Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D63861D02FA1D0A0000487988 /* Exceptions for "WakeWell Watch App Watch App" folder in "WakeWell Watch App Watch App" target */,
+			);
 			path = "WakeWell Watch App Watch App";
 			sourceTree = "<group>";
 		};
@@ -270,12 +280,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -307,12 +319,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -1,8 +1,14 @@
 import SwiftUI
 
 struct RiseRitualWatchView: View {
+    let autoStart: Bool
     private let rituals = WatchRiseRitualLibrary.rituals
     @State private var featuredRitualID = WatchRiseRitualLibrary.rituals.first?.id
+    @State private var showSession = false
+
+    init(autoStart: Bool = false) {
+        self.autoStart = autoStart
+    }
 
     var body: some View {
         ScrollView {
@@ -18,12 +24,12 @@ struct RiseRitualWatchView: View {
                     .foregroundStyle(WatchTheme.secondaryText)
 
                 ForEach(rituals) { ritual in
-                    Button {
+                    RitualRow(
+                        ritual: ritual,
+                        isSelected: ritual.id == featuredRitualID
+                    ) {
                         featuredRitualID = ritual.id
-                    } label: {
-                        RitualRow(ritual: ritual, isSelected: ritual.id == featuredRitualID)
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 6)
@@ -32,6 +38,14 @@ struct RiseRitualWatchView: View {
         .navigationTitle("Rise")
         .background(WatchTheme.background)
         .containerBackground(WatchTheme.background.gradient, for: .navigation)
+        .navigationDestination(isPresented: $showSession) {
+            RiseRitualSessionView(ritual: featuredRitual ?? rituals[0], initialRunning: true)
+        }
+        .onAppear {
+            guard autoStart else { return }
+            featuredRitualID = rituals.first?.id
+            showSession = true
+        }
     }
 
     private var featuredRitual: WatchRiseRitual? {
@@ -48,7 +62,7 @@ struct RiseRitualWatchView: View {
                     .foregroundStyle(WatchTheme.primaryText)
             }
 
-            Text("A simple wrist-guided reset for waking up well.")
+            Text("Start your day healthily")
                 .font(.caption2)
                 .foregroundStyle(WatchTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -126,52 +140,67 @@ private struct FeaturedRitualCard: View {
 private struct RitualRow: View {
     let ritual: WatchRiseRitual
     let isSelected: Bool
+    let onSelect: () -> Void
+    @State private var isExpanded = false
 
     var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(isSelected ? WatchTheme.gold.opacity(0.22) : WatchTheme.purple.opacity(0.22))
-                Image(systemName: ritual.iconName)
-                    .font(.system(size: 15, weight: .semibold))
+        Button {
+            onSelect()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isExpanded.toggle()
+            }
+        } label: {
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(isSelected ? WatchTheme.gold.opacity(0.22) : WatchTheme.purple.opacity(0.22))
+                    Image(systemName: ritual.iconName)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(isSelected ? WatchTheme.gold : WatchTheme.secondaryText)
+                }
+                .frame(width: 34, height: 34)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(ritual.title)
+                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .foregroundStyle(WatchTheme.primaryText)
+                        .lineLimit(1)
+
+                    if isExpanded {
+                        Text(ritual.subtitle)
+                            .font(.caption2)
+                            .foregroundStyle(WatchTheme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(isSelected ? WatchTheme.gold : WatchTheme.secondaryText)
             }
-            .frame(width: 34, height: 34)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(ritual.title)
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                    .foregroundStyle(WatchTheme.primaryText)
-                    .lineLimit(1)
-
-                HStack(spacing: 4) {
-                    Text(ritual.category)
-                    Text(ritual.durationText)
-                }
-                .font(.caption2)
-                .foregroundStyle(WatchTheme.secondaryText)
-            }
-
-            Spacer(minLength: 0)
-
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(isSelected ? WatchTheme.gold : WatchTheme.secondaryText)
+            .padding(10)
+            .background(isSelected ? WatchTheme.card.opacity(1) : WatchTheme.card.opacity(0.72))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isSelected ? WatchTheme.gold.opacity(0.28) : .clear, lineWidth: 1)
+            )
         }
-        .padding(10)
-        .background(isSelected ? WatchTheme.card.opacity(1) : WatchTheme.card.opacity(0.72))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(isSelected ? WatchTheme.gold.opacity(0.28) : .clear, lineWidth: 1)
-        )
+        .buttonStyle(.plain)
     }
 }
 
 private struct RiseRitualSessionView: View {
     let ritual: WatchRiseRitual
     @State private var currentStep = 0
-    @State private var isRunning = false
+    @State private var isRunning: Bool
+
+    init(ritual: WatchRiseRitual, initialRunning: Bool = false) {
+        self.ritual = ritual
+        _isRunning = State(initialValue: initialRunning)
+    }
 
     var body: some View {
         ScrollView {
@@ -224,6 +253,7 @@ private struct RiseRitualSessionView: View {
                             isRunning = true
                         } else {
                             isRunning = false
+                            WatchConnectivityManager.shared.stopStreaming()
                         }
                     } label: {
                         Image(systemName: currentStep < ritual.steps.count - 1 ? "arrow.right" : "checkmark")

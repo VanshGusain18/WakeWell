@@ -22,6 +22,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     @Published var hasReceivedHRV = false
     @Published var hasReceivedRespiratoryRate = false
     @Published var shouldOpenRiseRitual = false
+    @Published var shouldAutoStartRiseRitual = false
 
     private let session = WCSession.default
     private let aggregator = UnifiedVitalsAggregator.shared
@@ -29,6 +30,12 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     private var pendingVitals: WatchVitals?
     private var isStreaming = false
     private var pendingBackgroundTasks: [WKRefreshBackgroundTask] = []
+    private var respiratoryRateTimer: Timer?
+    private var windowStart: Date?
+    private var windowEnd: Date?
+    private var windowStartTimer: Timer?
+    private var windowEndTimer: Timer?
+    private var hapticWorkItems: [DispatchWorkItem] = []
 
     private override init() {
         super.init()
@@ -59,6 +66,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     func startStreaming() {
         guard !isStreaming else { return }
         isStreaming = true
+        scheduleWindowEndIfNeeded()
 
         HealthKitManager.shared.requestPermissions { [weak self] success in
             guard let self else { return }
@@ -69,6 +77,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
                 MotionManager.shared.stop()
                 HealthKitWorkoutManager.shared.stop()
                 HRVManager.shared.stop()
+                self.stopRespiratoryRatePolling()
                 self.aggregator.stop()
                 self.isStreaming = false
                 return
@@ -103,12 +112,14 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
             HRVManager.shared.onHRV = { [weak self] hrv, timestamp in
                 self?.lastHRV = hrv
                 self?.lastHRVUpdatedAt = timestamp
+                self?.hasReceivedHRV = true
                 self?.aggregator.updateHRV(hrv, timestamp: timestamp)
             }
             HRVManager.shared.onUnavailable = { [weak self] reason in
                 self?.aggregator.markHRVUnavailable(reason: reason)
             }
             HRVManager.shared.start()
+            self.startRespiratoryRatePolling()
 
             MotionManager.shared.start { [weak self] motion in
                 self?.lastMotion = motion
@@ -118,11 +129,47 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         }
     }
 
+    func stopStreaming() {
+        guard isStreaming else { return }
+        MotionManager.shared.stop()
+        HealthKitWorkoutManager.shared.stop()
+        HRVManager.shared.stop()
+        stopRespiratoryRatePolling()
+        aggregator.stop()
+        isStreaming = false
+        statusText = "Session complete"
+    }
+
     private func handleCommand(_ payload: [String: Any]) {
         guard let action = payload["action"] as? String else { return }
 
-        if action == "open_rise_ritual" {
+        captureWindow(from: payload)
+
+        if action == "open_rise_ritual" || action == "start_ritual" {
+            shouldAutoStartRiseRitual = action == "start_ritual"
             shouldOpenRiseRitual = true
+            if action == "start_ritual" {
+                startStreaming()
+            }
+            completeBackgroundTasks()
+            return
+        }
+
+        if action == "start_wake_alarm" {
+            playSoftWakeHaptics()
+            completeBackgroundTasks()
+            return
+        }
+
+        if action == "end_session" {
+            stopStreaming()
+            cancelWindowTimers()
+            completeBackgroundTasks()
+            return
+        }
+
+        if action == "schedule_session" {
+            scheduleWindowStartIfNeeded()
             completeBackgroundTasks()
             return
         }
@@ -148,6 +195,114 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         lastHRV = vitals.hrv ?? lastHRV
         lastRespiratoryRate = vitals.respiratoryRate ?? lastRespiratoryRate
         send(vitals: vitals)
+    }
+
+    private func startRespiratoryRatePolling() {
+        stopRespiratoryRatePolling()
+        fetchLatestRespiratoryRate()
+        respiratoryRateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.fetchLatestRespiratoryRate()
+        }
+    }
+
+    private func stopRespiratoryRatePolling() {
+        respiratoryRateTimer?.invalidate()
+        respiratoryRateTimer = nil
+    }
+
+    private func captureWindow(from payload: [String: Any]) {
+        if let alarmTimestamp = payload["alarmTime"] as? Double {
+            alarmTime = Date(timeIntervalSince1970: alarmTimestamp)
+        }
+        if let startTimestamp = payload["windowStart"] as? Double {
+            windowStart = Date(timeIntervalSince1970: startTimestamp)
+        }
+        if let endTimestamp = payload["windowEnd"] as? Double {
+            windowEnd = Date(timeIntervalSince1970: endTimestamp)
+        }
+    }
+
+    private func scheduleWindowStartIfNeeded() {
+        guard !isStreaming else { return }
+        guard let windowStart, let windowEnd else { return }
+
+        let now = Date()
+        if now >= windowStart && now <= windowEnd {
+            startStreaming()
+            return
+        }
+
+        guard windowStart > now else {
+            stopStreaming()
+            return
+        }
+
+        windowStartTimer?.invalidate()
+        windowStartTimer = Timer.scheduledTimer(
+            withTimeInterval: windowStart.timeIntervalSince(now),
+            repeats: false
+        ) { [weak self] _ in
+            self?.startStreaming()
+        }
+    }
+
+    private func scheduleWindowEndIfNeeded() {
+        windowEndTimer?.invalidate()
+        guard let windowEnd else { return }
+
+        let now = Date()
+        if now >= windowEnd {
+            stopStreaming()
+            return
+        }
+
+        windowEndTimer = Timer.scheduledTimer(
+            withTimeInterval: windowEnd.timeIntervalSince(now),
+            repeats: false
+        ) { [weak self] _ in
+            self?.stopStreaming()
+        }
+    }
+
+    private func cancelWindowTimers() {
+        windowStartTimer?.invalidate()
+        windowStartTimer = nil
+        windowEndTimer?.invalidate()
+        windowEndTimer = nil
+    }
+
+    private func playSoftWakeHaptics() {
+        hapticWorkItems.forEach { $0.cancel() }
+        hapticWorkItems.removeAll()
+
+        let pattern: [(TimeInterval, WKHapticType)] = [
+            (0.0, .click),
+            (1.2, .directionUp),
+            (2.8, .notification)
+        ]
+
+        for (delay, haptic) in pattern {
+            let item = DispatchWorkItem {
+                WKInterfaceDevice.current().play(haptic)
+            }
+            hapticWorkItems.append(item)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+        }
+    }
+
+    private func fetchLatestRespiratoryRate() {
+        HealthKitManager.shared.fetchLatestRespiratoryRate { [weak self] respiratoryRate in
+            guard let self, let respiratoryRate, respiratoryRate > 0 else {
+                print("REAL RESPIRATORY RATE unavailable: no_recent_sample")
+                return
+            }
+
+            let timestamp = Date()
+            print("REAL RESPIRATORY RATE RECEIVED", respiratoryRate)
+            self.lastRespiratoryRate = respiratoryRate
+            self.hasReceivedRespiratoryRate = true
+            self.aggregator.updateRespiratoryRate(respiratoryRate, timestamp: timestamp)
+        }
     }
 
     private func send(vitals: WatchVitals) {

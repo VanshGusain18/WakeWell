@@ -215,7 +215,7 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: RiseRitualViewModel(model: model))
             cell.onStartRitual = { [weak self] in
                 guard let self else { return }
-                WatchConnectivityReceiver.shared.openRiseRitualOnWatch()
+                WatchConnectivityReceiver.shared.startRiseRitualOnWatch()
 
                 let alert = UIAlertController(
                     title: "Opening on Apple Watch",
@@ -353,7 +353,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         switch viewModel.cards[indexPath.item] {
         case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
-        case .riseRitual:   return CGSize(width: fullWidth, height: 150)
+        case .riseRitual:   return CGSize(width: fullWidth, height: 92)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .liveVitals:   return CGSize(width: fullWidth, height: 190)

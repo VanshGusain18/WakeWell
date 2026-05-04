@@ -674,9 +674,13 @@ final class SmartAlarmEngine {
         let monitor = WatchConnectionMonitor.shared
 
         guard monitor.state == .connected else {
-            print("WATCH DISCONNECTED - FREEZING ENGINE")
+            if monitor.state == .disconnected {
+                print("WATCH DISCONNECTED - FREEZING ENGINE")
+            } else {
+                print("WAITING FOR LIVE WATCH DATA - FREEZING ENGINE")
+            }
             freezeSignalState()
-            return noDecision(reason: "watch_disconnected")
+            return noDecision(reason: monitor.state == .disconnected ? "watch_disconnected" : "waiting_for_watch_data")
         }
 
         guard !monitor.isStaleData else {
@@ -735,8 +739,10 @@ final class SmartAlarmEngine {
         }
 
         print("SAFE TRIGGER BLOCKED")
-        if !watchConnected {
+        if monitor.state == .disconnected {
             print("WATCH DISCONNECTED - FREEZING ENGINE")
+        } else if !watchConnected {
+            print("WAITING FOR LIVE WATCH DATA - FREEZING ENGINE")
         }
         if !dataFresh {
             print("DATA STALE - NO DECISION")

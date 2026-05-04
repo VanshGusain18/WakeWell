@@ -33,8 +33,11 @@ final class HealthKitWorkoutManager: NSObject {
         }
 
         startHeartRateQuery()
-        startHRVQuery()
-        startRespiratoryRateQuery()
+        // HRV and respiratory rate queries are started inside startWorkoutSession()
+        // after the session is active, so the anchored queries are scoped to
+        // in-workout samples only. Starting them here (before the session is active)
+        // causes the initial-results handler to consume the anchor without
+        // receiving any live workout samples in the updateHandler.
     }
 
     func stop() {
@@ -76,10 +79,20 @@ final class HealthKitWorkoutManager: NSObject {
             let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
             let builder = session.associatedWorkoutBuilder()
 
-            builder.dataSource = HKLiveWorkoutDataSource(
+            let dataSource = HKLiveWorkoutDataSource(
                 healthStore: healthStore,
                 workoutConfiguration: configuration
             )
+            // Explicitly enable HRV and respiratory rate collection.
+            // HKLiveWorkoutDataSource only tracks heartRate by default;
+            // heartRateVariabilitySDNN and respiratoryRate must be opted in.
+            if let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) {
+                dataSource.enableCollection(for: hrvType, predicate: nil)
+            }
+            if let rrType = HKObjectType.quantityType(forIdentifier: .respiratoryRate) {
+                dataSource.enableCollection(for: rrType, predicate: nil)
+            }
+            builder.dataSource = dataSource
 
             session.delegate = self
             builder.delegate = self
@@ -93,6 +106,13 @@ final class HealthKitWorkoutManager: NSObject {
                 print("Workout started", success, error?.localizedDescription ?? "")
                 DispatchQueue.main.async {
                     self.isWorkoutActive = success
+                    if success {
+                        // Start HRV and RR queries only now that the workout session
+                        // is active. This ensures the anchored queries capture
+                        // samples written during the workout session.
+                        self.startHRVQuery()
+                        self.startRespiratoryRateQuery()
+                    }
                 }
             }
         } catch {
@@ -131,10 +151,19 @@ final class HealthKitWorkoutManager: NSObject {
             return
         }
 
+        // Predicate: only samples from now onward so the initial results batch
+        // is empty (anchor lands at "now") and the updateHandler fires for every
+        // new HRV sample written during the active workout session.
+        let predicate = HKQuery.predicateForSamples(
+            withStart: Date(),
+            end: nil,
+            options: .strictStartDate
+        )
+
         let query = HKAnchoredObjectQuery(
             type: hrvType,
-            predicate: nil,
-            anchor: hrvAnchor,
+            predicate: predicate,
+            anchor: nil,
             limit: HKObjectQueryNoLimit
         ) { [weak self] _, samples, _, newAnchor, error in
             self?.hrvAnchor = newAnchor
@@ -156,10 +185,19 @@ final class HealthKitWorkoutManager: NSObject {
             return
         }
 
+        // Same recency predicate as the HRV query: start from now so the
+        // initial handler fires with zero samples and the updateHandler
+        // receives only live in-workout respiratory rate samples.
+        let predicate = HKQuery.predicateForSamples(
+            withStart: Date(),
+            end: nil,
+            options: .strictStartDate
+        )
+
         let query = HKAnchoredObjectQuery(
             type: respiratoryRateType,
-            predicate: nil,
-            anchor: respiratoryRateAnchor,
+            predicate: predicate,
+            anchor: nil,
             limit: HKObjectQueryNoLimit
         ) { [weak self] _, samples, _, newAnchor, error in
             self?.respiratoryRateAnchor = newAnchor

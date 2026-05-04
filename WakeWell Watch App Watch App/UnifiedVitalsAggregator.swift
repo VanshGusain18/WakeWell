@@ -75,7 +75,10 @@ final class UnifiedVitalsAggregator {
     }
 
     func markHRVUnavailable(reason: String) {
-        lastHRVValue = nil
+        // Only update the reason string. Do NOT clear lastHRVValue here —
+        // HRV samples arrive infrequently (every few minutes) and we want
+        // to keep forwarding the last known value between samples.
+        // The value is cleared only in stop() when a new session begins.
         hrvUnavailableReason = reason
     }
 

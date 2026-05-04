@@ -27,7 +27,10 @@ final class AlarmViewModel {
             return
         }
 
-        AlarmManager.shared.setAlarm(AlarmModel(time: config.wakeUpTime))
+        AlarmManager.shared.setAlarm(
+            AlarmModel(time: config.wakeUpTime),
+            smartWindowMinutes: config.smartWindowMinutes
+        )
         NotificationCenter.default.post(name: .alarmTimeDidChange, object: nil)
         delegate?.alarmDidSave(wakeUpTime: config.wakeUpTime, isSmart: true)
     }

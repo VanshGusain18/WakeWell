@@ -47,18 +47,8 @@
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V73-QJ-vjG">
                                 <rect key="frame" x="358.33333333333331" y="12" width="33.666666666666686" height="31"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="X">
-                                    <fontDescription key="titleFontDescription" type="system" pointSize="14"/>
-                                </buttonConfiguration>
+                                <state key="normal"/>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="869-xT-QYo">
-                                <rect key="frame" x="144" y="96" width="202" height="43"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Hd-eL-5Iu">
                                 <rect key="frame" x="16" y="91" width="112" height="40"/>
                                 <state key="normal" title="Button"/>
@@ -73,7 +63,6 @@
                             <constraint firstAttribute="bottom" secondItem="9Hd-eL-5Iu" secondAttribute="bottom" constant="12" id="25M-4R-z8l"/>
                             <constraint firstAttribute="trailing" secondItem="V73-QJ-vjG" secondAttribute="trailing" constant="16" id="5Gm-Ci-xfH"/>
                             <constraint firstItem="V73-QJ-vjG" firstAttribute="top" secondItem="gRL-TY-Utn" secondAttribute="top" constant="12" id="OI0-HY-vtI"/>
-                            <constraint firstItem="869-xT-QYo" firstAttribute="leading" secondItem="9Hd-eL-5Iu" secondAttribute="trailing" constant="16" id="dU6-VJ-cxT"/>
                             <constraint firstItem="9Hd-eL-5Iu" firstAttribute="leading" secondItem="gRL-TY-Utn" secondAttribute="leading" constant="16" id="rr4-Lo-jW9"/>
                         </constraints>
                     </view>
@@ -90,7 +79,6 @@
             <connections>
                 <outlet property="categoryLabel" destination="SeU-UA-9A8" id="abf-V4-ZFA"/>
                 <outlet property="closeButton" destination="V73-QJ-vjG" id="fPm-59-1u6"/>
-                <outlet property="descriptionLabel" destination="869-xT-QYo" id="fAR-Vd-x4C"/>
                 <outlet property="iconContainerView" destination="WJw-59-Z9R" id="W2b-4t-cHl"/>
                 <outlet property="iconImageView" destination="SKi-ol-kLs" id="zTE-kg-gFW"/>
                 <outlet property="startButton" destination="9Hd-eL-5Iu" id="EXZ-BO-Zjn"/>

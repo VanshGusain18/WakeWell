@@ -60,4 +60,33 @@ final class HealthKitManager {
 
         store.execute(query)
     }
+
+    func fetchLatestRespiratoryRate(completion: @escaping (Double?) -> Void) {
+        guard let type = HKObjectType.quantityType(forIdentifier: .respiratoryRate) else {
+            completion(nil)
+            return
+        }
+
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let query = HKSampleQuery(
+            sampleType: type,
+            predicate: nil,
+            limit: 1,
+            sortDescriptors: [sort]
+        ) { _, samples, error in
+            if let error {
+                print("Respiratory rate query error:", error.localizedDescription)
+            }
+
+            let value = (samples?.first as? HKQuantitySample)?
+                .quantity
+                .doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+
+            DispatchQueue.main.async {
+                completion(value)
+            }
+        }
+
+        store.execute(query)
+    }
 }

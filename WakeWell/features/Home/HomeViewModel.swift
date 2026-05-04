@@ -22,13 +22,13 @@ final class HomeViewModel {
 
     init() {
         allCards = [
+            .riseRitual(provider.getRiseRitual()),
             .sleepRing(provider.getSleepRing()),  
             .alarm(provider.getAlarm()),
             .liveVitals,
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
-            .sounds,
-            .riseRitual(provider.getRiseRitual())
+            .sounds
         ]
 
         updateSleepDebtCard(with: provider.getSleepDebt())
@@ -56,6 +56,10 @@ final class HomeViewModel {
         let sleepDebtViewModel = SleepDebtViewModel(model: model)
         guard sleepDebtViewModel.shouldShowCard() else { return }
 
-        allCards.insert(.sleepDebt(model), at: 0)
+        let insertIndex = allCards.firstIndex {
+            if case .riseRitual = $0 { return true }
+            return false
+        }.map { $0 + 1 } ?? 0
+        allCards.insert(.sleepDebt(model), at: insertIndex)
     }
 }

@@ -10,6 +10,9 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    private let tabBarLeadingPadding: CGFloat = 16
+    private let tabBarItemWidth: CGFloat = 84
+    private let tabBarItemSpacing: CGFloat = 8
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -17,6 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        alignTabBarItemsAfterLayout()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -29,6 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        alignTabBarItemsAfterLayout()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -39,12 +44,49 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        alignTabBarItemsAfterLayout()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+
+    private func alignTabBarItemsAfterLayout() {
+        DispatchQueue.main.async { [weak self] in
+            self?.alignTabBarItems()
+        }
+    }
+
+    private func alignTabBarItems() {
+        guard let tabBarController = window?.rootViewController as? UITabBarController else {
+            return
+        }
+
+        let tabBar = tabBarController.tabBar
+        tabBar.itemPositioning = .fill
+        tabBar.layoutIfNeeded()
+
+        let controls = tabBar.subviews
+            .compactMap { $0 as? UIControl }
+            .sorted { $0.frame.minX < $1.frame.minX }
+
+        guard !controls.isEmpty else { return }
+
+        let maxWidth = tabBar.bounds.width -
+            tabBar.safeAreaInsets.left -
+            tabBar.safeAreaInsets.right -
+            tabBarLeadingPadding * 2
+        let width = min(tabBarItemWidth, maxWidth / CGFloat(controls.count))
+        let startX = tabBar.safeAreaInsets.left + tabBarLeadingPadding
+
+        for (index, control) in controls.enumerated() {
+            var frame = control.frame
+            frame.origin.x = startX + CGFloat(index) * (width + tabBarItemSpacing)
+            frame.size.width = width
+            control.frame = frame
+        }
     }
 
 }

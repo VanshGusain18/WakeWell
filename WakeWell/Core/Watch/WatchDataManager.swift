@@ -43,12 +43,18 @@ final class WatchDataManager {
 
         if decision.shouldTrigger {
             LiveVitalsViewModel.shared.updateAlertStatus("Alert triggered")
+            AlarmPresentationManager.shared.presentWakeAlarm(
+                reason: decision.reason,
+                confidence: decision.confidence
+            )
+            WatchConnectivityReceiver.shared.startWakeAlarmOnWatch()
             NotificationManager.shared.triggerImmediateAlarm()
             SleepSessionManager.shared.endSession(
                 triggerTime: Date(),
                 reason: decision.reason,
                 confidence: decision.confidence
             )
+            WatchConnectivityReceiver.shared.endWatchSession()
             stop()
         } else {
             LiveVitalsViewModel.shared.updateAlertStatus(decision.reason)

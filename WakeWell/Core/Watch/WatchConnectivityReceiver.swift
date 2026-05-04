@@ -31,21 +31,32 @@ final class WatchConnectivityReceiver: NSObject {
     }
 
     func sendStartSession(alarmTime: Date) {
+        sendStartSession(alarmTime: alarmTime, windowStart: nil, windowEnd: nil)
+    }
+
+    func sendStartSession(alarmTime: Date, windowStart: Date?, windowEnd: Date?) {
         guard WCSession.isSupported() else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markUnavailable()
             return
         }
 
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "action": "start_session",
             "alarmTime": alarmTime.timeIntervalSince1970
         ]
+        if let windowStart {
+            payload["windowStart"] = windowStart.timeIntervalSince1970
+        }
+        if let windowEnd {
+            payload["windowEnd"] = windowEnd.timeIntervalSince1970
+        }
 
         let session = WCSession.default
         pendingStartPayload = payload
         activate()
 
         guard session.activationState == .activated else {
+            WatchConnectionMonitor.shared.markDeliveryQueued()
             print("⌚️ Queued start_session until WCSession activation completes")
             return
         }
@@ -53,16 +64,64 @@ final class WatchConnectivityReceiver: NSObject {
         flushPendingStartPayload()
     }
 
-    func openRiseRitualOnWatch() {
+    func sendScheduledSession(alarmTime: Date, windowStart: Date, windowEnd: Date) {
         sendCommand([
-            "action": "open_rise_ritual",
+            "action": "schedule_session",
+            "alarmTime": alarmTime.timeIntervalSince1970,
+            "windowStart": windowStart.timeIntervalSince1970,
+            "windowEnd": windowEnd.timeIntervalSince1970,
+            "timestamp": Date().timeIntervalSince1970
+        ])
+    }
+
+    func openRiseRitualOnWatch() {
+        startRiseRitualOnWatch()
+    }
+
+    func startRiseRitualOnWatch() {
+        let alarmTime = AlarmManager.shared.getWakeTime()
+        let windowStart = alarmTime.map { AlarmManager.shared.alarmWindowStart(for: $0) }
+        let windowEnd = alarmTime
+
+        if let alarmTime {
+            SleepSessionManager.shared.startSession(alarmTime: alarmTime)
+            SmartAlarmEngine.shared.beginMonitoring()
+            sendStartSession(alarmTime: alarmTime, windowStart: windowStart, windowEnd: windowEnd)
+        }
+
+        var ritualPayload: [String: Any] = [
+            "action": "start_ritual",
+            "timestamp": Date().timeIntervalSince1970
+        ]
+        if let alarmTime {
+            ritualPayload["alarmTime"] = alarmTime.timeIntervalSince1970
+        }
+        if let windowStart {
+            ritualPayload["windowStart"] = windowStart.timeIntervalSince1970
+        }
+        if let windowEnd {
+            ritualPayload["windowEnd"] = windowEnd.timeIntervalSince1970
+        }
+        sendCommand(ritualPayload)
+    }
+
+    func startWakeAlarmOnWatch() {
+        sendCommand([
+            "action": "start_wake_alarm",
+            "timestamp": Date().timeIntervalSince1970
+        ])
+    }
+
+    func endWatchSession() {
+        sendCommand([
+            "action": "end_session",
             "timestamp": Date().timeIntervalSince1970
         ])
     }
 
     private func sendCommand(_ payload: [String: Any]) {
         guard WCSession.isSupported() else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markUnavailable()
             return
         }
 
@@ -70,6 +129,7 @@ final class WatchConnectivityReceiver: NSObject {
         activate()
 
         guard WCSession.default.activationState == .activated else {
+            WatchConnectionMonitor.shared.markDeliveryQueued()
             print("⌚️ Queued watch command until WCSession activation completes")
             return
         }
@@ -89,8 +149,10 @@ final class WatchConnectivityReceiver: NSObject {
         if session.isWatchAppInstalled {
             session.transferUserInfo(payload)
         } else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markUnavailable()
             print("⌚️ Watch app is not installed")
+            pendingStartPayload = nil
+            return
         }
 
         do {
@@ -100,7 +162,7 @@ final class WatchConnectivityReceiver: NSObject {
         }
 
         guard session.isReachable else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markDeliveryQueued()
             print("⌚️ Watch not reachable; start_session queued via context/userInfo")
             pendingStartPayload = nil
             return
@@ -125,8 +187,10 @@ final class WatchConnectivityReceiver: NSObject {
         if session.isWatchAppInstalled {
             session.transferUserInfo(payload)
         } else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markUnavailable()
             print("⌚️ Watch app is not installed")
+            pendingCommandPayload = nil
+            return
         }
 
         do {
@@ -136,7 +200,7 @@ final class WatchConnectivityReceiver: NSObject {
         }
 
         guard session.isReachable else {
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markDeliveryQueued()
             print("⌚️ Watch not reachable; command queued via context/userInfo")
             pendingCommandPayload = nil
             return
@@ -155,7 +219,7 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
             print("⌚️ iPhone WCSession activation error:", error.localizedDescription)
-            WatchConnectionMonitor.shared.updateReachability(false)
+            WatchConnectionMonitor.shared.markUnavailable()
             return
         }
 

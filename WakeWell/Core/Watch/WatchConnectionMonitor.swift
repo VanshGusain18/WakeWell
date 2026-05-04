@@ -3,6 +3,7 @@ import WatchConnectivity
 
 enum WatchConnectionState {
     case connected
+    case waiting
     case disconnected
     case unknown
 }
@@ -27,10 +28,10 @@ final class WatchConnectionMonitor {
     }
 
     var displayStatus: String {
-        guard WCSession.isSupported() else { return "Waiting for Apple Watch" }
+        guard WCSession.isSupported() else { return "Watch Connectivity Unavailable" }
 
         #if os(iOS)
-        guard WCSession.default.isWatchAppInstalled else { return "Waiting for Apple Watch" }
+        guard WCSession.default.isWatchAppInstalled else { return "Install WakeWell on Apple Watch" }
         #endif
 
         if state == .connected && !isStaleData {
@@ -41,18 +42,42 @@ final class WatchConnectionMonitor {
             return "Disconnected"
         }
 
-        return "Waiting for Apple Watch"
+        return isReachable ? "Waiting for Live Data" : "Connecting to Apple Watch"
     }
 
     func markPayloadReceived(at date: Date = Date()) {
-        lastReceivedTimestamp = date
-        isReachable = WCSession.default.isReachable
-        transition(to: .connected)
+        performOnMain {
+            self.lastReceivedTimestamp = date
+            self.isReachable = WCSession.default.isReachable
+            self.transition(to: .connected)
+        }
     }
 
     func updateReachability(_ reachable: Bool) {
-        isReachable = reachable
-        transition(to: reachable ? .connected : .disconnected)
+        performOnMain {
+            self.isReachable = reachable
+            self.transition(to: self.isStaleData ? .waiting : .connected)
+        }
+    }
+
+    func markDeliveryQueued() {
+        performOnMain {
+            self.transition(to: self.isStaleData ? .waiting : .connected)
+        }
+    }
+
+    func markUnavailable() {
+        performOnMain {
+            self.transition(to: .disconnected)
+        }
+    }
+
+    private func performOnMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.sync(execute: work)
+        }
     }
 
     private func transition(to nextState: WatchConnectionState) {
@@ -63,6 +88,8 @@ final class WatchConnectionMonitor {
         switch nextState {
         case .connected:
             print("WATCH CONNECTED")
+        case .waiting:
+            print("WATCH WAITING FOR LIVE DATA")
         case .disconnected:
             print("WATCH DISCONNECTED - FREEZING ENGINE")
         case .unknown:

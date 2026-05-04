@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import WatchConnectivity
 
 struct ContentView: View {
     @StateObject private var connectivity = WatchConnectivityManager.shared
@@ -45,7 +44,7 @@ struct ContentView: View {
             .background(WatchTheme.background)
             .containerBackground(WatchTheme.background.gradient, for: .navigation)
             .navigationDestination(isPresented: $connectivity.shouldOpenRiseRitual) {
-                RiseRitualWatchView()
+                RiseRitualWatchView(autoStart: connectivity.shouldAutoStartRiseRitual)
             }
         }
     }
@@ -112,7 +111,7 @@ private struct LiveVitalsWatchView: View {
     @ObservedObject var connectivity: WatchConnectivityManager
 
     var body: some View {
-        let isReachable = WCSession.default.isReachable
+        let isReachable = connectivity.isReachable
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -171,23 +170,19 @@ private struct LiveVitalsWatchView: View {
     }
 
     private func statusText(isReachable: Bool) -> String {
-        if !isReachable {
-            return "iPhone not reachable"
+        if connectivity.hasSentPayload {
+            return isReachable ? "Sending Live Vitals" : "Syncing in background"
         }
 
-        if !connectivity.hasSentPayload {
+        if isReachable {
             return "Connecting"
         }
 
-        return "Sending Live Vitals"
+        return "Waiting for iPhone"
     }
 
     private func statusColor(isReachable: Bool) -> Color {
-        if !isReachable {
-            return .red
-        }
-
-        return connectivity.hasSentPayload ? .green : .yellow
+        connectivity.hasSentPayload ? .green : .yellow
     }
 
     private var hrvUpdateText: String {

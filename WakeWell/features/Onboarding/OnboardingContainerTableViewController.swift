@@ -25,26 +25,26 @@ final class OnboardingContainerTableViewController: UITableViewController {
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             sfSymbol:    "sailboat.fill",
-            title:       "Welcome to SetSail",
-            subtitle:    "Navigate your nights. Wake up ready to sail into every morning.",
+            title:       "Welcome to WakeWell",
+            subtitle:    "Set your wake window, sleep with Apple Watch, and wake at the right moment.",
             accentColor: UIColor(hex: "#5E9BF0")
         ),
         OnboardingPage(
             sfSymbol:    "waveform.path.ecg",
-            title:       "Track While You Sleep",
-            subtitle:    "SetSail monitors your heart rate, HRV and movement all night long.",
+            title:       "Sleep Signals",
+            subtitle:    "WakeWell reads heart rate and movement only during your alarm window.",
             accentColor: WakeWellTheme.accentGold
         ),
         OnboardingPage(
             sfSymbol:    "alarm.waves.left.and.right.fill",
             title:       "Smart Wake Alarm",
-            subtitle:    "Wake during your lightest sleep phase — feel bright, never groggy.",
+            subtitle:    "When your body is ready, iPhone alarms and Apple Watch haptics wake you gently.",
             accentColor: UIColor(hex: "#5E9BF0")
         ),
         OnboardingPage(
-            sfSymbol:    "chart.bar.xaxis",
-            title:       "Understand Your Sleep",
-            subtitle:    "Beautiful charts break down your deep, REM and core sleep every morning.",
+            sfSymbol:    "sunrise.fill",
+            title:       "Rise Ritual",
+            subtitle:    "Start a short Watch-guided routine to move into the day with intention.",
             accentColor: WakeWellTheme.accentGold
         )
     ]

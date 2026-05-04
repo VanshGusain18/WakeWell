@@ -1,6 +1,8 @@
 import Foundation
 
-struct AlarmViewModel {
+// NOTE: Renamed from AlarmViewModel → HomeAlarmViewModel to avoid collision
+// with features/Alarm/ViewModel/AlarmViewModel (the alarm scheduling ViewModel).
+struct HomeAlarmViewModel {
 
     let title: String
     let timeText: String

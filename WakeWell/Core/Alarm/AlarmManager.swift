@@ -10,6 +10,7 @@ final class AlarmManager {
     private var currentAlarm: AlarmModel?
 
     private let alarmKey = "wakewell_alarm_time"
+    private let savedAlarmDateKey = "wakewell.savedAlarmTime"
 
     // MARK: - Public API
 
@@ -22,6 +23,7 @@ final class AlarmManager {
         }
 
         UserDefaults.standard.set(time.timeIntervalSince1970, forKey: alarmKey)
+        UserDefaults.standard.set(time, forKey: savedAlarmDateKey)
         NotificationManager.shared.cancelAllScheduledAlarms()
         NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: time)
         SleepSessionManager.shared.startSession(alarmTime: time)
@@ -47,13 +49,18 @@ final class AlarmManager {
     }
 
     func loadSavedAlarm() {
-        let timestamp = UserDefaults.standard.double(forKey: alarmKey)
+        let date: Date?
+        if let savedDate = UserDefaults.standard.object(forKey: savedAlarmDateKey) as? Date {
+            date = savedDate
+        } else {
+            let timestamp = UserDefaults.standard.double(forKey: alarmKey)
+            date = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : nil
+        }
 
-        guard timestamp > 0 else { return }
+        guard let date else { return }
 
-        let date = Date(timeIntervalSince1970: timestamp)
         currentAlarm = AlarmModel(time: date)
-
+        NotificationManager.shared.scheduleSmartAlarmWindow(baseTime: date)
         print("📦 Loaded saved alarm:", date)
     }
 }
@@ -71,8 +78,6 @@ final class NotificationManager: NSObject {
     private let immediatePrefix = "wakewell.smartAlarm.immediate"
     private let notificationCategory = "WAKEWELL_ALARM"
     private let customSoundName = "alarm_chime.caf"
-    private let wakeWindowMinutes = 30
-    private let intervalMinutes = 5
 
     // MARK: - Public
 
@@ -123,8 +128,7 @@ final class NotificationManager: NSObject {
             }
 
             let normalizedBaseTime = self.normalizedBaseTime(from: baseTime)
-            let windowStart = normalizedBaseTime.addingTimeInterval(TimeInterval(-self.wakeWindowMinutes * 60))
-            let fireDates = self.notificationDates(from: windowStart, to: normalizedBaseTime)
+            let fireDates = [normalizedBaseTime].filter { $0 > Date().addingTimeInterval(1) }
 
             guard !fireDates.isEmpty else {
                 print("⛔ No valid smart alarm notifications to schedule")
@@ -137,8 +141,8 @@ final class NotificationManager: NSObject {
                 let identifier = "\(self.scheduledPrefix).\(Int(normalizedBaseTime.timeIntervalSince1970)).\(index)"
                 let content = self.makeAlarmContent(
                     title: "Rise & Shine",
-                    subtitle: "Smart wake window",
-                    body: "WakeWell is ready to wake you gently.",
+                    subtitle: "Your alarm",
+                    body: "WakeWell is ready to wake you.",
                     fireDate: fireDate,
                     isImmediate: false
                 )
@@ -158,7 +162,7 @@ final class NotificationManager: NSObject {
             }
 
             let formattedTimes = fireDates.map { self.timestampFormatter.string(from: $0) }.joined(separator: ", ")
-            print("✅ Smart alarm window scheduled:", formattedTimes)
+            print("✅ Final alarm fallback scheduled:", formattedTimes)
         }
     }
 
@@ -244,25 +248,6 @@ final class NotificationManager: NSObject {
         }
 
         return Calendar.current.date(byAdding: .day, value: 1, to: baseTime) ?? baseTime
-    }
-
-    private func notificationDates(from windowStart: Date, to baseTime: Date) -> [Date] {
-        var dates: [Date] = []
-        var currentDate = windowStart
-
-        while currentDate <= baseTime {
-            if currentDate > Date().addingTimeInterval(1) {
-                dates.append(currentDate)
-            }
-
-            currentDate = Calendar.current.date(byAdding: .minute, value: intervalMinutes, to: currentDate) ?? baseTime.addingTimeInterval(1)
-        }
-
-        if dates.isEmpty && baseTime > Date() {
-            dates.append(baseTime)
-        }
-
-        return dates
     }
 
     private func makeAlarmContent(

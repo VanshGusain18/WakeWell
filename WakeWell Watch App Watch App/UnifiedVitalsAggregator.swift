@@ -11,6 +11,8 @@ final class UnifiedVitalsAggregator {
     private var motionSamples: [(timestamp: Date, value: Double)] = []
     private var lastHRVValue: Double?
     private var lastHRVTimestamp: Date?
+    private var lastRespiratoryRateValue: Double?
+    private var lastRespiratoryRateTimestamp: Date?
     private var hrvUnavailableReason = "system_delay"
     private var lastEmitTime: Date?
     private var emitTimer: Timer?
@@ -47,6 +49,8 @@ final class UnifiedVitalsAggregator {
         motionSamples.removeAll()
         lastHRVValue = nil
         lastHRVTimestamp = nil
+        lastRespiratoryRateValue = nil
+        lastRespiratoryRateTimestamp = nil
         hrvUnavailableReason = "system_delay"
         lastEmitTime = nil
     }
@@ -63,6 +67,11 @@ final class UnifiedVitalsAggregator {
         lastHRVValue = hrv
         lastHRVTimestamp = timestamp
         hrvUnavailableReason = ""
+    }
+
+    func updateRespiratoryRate(_ respiratoryRate: Double, timestamp: Date) {
+        lastRespiratoryRateValue = respiratoryRate
+        lastRespiratoryRateTimestamp = timestamp
     }
 
     func markHRVUnavailable(reason: String) {
@@ -85,6 +94,7 @@ final class UnifiedVitalsAggregator {
             heartRate: average(heartRateSamples),
             hrv: lastHRVValue,
             motion: average(motionSamples),
+            respiratoryRate: lastRespiratoryRateValue,
             timestamp: now,
             hrvUnavailableReason: lastHRVValue == nil ? hrvUnavailableReason : nil
         )

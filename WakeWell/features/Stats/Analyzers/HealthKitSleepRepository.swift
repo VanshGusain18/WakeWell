@@ -3,7 +3,7 @@
 //  WakeWell
 //
 //  Central HealthKit data layer.
-//  All analyzers call this instead of returning hardcoded arrays.
+//  All analyzers call this repository for HealthKit-backed records.
 //  Data is cached per range so HealthKit is queried only once per session.
 //
 
@@ -32,7 +32,7 @@ struct NightRecord {
     let totalAwakeMin:   Double     // minutes awake after sleep onset
     let restingHR:       Double     // average RHR that night (0 if unavailable)
     let hrv:             Double     // average HRV that night (0 if unavailable)
-    let movementIndex:   Double     // placeholder; 0.2 default until motion data added
+    let movementIndex:   Double     // 0 when HealthKit motion data is unavailable
     let bedtime:         Double     // hour of day as decimal (e.g. 23.5 = 11:30 PM)
     let wakeTime:        Double     // hour of day as decimal (e.g. 7.25 = 7:15 AM)
 }
@@ -186,7 +186,7 @@ final class HealthKitSleepRepository {
                 totalAwakeMin: awakeSecs / 60,
                 restingHR:     rhr,
                 hrv:           hrv,
-                movementIndex: 0.20,
+                movementIndex: 0,
                 bedtime:       bedDecimal,
                 wakeTime:      wakeDecimal
             )

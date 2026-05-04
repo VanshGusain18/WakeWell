@@ -4,6 +4,8 @@ final class HealthKitWorkoutManager: NSObject {
     static let shared = HealthKitWorkoutManager()
 
     var onHeartRate: ((Double) -> Void)?
+    var onHRV: ((Double, Date) -> Void)?
+    var onRespiratoryRate: ((Double, Date) -> Void)?
     private(set) var isWorkoutActive = false
 
     private let healthStore = HealthKitManager.shared.store
@@ -11,6 +13,10 @@ final class HealthKitWorkoutManager: NSObject {
     private var builder: HKLiveWorkoutBuilder?
     private var heartRateQuery: HKAnchoredObjectQuery?
     private var heartRateAnchor: HKQueryAnchor?
+    private var hrvQuery: HKAnchoredObjectQuery?
+    private var hrvAnchor: HKQueryAnchor?
+    private var respiratoryRateQuery: HKAnchoredObjectQuery?
+    private var respiratoryRateAnchor: HKQueryAnchor?
 
     private override init() {
         super.init()
@@ -27,14 +33,26 @@ final class HealthKitWorkoutManager: NSObject {
         }
 
         startHeartRateQuery()
+        startHRVQuery()
+        startRespiratoryRateQuery()
     }
 
     func stop() {
         if let heartRateQuery {
             healthStore.stop(heartRateQuery)
         }
+        if let hrvQuery {
+            healthStore.stop(hrvQuery)
+        }
+        if let respiratoryRateQuery {
+            healthStore.stop(respiratoryRateQuery)
+        }
         heartRateQuery = nil
         heartRateAnchor = nil
+        hrvQuery = nil
+        hrvAnchor = nil
+        respiratoryRateQuery = nil
+        respiratoryRateAnchor = nil
 
         session?.end()
         builder?.endCollection(withEnd: Date()) { [weak self] _, _ in
@@ -107,6 +125,56 @@ final class HealthKitWorkoutManager: NSObject {
         healthStore.execute(query)
     }
 
+    private func startHRVQuery() {
+        guard hrvQuery == nil,
+              let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else {
+            return
+        }
+
+        let query = HKAnchoredObjectQuery(
+            type: hrvType,
+            predicate: nil,
+            anchor: hrvAnchor,
+            limit: HKObjectQueryNoLimit
+        ) { [weak self] _, samples, _, newAnchor, error in
+            self?.hrvAnchor = newAnchor
+            self?.handleHRV(samples: samples, error: error)
+        }
+
+        query.updateHandler = { [weak self] _, samples, _, newAnchor, error in
+            self?.hrvAnchor = newAnchor
+            self?.handleHRV(samples: samples, error: error)
+        }
+
+        hrvQuery = query
+        healthStore.execute(query)
+    }
+
+    private func startRespiratoryRateQuery() {
+        guard respiratoryRateQuery == nil,
+              let respiratoryRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate) else {
+            return
+        }
+
+        let query = HKAnchoredObjectQuery(
+            type: respiratoryRateType,
+            predicate: nil,
+            anchor: respiratoryRateAnchor,
+            limit: HKObjectQueryNoLimit
+        ) { [weak self] _, samples, _, newAnchor, error in
+            self?.respiratoryRateAnchor = newAnchor
+            self?.handleRespiratoryRate(samples: samples, error: error)
+        }
+
+        query.updateHandler = { [weak self] _, samples, _, newAnchor, error in
+            self?.respiratoryRateAnchor = newAnchor
+            self?.handleRespiratoryRate(samples: samples, error: error)
+        }
+
+        respiratoryRateQuery = query
+        healthStore.execute(query)
+    }
+
     private func handleHeartRate(samples: [HKSample]?, error: Error?) {
         if let error {
             print("Heart rate query error:", error.localizedDescription)
@@ -121,6 +189,42 @@ final class HealthKitWorkoutManager: NSObject {
             DispatchQueue.main.async {
                 print("REAL HR RECEIVED", heartRate)
                 self.onHeartRate?(heartRate)
+            }
+        }
+    }
+
+    private func handleHRV(samples: [HKSample]?, error: Error?) {
+        if let error {
+            print("HRV query error:", error.localizedDescription)
+            return
+        }
+
+        guard let quantitySamples = samples as? [HKQuantitySample] else { return }
+
+        let unit = HKUnit.secondUnit(with: .milli)
+        for sample in quantitySamples {
+            let hrv = sample.quantity.doubleValue(for: unit)
+            DispatchQueue.main.async {
+                print("REAL HRV RECEIVED", hrv)
+                self.onHRV?(hrv, sample.endDate)
+            }
+        }
+    }
+
+    private func handleRespiratoryRate(samples: [HKSample]?, error: Error?) {
+        if let error {
+            print("Respiratory rate query error:", error.localizedDescription)
+            return
+        }
+
+        guard let quantitySamples = samples as? [HKQuantitySample] else { return }
+
+        let unit = HKUnit.count().unitDivided(by: .minute())
+        for sample in quantitySamples {
+            let respiratoryRate = sample.quantity.doubleValue(for: unit)
+            DispatchQueue.main.async {
+                print("REAL RESPIRATORY RATE RECEIVED", respiratoryRate)
+                self.onRespiratoryRate?(respiratoryRate, sample.endDate)
             }
         }
     }

@@ -7,7 +7,7 @@ final class DatabaseManager {
 
     private init() {}
 
-    private var dbURL: URL {
+    var dbURL: URL {
 
         let fileManager = FileManager.default
 
@@ -238,9 +238,17 @@ final class DatabaseManager {
         let timestampString = formatter.string(from: data.timestamp)
         sqlite3_bind_text(statement, 1, (timestampString as NSString).utf8String, -1, nil)
         sqlite3_bind_double(statement, 2, data.heartRate)
-        sqlite3_bind_double(statement, 3, data.hrv)
+        if let hrv = data.hrv {
+            sqlite3_bind_double(statement, 3, hrv)
+        } else {
+            sqlite3_bind_null(statement, 3)
+        }
         sqlite3_bind_double(statement, 4, data.motion)
-        sqlite3_bind_double(statement, 5, data.respiratoryRate)
+        if let respiratoryRate = data.respiratoryRate {
+            sqlite3_bind_double(statement, 5, respiratoryRate)
+        } else {
+            sqlite3_bind_null(statement, 5)
+        }
         sqlite3_bind_double(statement, 6, data.wristTemp ?? 0)
         sqlite3_bind_double(statement, 7, data.oxygenSaturation ?? 0)
 
@@ -290,9 +298,9 @@ final class DatabaseManager {
             let data = WatchVitalsModel(
                 timestamp: timestamp,
                 heartRate: sqlite3_column_double(statement, 1),
-                hrv: sqlite3_column_double(statement, 2),
+                hrv: sqlite3_column_type(statement, 2) == SQLITE_NULL ? nil : sqlite3_column_double(statement, 2),
                 motion: sqlite3_column_double(statement, 3),
-                respiratoryRate: sqlite3_column_double(statement, 4),
+                respiratoryRate: sqlite3_column_type(statement, 4) == SQLITE_NULL ? nil : sqlite3_column_double(statement, 4),
                 wristTemp: sqlite3_column_double(statement, 5),
                 oxygenSaturation: sqlite3_column_double(statement, 6)
             )

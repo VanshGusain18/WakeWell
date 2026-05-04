@@ -62,6 +62,7 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
 
         let rawHRV = payload["hrv"] as? Double
         let hrv = rawHRV.flatMap { $0 > 0 ? $0 : nil }
+        let respiratoryRate = payload["respiratoryRate"] as? Double
         let hrvUnavailableReason = payload["hrvUnavailableReason"] as? String
         let validityFlags = WatchValidityFlags(dictionary: payload["validityFlags"] as? [String: Any])
         if rawHRV == nil {
@@ -72,6 +73,7 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
         print("HR:", heartRate)
         print("HRV:", rawHRV as Any)
         print("Motion:", motion)
+        print("Respiratory Rate:", respiratoryRate as Any)
         print("Source labels: HR=HealthKit HRV=\(validityFlags.hrvReal ? "HealthKit" : "unavailable") Motion=CoreMotion")
 
         WatchConnectionMonitor.shared.markPayloadReceived()
@@ -88,21 +90,17 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
         LiveVitalsViewModel.shared.update(
             heartRate: heartRate,
             motion: motion,
-            hrv: hrv ?? LiveVitalsViewModel.shared.hrv,
+            hrv: hrv ?? 0,
+            respiratoryRate: respiratoryRate,
             hrvStatus: hrv == nil ? (hrvUnavailableReason ?? "unavailable") : "HealthKit"
         )
-
-        if AlarmManager.shared.getWakeTime() == nil {
-            let demoAlarmTime = Date().addingTimeInterval(5 * 60)
-            AlarmManager.shared.setAlarm(AlarmModel(time: demoAlarmTime))
-            NotificationCenter.default.post(name: .alarmTimeDidChange, object: nil)
-        }
 
         let sample = WatchPayloadSample(
             timestamp: Date(timeIntervalSince1970: timestamp),
             heartRate: heartRate,
             hrv: hrv,
             motion: motion,
+            respiratoryRate: respiratoryRate,
             validityFlags: validityFlags,
             hrvUnavailableReason: hrvUnavailableReason
         )

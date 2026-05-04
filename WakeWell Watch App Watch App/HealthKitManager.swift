@@ -16,7 +16,8 @@ final class HealthKitManager {
 
         let types: Set<HKObjectType> = [
             HKObjectType.quantityType(forIdentifier: .heartRate)!,
-            HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+            HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+            HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
         ]
 
         store.requestAuthorization(toShare: [], read: types) { success, error in

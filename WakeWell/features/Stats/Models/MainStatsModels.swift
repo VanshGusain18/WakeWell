@@ -1,10 +1,3 @@
-//
-//  MainStatsModels.swift
-//  WakeWell
-//
-//  Created by geu on 19/03/26.
-//
-
 import Foundation
 
 struct MetricValue {
@@ -12,7 +5,7 @@ struct MetricValue {
 }
 
 struct MetricData {
-    let day: String
+    let day:   String
     let value: MetricValue
 }
 
@@ -28,6 +21,7 @@ struct SleepStats {
 struct SleepMetric {
     let type:         SleepMetricType
     let displayValue: String
+    let trendPercent: Int       // % change vs previous period; 0 = no data
 }
 
 enum SleepMetricType: CaseIterable {

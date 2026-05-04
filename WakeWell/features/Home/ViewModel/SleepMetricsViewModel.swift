@@ -3,9 +3,9 @@ import UIKit
 struct SleepMetricsViewModel {
 
     struct MetricUI {
-        let title: String
-        let valueText: String
-        let trendText: String
+        let title:      String
+        let valueText:  String   // plain score e.g. "82", no "/100"
+        let trendText:  String
         let trendColor: UIColor
     }
 
@@ -14,30 +14,25 @@ struct SleepMetricsViewModel {
 
     init(model: SleepMetricsModel) {
 
-        sleepScoreText = "Sleep Score: \(model.sleepScore) / 100"
+        sleepScoreText = "Sleep Score: \(model.sleepScore)"
 
-        metrics = model.metrics.map {
+        metrics = model.metrics.map { item in
 
             let arrow: String
             let color: UIColor
 
-            if $0.trendPercent > 0 {
-                arrow = "↑"
-                color = .systemGreen
-            } else if $0.trendPercent < 0 {
-                arrow = "↓"
-                color = .systemRed
+            if item.trendPercent > 0 {
+                arrow = "↑"; color = .systemGreen
+            } else if item.trendPercent < 0 {
+                arrow = "↓"; color = .systemRed
             } else {
-                arrow = "→"
-                color = .systemGray
+                arrow = "→"; color = .systemGray
             }
 
-            let trendText = "\(arrow) \(abs($0.trendPercent))%"
-
             return MetricUI(
-                title: $0.title,
-                valueText: "\($0.score) / \($0.maxScore)",
-                trendText: trendText,
+                title:      item.title,
+                valueText:  "\(item.score)",          // just the number, out of 100
+                trendText:  "\(arrow) \(abs(item.trendPercent))%",
                 trendColor: color
             )
         }

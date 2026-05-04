@@ -62,7 +62,7 @@ class MiniPlayerView: UIView {
 
         //Title
         titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
-        titleLabel.textColor = .label
+        titleLabel.textColor = WakeWellTheme.labelPrimary
         titleLabel.numberOfLines = 1
         titleLabel.lineBreakMode = .byTruncatingTail
 
@@ -72,7 +72,7 @@ class MiniPlayerView: UIView {
 
        //Buttons
         [playPauseButton, nextButton, previousButton].forEach {
-            $0.tintColor = .label
+            $0.tintColor = WakeWellTheme.labelPrimary
             $0.translatesAutoresizingMaskIntoConstraints = false
             $0.widthAnchor.constraint(equalToConstant: 32).isActive = true
             $0.heightAnchor.constraint(equalToConstant: 32).isActive = true

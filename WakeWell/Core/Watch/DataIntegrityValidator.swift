@@ -4,19 +4,22 @@ struct WatchValidityFlags {
     let hrReal: Bool
     let hrvReal: Bool
     let motionReal: Bool
+    let respiratoryRateReal: Bool
 
-    static let unknown = WatchValidityFlags(hrReal: false, hrvReal: false, motionReal: false)
+    static let unknown = WatchValidityFlags(hrReal: false, hrvReal: false, motionReal: false, respiratoryRateReal: false)
 
     init(dictionary: [String: Any]?) {
         hrReal = dictionary?["hrReal"] as? Bool ?? false
         hrvReal = dictionary?["hrvReal"] as? Bool ?? false
         motionReal = dictionary?["motionReal"] as? Bool ?? false
+        respiratoryRateReal = dictionary?["respiratoryRateReal"] as? Bool ?? false
     }
 
-    private init(hrReal: Bool, hrvReal: Bool, motionReal: Bool) {
+    private init(hrReal: Bool, hrvReal: Bool, motionReal: Bool, respiratoryRateReal: Bool) {
         self.hrReal = hrReal
         self.hrvReal = hrvReal
         self.motionReal = motionReal
+        self.respiratoryRateReal = respiratoryRateReal
     }
 }
 
@@ -25,6 +28,7 @@ struct WatchPayloadSample {
     let heartRate: Double
     let hrv: Double?
     let motion: Double
+    let respiratoryRate: Double?
     let validityFlags: WatchValidityFlags
     let hrvUnavailableReason: String?
 }
@@ -34,6 +38,7 @@ struct ValidatedVitalsSample {
     let heartRate: Double
     let hrv: Double?
     let motion: Double
+    let respiratoryRate: Double?
     let validityFlags: WatchValidityFlags
 }
 
@@ -75,6 +80,7 @@ final class DataIntegrityValidator {
                     heartRate: sample.heartRate,
                     hrv: validHRV,
                     motion: sample.motion,
+                    respiratoryRate: sample.respiratoryRate,
                     validityFlags: sample.validityFlags
                 )
             }
@@ -89,6 +95,12 @@ final class DataIntegrityValidator {
             return nil
         }
 
+        if let respiratoryRate = sample.respiratoryRate,
+           (respiratoryRate < 4 || respiratoryRate > 60) {
+            print("DATA INTEGRITY ISSUE: respiratory rate outside 4-60:", respiratoryRate)
+            return nil
+        }
+
         if sample.motion > 0.7 && sample.heartRate < 45 {
             print("DATA INTEGRITY ISSUE: motion/HR sanity check failed")
         }
@@ -98,6 +110,7 @@ final class DataIntegrityValidator {
             heartRate: sample.heartRate,
             hrv: validHRV,
             motion: sample.motion,
+            respiratoryRate: sample.respiratoryRate,
             validityFlags: sample.validityFlags
         )
     }

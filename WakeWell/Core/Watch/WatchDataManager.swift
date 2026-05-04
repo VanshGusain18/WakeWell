@@ -47,7 +47,8 @@ final class WatchDataManager {
         LiveVitalsViewModel.shared.update(
             heartRate: data.heartRate,
             motion: data.motion,
-            hrv: data.hrv ?? LiveVitalsViewModel.shared.hrv,
+            hrv: data.hrv ?? 0,
+            respiratoryRate: data.respiratoryRate,
             hrvStatus: data.hrv == nil ? "unavailable" : "HealthKit"
         )
 

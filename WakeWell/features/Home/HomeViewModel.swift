@@ -30,6 +30,7 @@ class HomeViewModel {
             .riseRitual(provider.getRiseRitual()),
             .sleepRing(provider.getSleepRing()),  
             .alarm(provider.getAlarm()),
+            .liveVitals,
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
             .sounds

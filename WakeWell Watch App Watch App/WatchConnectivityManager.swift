@@ -9,6 +9,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     @Published var lastHeartRate: Double = 0
     @Published var lastMotion: Double = 0
     @Published var lastHRV: Double = 0
+    @Published var lastRespiratoryRate: Double = 0
     @Published var lastHRVUpdatedAt: Date?
     @Published var isReachable = false
     @Published var hasSentPayload = false
@@ -62,6 +63,15 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
                 self?.lastHeartRate = heartRate
                 self?.aggregator.addHeartRate(heartRate)
             }
+            HealthKitWorkoutManager.shared.onHRV = { [weak self] hrv, timestamp in
+                self?.lastHRV = hrv
+                self?.lastHRVUpdatedAt = timestamp
+                self?.aggregator.updateHRV(hrv, timestamp: timestamp)
+            }
+            HealthKitWorkoutManager.shared.onRespiratoryRate = { [weak self] respiratoryRate, timestamp in
+                self?.lastRespiratoryRate = respiratoryRate
+                self?.aggregator.updateRespiratoryRate(respiratoryRate, timestamp: timestamp)
+            }
             HealthKitWorkoutManager.shared.start()
 
             HRVManager.shared.onHRV = { [weak self] hrv, timestamp in
@@ -85,6 +95,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         lastHeartRate = vitals.heartRate
         lastMotion = vitals.motion
         lastHRV = vitals.hrv ?? lastHRV
+        lastRespiratoryRate = vitals.respiratoryRate ?? lastRespiratoryRate
         send(vitals: vitals)
     }
 
@@ -115,6 +126,13 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         } catch {
             statusText = "Context failed: \(error.localizedDescription)"
             hasSentPayload = false
+        }
+
+        guard session.isReachable else { return }
+        session.sendMessage(payload, replyHandler: nil) { [weak self] error in
+            DispatchQueue.main.async {
+                self?.statusText = "Message failed: \(error.localizedDescription)"
+            }
         }
     }
 }

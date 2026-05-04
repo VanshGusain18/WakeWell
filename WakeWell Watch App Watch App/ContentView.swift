@@ -37,6 +37,9 @@ struct ContentView: View {
             Text("HRV: \(String(format: "%.1f", connectivity.lastHRV)) ms")
                 .font(.caption)
 
+            Text("Resp: \(String(format: "%.1f", connectivity.lastRespiratoryRate)) /min")
+                .font(.caption)
+
             Text("HRV updated: \(hrvUpdateText)")
                 .font(.caption2)
                 .foregroundStyle(.secondary)

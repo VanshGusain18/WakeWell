@@ -33,7 +33,7 @@ final class BoxBreathingViewController: RoutineActivityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         navigationItem.title = "Step \(currentIndex + 1)/\(routineQueue.count)"
         setupUI()
         startPhase()
@@ -54,7 +54,7 @@ final class BoxBreathingViewController: RoutineActivityViewController {
 
         cycleLabel.translatesAutoresizingMaskIntoConstraints = false
         cycleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        cycleLabel.textColor = .secondaryLabel
+        cycleLabel.textColor = WakeWellTheme.labelSecondary
         cycleLabel.textAlignment = .center
 
         phaseLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -64,24 +64,24 @@ final class BoxBreathingViewController: RoutineActivityViewController {
         helperLabel.translatesAutoresizingMaskIntoConstraints = false
         helperLabel.font = .monospacedDigitSystemFont(ofSize: 20, weight: .medium)
         helperLabel.textAlignment = .center
-        helperLabel.textColor = .secondaryLabel
+        helperLabel.textColor = WakeWellTheme.labelSecondary
 
         boxView.translatesAutoresizingMaskIntoConstraints = false
         boxView.layer.cornerRadius = 24
         boxView.layer.borderWidth = 4
-        boxView.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.35).cgColor
-        boxView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.05)
+        boxView.layer.borderColor = WakeWellTheme.accentPurple.withAlphaComponent(0.35).cgColor
+        boxView.backgroundColor = WakeWellTheme.accentPurple.withAlphaComponent(0.05)
 
         dotView.translatesAutoresizingMaskIntoConstraints = true
         dotView.frame = CGRect(x: 0, y: 0, width: 18, height: 18)
-        dotView.backgroundColor = .systemBlue
+        dotView.backgroundColor = WakeWellTheme.accentPurple
         dotView.layer.cornerRadius = 9
 
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.white, for: .normal)
         skipButton.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        skipButton.backgroundColor = .systemBlue
+        skipButton.backgroundColor = WakeWellTheme.accentGold
         skipButton.layer.cornerRadius = 16
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
 

@@ -13,12 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            print("HealthKit Permission:", success)
 
             if success {
-                //HealthKitManager.shared.addMockSleepData()
                 HealthKitManager.shared.fetchLastNightSleep()
+                HealthKitVitalsFallbackManager.shared.start()
             }
         }
 
-        WatchDebugRunner.run()
         AlarmManager.shared.loadSavedAlarm()
         return true
     }

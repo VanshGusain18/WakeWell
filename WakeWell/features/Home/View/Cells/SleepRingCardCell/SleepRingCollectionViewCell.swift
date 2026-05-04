@@ -4,20 +4,18 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
 
     static let identifier = "SleepRingCollectionViewCell"
 
-    @IBOutlet weak var containerView: UIView!
+    @IBOutlet weak var containerView:     UIView!
     @IBOutlet weak var ringContainerView: UIView!
-    @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
-    @IBOutlet weak var ctaLabel: UILabel!
-    @IBOutlet weak var chevronImageView: UIImageView!
+    @IBOutlet weak var scoreLabel:        UILabel!
+    @IBOutlet weak var titleLabel:        UILabel!
+    @IBOutlet weak var subtitleLabel:     UILabel!
+    @IBOutlet weak var ctaLabel:          UILabel!
+    @IBOutlet weak var chevronImageView:  UIImageView!
 
     var onChevronTapped: (() -> Void)?
 
     private let backgroundRingLayer = CAShapeLayer()
     private let progressRingLayer   = CAShapeLayer()
-
-    // MARK: - Lifecycle
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -25,43 +23,56 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         setupChevron()
         addChevronTapGesture()
         setupUI()
-        applyStyling()
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
         drawRing()
-        applyShadowPath()
+        layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: 20).cgPath
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        onChevronTapped = nil
+    override func prepareForReuse() { super.prepareForReuse(); onChevronTapped = nil }
+
+    // ── Card ───────────────────────────────────────────────────────────────
+    private func setupUI() {
+        contentView.backgroundColor       = .clear
+        containerView.backgroundColor     = WakeWellTheme.cardBackground
+        ringContainerView.backgroundColor = .clear
+        containerView.layer.cornerRadius  = 20
+        containerView.layer.masksToBounds = true
+        layer.masksToBounds  = false
+        layer.shadowColor    = WakeWellTheme.shadowColor.cgColor
+        layer.shadowOpacity  = WakeWellTheme.shadowOpacity
+        layer.shadowRadius   = WakeWellTheme.shadowRadius
+        layer.shadowOffset   = WakeWellTheme.shadowOffset
     }
+
+    // ── Labels ─────────────────────────────────────────────────────────────
     private func setupLabels() {
-        titleLabel?.font          = UIFont.systemFont(ofSize: 11, weight: .semibold)
-        titleLabel?.textColor     = .secondaryLabel
+        titleLabel?.font       = .systemFont(ofSize: 11, weight: .semibold)
+        titleLabel?.textColor  = WakeWellTheme.labelSecondary
         titleLabel?.textAlignment = .center
-        titleLabel?.text          = "YOUR SLEEP SCORE"
+        titleLabel?.text       = "YOUR SLEEP SCORE"
 
-        scoreLabel?.font          = UIFont.boldSystemFont(ofSize: 28)
-        scoreLabel?.textColor     = .label
+        scoreLabel?.font       = .boldSystemFont(ofSize: 28)
+        scoreLabel?.textColor  = WakeWellTheme.labelPrimary
         scoreLabel?.textAlignment = .center
 
-        subtitleLabel?.font          = UIFont.systemFont(ofSize: 14, weight: .semibold)
-        subtitleLabel?.textColor     = .label
+        subtitleLabel?.font      = .systemFont(ofSize: 14, weight: .semibold)
+        subtitleLabel?.textColor = WakeWellTheme.labelPrimary
         subtitleLabel?.textAlignment = .center
 
-        ctaLabel?.font          = UIFont.systemFont(ofSize: 10)
-        ctaLabel?.textColor     = .secondaryLabel
+        ctaLabel?.font       = .systemFont(ofSize: 10)
+        ctaLabel?.textColor  = WakeWellTheme.labelSecondary
         ctaLabel?.textAlignment = .center
         ctaLabel?.numberOfLines = 2
-        ctaLabel?.text          = "Tap for detailed sleep score"
+        ctaLabel?.text       = "Tap for detailed sleep score"
     }
 
+    // ── Chevron ────────────────────────────────────────────────────────────
     private func setupChevron() {
         chevronImageView?.image       = UIImage(systemName: "chevron.down")
-        chevronImageView?.tintColor   = .secondaryLabel
+        chevronImageView?.tintColor   = WakeWellTheme.labelSecondary
         chevronImageView?.contentMode = .scaleAspectFit
     }
 
@@ -81,6 +92,7 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         }
     }
 
+    // ── Ring ───────────────────────────────────────────────────────────────
     private func drawRing() {
         guard let rc = ringContainerView, rc.bounds.width > 0 else { return }
         backgroundRingLayer.removeFromSuperlayer()
@@ -91,42 +103,24 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         guard radius > 0 else { return }
 
         let path = UIBezierPath(arcCenter: center, radius: radius,
-                                startAngle: -.pi / 2, endAngle: 1.5 * .pi,
-                                clockwise: true)
+                                startAngle: -.pi / 2, endAngle: 1.5 * .pi, clockwise: true)
 
         backgroundRingLayer.path        = path.cgPath
-        backgroundRingLayer.strokeColor = UIColor.systemGray5.cgColor
+        backgroundRingLayer.strokeColor = WakeWellTheme.border.cgColor
         backgroundRingLayer.lineWidth   = 10
         backgroundRingLayer.fillColor   = UIColor.clear.cgColor
         rc.layer.addSublayer(backgroundRingLayer)
 
+        // Purple ring — matches screenshot
         progressRingLayer.path        = path.cgPath
-        progressRingLayer.strokeColor = UIColor.systemBlue.cgColor
+        progressRingLayer.strokeColor = WakeWellTheme.accentPurple.cgColor
         progressRingLayer.lineWidth   = 10
         progressRingLayer.fillColor   = UIColor.clear.cgColor
         progressRingLayer.lineCap     = .round
         rc.layer.addSublayer(progressRingLayer)
     }
 
-    private func setupUI() {
-        contentView.backgroundColor       = .clear
-        containerView.layer.cornerRadius  = 20
-        containerView.layer.masksToBounds = true
-        containerView.backgroundColor     = .systemBackground
-        layer.masksToBounds               = false
-    }
-
-    private func applyStyling() {
-        layer.shadowColor   = UIColor.black.cgColor
-        layer.shadowOpacity = 0.1
-        layer.shadowRadius  = 10
-        layer.shadowOffset  = CGSize(width: 0, height: 4)
-    }
-
-    private func applyShadowPath() {
-        layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: 20).cgPath
-    }
-
+    // ── Configure (logic unchanged) ────────────────────────────────────────
     func configure(with viewModel: SleepRingViewModel) {
         titleLabel?.text    = "YOUR SLEEP SCORE"
         scoreLabel?.text    = viewModel.scoreText

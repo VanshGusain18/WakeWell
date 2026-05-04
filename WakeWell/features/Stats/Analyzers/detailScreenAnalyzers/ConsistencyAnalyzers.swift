@@ -10,7 +10,7 @@ final class SleepConsistencyAnalyzer {
 
     static func getData(for range: StatsTimeRange) -> [SleepConsistencyData] {
         let records = HealthKitSleepRepository.shared.records(for: range)
-        guard !records.isEmpty else { return fallback(for: range) }
+        guard !records.isEmpty else { return noData(for: range) }
 
         switch range {
         case .week:
@@ -78,33 +78,8 @@ final class SleepConsistencyAnalyzer {
         """
     }
 
-    private static func fallback(for range: StatsTimeRange) -> [SleepConsistencyData] {
-        switch range {
-        case .week:
-            return [
-                SleepConsistencyData(day: "Mon", bedtime: 23.0, wakeTime: 7.0),
-                SleepConsistencyData(day: "Tue", bedtime: 23.5, wakeTime: 7.2),
-                SleepConsistencyData(day: "Wed", bedtime: 24.0, wakeTime: 7.5),
-                SleepConsistencyData(day: "Thu", bedtime: 23.2, wakeTime: 7.1),
-                SleepConsistencyData(day: "Fri", bedtime: 23.8, wakeTime: 7.4),
-                SleepConsistencyData(day: "Sat", bedtime: 24.5, wakeTime: 8.0),
-                SleepConsistencyData(day: "Sun", bedtime: 23.3, wakeTime: 7.3)
-            ]
-        case .month:
-            return [
-                SleepConsistencyData(day: "W1", bedtime: 23.4, wakeTime: 7.1),
-                SleepConsistencyData(day: "W2", bedtime: 23.2, wakeTime: 7.0),
-                SleepConsistencyData(day: "W3", bedtime: 23.6, wakeTime: 7.2),
-                SleepConsistencyData(day: "W4", bedtime: 23.3, wakeTime: 7.1)
-            ]
-        case .year:
-            return zip(StatsTimeRange.year.xAxisLabels,
-                       [(23.5,7.2),(23.4,7.1),(23.3,7.0),(23.2,7.0),
-                        (23.1,6.9),(23.0,6.8),(23.0,6.8),(23.1,6.9),
-                        (23.2,7.0),(23.4,7.1),(23.5,7.2),(23.6,7.3)]).map {
-                SleepConsistencyData(day: $0.0, bedtime: $0.1.0, wakeTime: $0.1.1)
-            }
-        }
+    private static func noData(for range: StatsTimeRange) -> [SleepConsistencyData] {
+        []
     }
 
     private static func standardDeviation(_ values: [Double]) -> Double {

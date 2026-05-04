@@ -407,7 +407,7 @@ final class SmartAlarmEngine {
 
     private func resolveAverages(from vitals: [WatchVitalsModel]) -> VitalAverages {
         if !vitals.isEmpty {
-            let validHRVValues = vitals.map(\.hrv).filter { $0 > 0 }
+            let validHRVValues = vitals.compactMap(\.hrv).filter { $0 > 0 }
             if validHRVValues.isEmpty {
                 print("HRV MISSING - IGNORED NOT ZEROED")
             }

@@ -9,10 +9,11 @@ import UIKit
 
 class ActivityDetailViewController: RoutineActivityViewController {
 
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var instructionLabel: UILabel!
-    @IBOutlet weak var steps: UILabel!
+    // Declared as regular vars — this VC is instantiated programmatically (no storyboard)
+    var titleLabel       = UILabel()
+    var imageView        = UIImageView()
+    var instructionLabel = UILabel()
+    var steps            = UILabel()
 
     var timerLayer = CAShapeLayer()
     var backgroundLayer = CAShapeLayer()
@@ -39,7 +40,7 @@ class ActivityDetailViewController: RoutineActivityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = WakeWellTheme.background
         setupUI()
         setupData()
         startCountdown()
@@ -89,7 +90,7 @@ class ActivityDetailViewController: RoutineActivityViewController {
         titleLabel.minimumScaleFactor = 0.75
 
         timerContainerView.translatesAutoresizingMaskIntoConstraints = false
-        timerContainerView.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.55)
+        timerContainerView.backgroundColor = WakeWellTheme.cardElevated.withAlphaComponent(0.55)
         timerContainerView.layer.cornerRadius = 110
         timerContainerView.clipsToBounds = false
 
@@ -107,31 +108,31 @@ class ActivityDetailViewController: RoutineActivityViewController {
         timerTextLabel.translatesAutoresizingMaskIntoConstraints = false
         timerTextLabel.font = .monospacedDigitSystemFont(ofSize: 36, weight: .bold)
         timerTextLabel.textAlignment = .center
-        timerTextLabel.textColor = .label
+        timerTextLabel.textColor = WakeWellTheme.labelPrimary
 
         timingLabel.translatesAutoresizingMaskIntoConstraints = false
         timingLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         timingLabel.textAlignment = .center
-        timingLabel.textColor = .secondaryLabel
+        timingLabel.textColor = WakeWellTheme.labelSecondary
         timingLabel.numberOfLines = 0
 
         instructionLabel.translatesAutoresizingMaskIntoConstraints = false
         instructionLabel.textAlignment = .left
         instructionLabel.numberOfLines = 0
         instructionLabel.font = .systemFont(ofSize: 18)
-        instructionLabel.textColor = .label
+        instructionLabel.textColor = WakeWellTheme.labelPrimary
 
         steps.translatesAutoresizingMaskIntoConstraints = false
         steps.textAlignment = .left
         steps.numberOfLines = 0
         steps.font = .systemFont(ofSize: 17)
-        steps.textColor = .secondaryLabel
+        steps.textColor = WakeWellTheme.labelSecondary
 
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.white, for: .normal)
         skipButton.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        skipButton.backgroundColor = .systemBlue
+        skipButton.backgroundColor = WakeWellTheme.accentGold
         skipButton.layer.cornerRadius = 14
         skipButton.contentEdgeInsets = UIEdgeInsets(top: 14, left: 28, bottom: 14, right: 28)
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
@@ -173,13 +174,13 @@ class ActivityDetailViewController: RoutineActivityViewController {
         ])
 
         countdownOverlay.translatesAutoresizingMaskIntoConstraints = false
-        countdownOverlay.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.95)
+        countdownOverlay.backgroundColor = WakeWellTheme.background.withAlphaComponent(0.95)
         countdownOverlay.alpha = 0
 
         countdownLabel.translatesAutoresizingMaskIntoConstraints = false
         countdownLabel.font = .boldSystemFont(ofSize: 34)
         countdownLabel.textAlignment = .center
-        countdownLabel.textColor = .label
+        countdownLabel.textColor = WakeWellTheme.labelPrimary
 
         countdownOverlay.addSubview(countdownLabel)
         view.addSubview(countdownOverlay)
@@ -202,9 +203,9 @@ class ActivityDetailViewController: RoutineActivityViewController {
         skipButton.isEnabled = false
         countdownLabel.text = "3"
 
-        UIView.animate(withDuration: 0.25) {
+        UIView.animate(withDuration: 0.25, animations: {
             self.countdownOverlay.alpha = 1
-        }
+        }, completion: nil)
 
         var countdownValue = 3
         countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
@@ -286,7 +287,7 @@ class ActivityDetailViewController: RoutineActivityViewController {
 
     private func showCompletionOverlay() {
         let overlay = UIView(frame: view.bounds)
-        overlay.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.96)
+        overlay.backgroundColor = WakeWellTheme.background.withAlphaComponent(0.96)
         overlay.alpha = 0
         overlay.translatesAutoresizingMaskIntoConstraints = false
 
@@ -294,7 +295,7 @@ class ActivityDetailViewController: RoutineActivityViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.font = .boldSystemFont(ofSize: 28)
-        label.textColor = .label
+        label.textColor = WakeWellTheme.labelPrimary
         label.numberOfLines = 0
         label.text = "Great job\nMoving to the next activity"
 
@@ -340,14 +341,14 @@ class ActivityDetailViewController: RoutineActivityViewController {
 //
 //        backgroundLayer = CAShapeLayer()
 //        backgroundLayer.path = circularPath.cgPath
-//        backgroundLayer.strokeColor = UIColor.systemGray4.cgColor
+//        backgroundLayer.strokeColor = WakeWellTheme.border.cgColor
 //        backgroundLayer.lineWidth = 6
 //        backgroundLayer.fillColor = UIColor.clear.cgColor
 //        backgroundLayer.position = center
 //
 //        timerLayer = CAShapeLayer()
 //        timerLayer.path = circularPath.cgPath
-//        timerLayer.strokeColor = UIColor.systemBlue.cgColor
+//        timerLayer.strokeColor = WakeWellTheme.accentPurple.cgColor
 //        timerLayer.lineWidth = 6
 //        timerLayer.fillColor = UIColor.clear.cgColor
 //        timerLayer.lineCap = .round

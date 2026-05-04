@@ -10,11 +10,11 @@ final class SleepArchitectureAnalyzer {
 
     static func getData(for range: StatsTimeRange) -> [SleepArchitectureData] {
         let records = HealthKitSleepRepository.shared.records(for: range)
-        guard !records.isEmpty else { return fallback(for: range) }
+        guard !records.isEmpty else { return noData(for: range) }
 
-        func toPct(_ record: NightRecord) -> (deep: Double, rem: Double, light: Double) {
+        func toPct(_ record: NightRecord) -> (deep: Double, rem: Double, light: Double)? {
             let total = record.deepHours + record.remHours + record.lightHours
-            guard total > 0 else { return (20, 22, 58) }
+            guard total > 0 else { return nil }
             return (
                 deep:  (record.deepHours  / total) * 100,
                 rem:   (record.remHours   / total) * 100,
@@ -24,21 +24,25 @@ final class SleepArchitectureAnalyzer {
 
         switch range {
         case .week:
-            return records.map {
-                let p = toPct($0)
+            return records.compactMap {
+                guard let p = toPct($0) else { return nil }
                 return SleepArchitectureData(day: weekdayLabel($0.date),
                                              deep: p.deep, rem: p.rem, light: p.light)
             }
         case .month:
-            return weeklyAveraged(records, fields: {
-                let p = toPct($0); return [p.deep, p.rem, p.light]
+            let validRecords = records.filter { toPct($0) != nil }
+            return weeklyAveraged(validRecords, fields: {
+                guard let p = toPct($0) else { return [] }
+                return [p.deep, p.rem, p.light]
             }).map {
                 SleepArchitectureData(day: $0.label,
                                       deep: $0.values[0], rem: $0.values[1], light: $0.values[2])
             }
         case .year:
-            return monthlyAveraged(records, fields: {
-                let p = toPct($0); return [p.deep, p.rem, p.light]
+            let validRecords = records.filter { toPct($0) != nil }
+            return monthlyAveraged(validRecords, fields: {
+                guard let p = toPct($0) else { return [] }
+                return [p.deep, p.rem, p.light]
             }).map {
                 SleepArchitectureData(day: $0.label,
                                       deep: $0.values[0], rem: $0.values[1], light: $0.values[2])
@@ -94,33 +98,7 @@ final class SleepArchitectureAnalyzer {
         """
     }
 
-    private static func fallback(for range: StatsTimeRange) -> [SleepArchitectureData] {
-        switch range {
-        case .week:
-            return [
-                SleepArchitectureData(day: "Mon", deep: 18.0, rem: 20.0, light: 62.0),
-                SleepArchitectureData(day: "Tue", deep: 16.0, rem: 19.0, light: 65.0),
-                SleepArchitectureData(day: "Wed", deep: 21.0, rem: 23.0, light: 56.0),
-                SleepArchitectureData(day: "Thu", deep: 19.0, rem: 21.0, light: 60.0),
-                SleepArchitectureData(day: "Fri", deep: 15.0, rem: 18.0, light: 67.0),
-                SleepArchitectureData(day: "Sat", deep: 22.0, rem: 24.0, light: 54.0),
-                SleepArchitectureData(day: "Sun", deep: 20.0, rem: 22.0, light: 58.0)
-            ]
-        case .month:
-            return [
-                SleepArchitectureData(day: "W1", deep: 18.0, rem: 20.0, light: 62.0),
-                SleepArchitectureData(day: "W2", deep: 19.5, rem: 21.5, light: 59.0),
-                SleepArchitectureData(day: "W3", deep: 17.0, rem: 19.0, light: 64.0),
-                SleepArchitectureData(day: "W4", deep: 20.5, rem: 22.5, light: 57.0)
-            ]
-        case .year:
-            return zip(StatsTimeRange.year.xAxisLabels,
-                       [(18,20,62),(17,19,64),(19,21,60),(20,22,58),
-                        (21,23,56),(22,24,54),(22,24,54),(21,23,56),
-                        (20,22,58),(19,21,60),(18,20,62),(18,20,62)]).map {
-                SleepArchitectureData(day: $0.0, deep: Double($0.1.0),
-                                      rem: Double($0.1.1), light: Double($0.1.2))
-            }
-        }
+    private static func noData(for range: StatsTimeRange) -> [SleepArchitectureData] {
+        []
     }
 }

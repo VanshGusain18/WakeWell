@@ -7,6 +7,7 @@ final class HealthKitManager {
     private let healthStore = HKHealthStore()
     private let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)
     private let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)
+    private let respiratoryRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)
     private let activeEnergyType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)
     private let stepCountType = HKObjectType.quantityType(forIdentifier: .stepCount)
     
@@ -20,7 +21,8 @@ final class HealthKitManager {
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
 
         guard let heartRateType,
-              let hrvType else {
+              let hrvType,
+              let respiratoryRateType else {
             completion(false)
             return
         }
@@ -28,7 +30,8 @@ final class HealthKitManager {
         var readTypes: Set<HKObjectType> = [
             sleepType,
             heartRateType,
-            hrvType
+            hrvType,
+            respiratoryRateType
         ]
         if let activeEnergyType {
             readTypes.insert(activeEnergyType)
@@ -107,9 +110,33 @@ final class HealthKitManager {
         healthStore.execute(query)
     }
 
-    func startWatchWorkoutSessionForLiveStreaming() {
-        // Demo placeholder: the real HKWorkoutSession must run on watchOS.
-        print("⌚️ Start HKWorkoutSession on Apple Watch for live heart-rate streaming")
+    func fetchLatestRespiratoryRate(completion: @escaping (Double?) -> Void) {
+        guard let respiratoryRateType else {
+            completion(nil)
+            return
+        }
+
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let query = HKSampleQuery(
+            sampleType: respiratoryRateType,
+            predicate: nil,
+            limit: 1,
+            sortDescriptors: [sortDescriptor]
+        ) { _, samples, _ in
+            let value = (samples?.first as? HKQuantitySample)?
+                .quantity
+                .doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+
+            if let value {
+                print("🫁 Respiratory Rate: \(String(format: "%.2f", value))")
+            }
+
+            DispatchQueue.main.async {
+                completion(value)
+            }
+        }
+
+        healthStore.execute(query)
     }
 
     func fetchLastNightSleep() {
@@ -172,72 +199,6 @@ final class HealthKitManager {
         }
 
         healthStore.execute(query)
-    }
-
-    func addMockSleepData() {
-
-        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let calendar = Calendar.current
-        let now = Date()
-
-        var samples: [HKCategorySample] = []
-
-        for i in 1...10 {
-
-            let baseDate = calendar.date(byAdding: .day, value: -i, to: now)!
-
-            let startHour = Int.random(in: 22...23)
-            let startMinute = Int.random(in: 0...59)
-
-            let sleepStart = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: baseDate)!
-
-            let totalMinutes = Int.random(in: 360...540)
-
-            var currentTime = sleepStart
-
-            func addStage(_ type: HKCategoryValueSleepAnalysis, minutes: Int) {
-                let end = calendar.date(byAdding: .minute, value: minutes, to: currentTime)!
-                
-                let sample = HKCategorySample(
-                    type: sleepType,
-                    value: type.rawValue,
-                    start: currentTime,
-                    end: end
-                )
-                
-                samples.append(sample)
-                currentTime = end
-            }
-
-            var remaining = totalMinutes
-
-            while remaining > 0 {
-
-                let chunk = min(Int.random(in: 20...90), remaining)
-
-                let stageRoll = Int.random(in: 1...100)
-
-                if stageRoll <= 55 {
-                    addStage(.asleepCore, minutes: chunk)
-                } else if stageRoll <= 75 {
-                    addStage(.asleepDeep, minutes: chunk)
-                } else if stageRoll <= 95 {
-                    addStage(.asleepREM, minutes: chunk)
-                } else {
-                    addStage(.awake, minutes: Int.random(in: 5...15))
-                }
-
-                remaining -= chunk
-            }
-        }
-
-        healthStore.save(samples) { success, error in
-            if success {
-                print("Realistic mock sleep data added")
-            } else {
-                print("Error:", error?.localizedDescription ?? "")
-            }
-        }
     }
 
 }

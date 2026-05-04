@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,11 +21,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="682" height="500"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="htq-Kt-yQI" customClass="LineChartView" customModule="DGCharts">
-                                <rect key="frame" x="12" y="44.333333333333343" width="658" height="443.66666666666663"/>
+                                <rect key="frame" x="16" y="52.333333333333343" width="650" height="431.66666666666663"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ku0-tq-OHC">
-                                <rect key="frame" x="12" y="11.999999999999998" width="658" height="20.333333333333329"/>
+                                <rect key="frame" x="16" y="15.999999999999998" width="650" height="20.333333333333329"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -33,15 +33,14 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="htq-Kt-yQI" firstAttribute="top" secondItem="ku0-tq-OHC" secondAttribute="bottom" constant="12" id="3HC-ZI-rnL"/>
-                            <constraint firstAttribute="trailing" secondItem="htq-Kt-yQI" secondAttribute="trailing" constant="12" id="9tf-vX-TQT"/>
-                            <constraint firstAttribute="bottom" secondItem="htq-Kt-yQI" secondAttribute="bottom" constant="12" id="IWc-O1-aqD"/>
-                            <constraint firstItem="htq-Kt-yQI" firstAttribute="leading" secondItem="FNA-TR-Iga" secondAttribute="leading" constant="12" id="YML-WP-3Uz"/>
-                            <constraint firstAttribute="trailing" secondItem="ku0-tq-OHC" secondAttribute="trailing" constant="12" id="a79-DT-5NN"/>
-                            <constraint firstItem="ku0-tq-OHC" firstAttribute="leading" secondItem="FNA-TR-Iga" secondAttribute="leading" constant="12" id="ceN-gN-LPW"/>
-                            <constraint firstItem="htq-Kt-yQI" firstAttribute="top" secondItem="ku0-tq-OHC" secondAttribute="bottom" constant="12" id="uiJ-Pm-G5k"/>
-                            <constraint firstItem="htq-Kt-yQI" firstAttribute="top" secondItem="ku0-tq-OHC" secondAttribute="bottom" constant="12" id="uvF-yL-BSA"/>
-                            <constraint firstItem="ku0-tq-OHC" firstAttribute="top" secondItem="FNA-TR-Iga" secondAttribute="top" constant="12" id="wQ1-pf-jPz"/>
+                            <constraint firstItem="htq-Kt-yQI" firstAttribute="top" secondItem="ku0-tq-OHC" secondAttribute="bottom" constant="16" id="0yn-99-UDz"/>
+                            <constraint firstAttribute="trailing" secondItem="ku0-tq-OHC" secondAttribute="trailing" constant="16" id="3Gv-KK-wqj"/>
+                            <constraint firstAttribute="trailing" secondItem="htq-Kt-yQI" secondAttribute="trailing" constant="16" id="53A-cY-ZZi"/>
+                            <constraint firstItem="htq-Kt-yQI" firstAttribute="top" secondItem="ku0-tq-OHC" secondAttribute="bottom" constant="16" id="BfW-ue-ghC"/>
+                            <constraint firstItem="ku0-tq-OHC" firstAttribute="leading" secondItem="FNA-TR-Iga" secondAttribute="leading" constant="16" id="Dmk-1V-vAJ"/>
+                            <constraint firstItem="htq-Kt-yQI" firstAttribute="leading" secondItem="FNA-TR-Iga" secondAttribute="leading" constant="16" id="LQh-lK-3RS"/>
+                            <constraint firstAttribute="bottom" secondItem="htq-Kt-yQI" secondAttribute="bottom" constant="16" id="W6z-ru-G1W"/>
+                            <constraint firstItem="ku0-tq-OHC" firstAttribute="top" secondItem="FNA-TR-Iga" secondAttribute="top" constant="16" id="r43-LZ-jUN"/>
                         </constraints>
                     </view>
                 </subviews>

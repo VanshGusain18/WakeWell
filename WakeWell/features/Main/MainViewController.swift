@@ -12,6 +12,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var here: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
     @IBAction func but(_ sender: Any) {

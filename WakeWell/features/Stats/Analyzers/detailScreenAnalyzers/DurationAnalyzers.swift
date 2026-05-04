@@ -2,8 +2,7 @@
 //  DurationAnalyzers.swift
 //  WakeWell
 //
-//  getData() now pulls from HealthKitSleepRepository.
-//  Hardcoded arrays are kept as fallback when no HealthKit data exists yet.
+//  getData() pulls from HealthKitSleepRepository.
 //
 
 import Foundation
@@ -13,7 +12,7 @@ final class SleepDurationAnalyzer {
 
     static func getData(for range: StatsTimeRange) -> [DurationData] {
         let records = HealthKitSleepRepository.shared.records(for: range)
-        guard !records.isEmpty else { return fallback(for: range) }
+        guard !records.isEmpty else { return noData(for: range) }
 
         switch range {
         case .week:
@@ -65,31 +64,8 @@ final class SleepDurationAnalyzer {
         """
     }
 
-    private static func fallback(for range: StatsTimeRange) -> [DurationData] {
-        switch range {
-        case .week:
-            return [
-                DurationData(day: "Mon", hoursSlept: 7.5),
-                DurationData(day: "Tue", hoursSlept: 6.8),
-                DurationData(day: "Wed", hoursSlept: 8.0),
-                DurationData(day: "Thu", hoursSlept: 7.2),
-                DurationData(day: "Fri", hoursSlept: 6.5),
-                DurationData(day: "Sat", hoursSlept: 8.5),
-                DurationData(day: "Sun", hoursSlept: 7.8)
-            ]
-        case .month:
-            return [
-                DurationData(day: "W1", hoursSlept: 7.1),
-                DurationData(day: "W2", hoursSlept: 7.4),
-                DurationData(day: "W3", hoursSlept: 6.9),
-                DurationData(day: "W4", hoursSlept: 7.6)
-            ]
-        case .year:
-            return zip(StatsTimeRange.year.xAxisLabels,
-                       [7.2, 7.0, 7.3, 7.5, 7.6, 7.8, 7.9, 7.7, 7.4, 7.2, 7.1, 7.3]).map {
-                DurationData(day: $0.0, hoursSlept: $0.1)
-            }
-        }
+    private static func noData(for range: StatsTimeRange) -> [DurationData] {
+        []
     }
 }
 

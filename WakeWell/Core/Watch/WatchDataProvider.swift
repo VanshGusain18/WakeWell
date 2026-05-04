@@ -5,7 +5,7 @@ struct VitalData {
     let heartRate: Double
     let hrv: Double?
     let motion: Double
-    let respiratoryRate: Double
+    let respiratoryRate: Double?
     let wristTemp: Double?
     let oxygenSaturation: Double?
     let phase: String
@@ -14,7 +14,7 @@ struct VitalData {
         WatchVitalsModel(
             timestamp: timestamp,
             heartRate: heartRate,
-            hrv: hrv ?? 0,
+            hrv: hrv,
             motion: motion,
             respiratoryRate: respiratoryRate,
             wristTemp: wristTemp,

@@ -4,6 +4,7 @@ struct WatchVitals {
     let heartRate: Double
     let hrv: Double?
     let motion: Double
+    let respiratoryRate: Double?
     let timestamp: Date
     let hrvUnavailableReason: String?
 
@@ -15,7 +16,8 @@ struct WatchVitals {
             "validityFlags": [
                 "hrReal": true,
                 "hrvReal": hrv != nil,
-                "motionReal": true
+                "motionReal": true,
+                "respiratoryRateReal": respiratoryRate != nil
             ]
         ]
 
@@ -23,6 +25,10 @@ struct WatchVitals {
             payload["hrv"] = hrv
         } else if let hrvUnavailableReason {
             payload["hrvUnavailableReason"] = hrvUnavailableReason
+        }
+
+        if let respiratoryRate {
+            payload["respiratoryRate"] = respiratoryRate
         }
 
         return payload

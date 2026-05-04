@@ -34,7 +34,7 @@ final class VitalsEngine {
             heartRate: smoothedHeartRate,
             hrv: sample.hrv,
             motion: sample.motion,
-            respiratoryRate: 0,
+            respiratoryRate: sample.respiratoryRate,
             wristTemp: nil,
             oxygenSaturation: nil,
             phase: sample.motion < 0.45 ? "Light Sleep" : "Wake Transition"

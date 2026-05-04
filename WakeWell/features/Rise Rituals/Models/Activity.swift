@@ -1,292 +1,141 @@
-//
-//  Activity.swift
-//  WakeWell
-//
-//  Created by geu on 18/03/26.
-//
+// Activity.swift — SetSail
+// Model is kept identical to the original so HomeDataProvider, Stats, and
+// other features that reference `activities` / `Activity` are unaffected.
 
-struct Activity : Codable{
-    let id: String
-    let title: String
-    let description: String
-    let duration: Int?
-    let category: String
-    let imageName: String
+import Foundation
+
+struct Activity: Codable {
+    let id:           String
+    let title:        String
+    let description:  String
+    let duration:     Int?
+    let category:     String
+    let imageName:    String
     let activityType: ActivityType
-    let steps: [String]
+    let steps:        [String]
 }
+
 enum ActivityType: String, Codable {
     case timerBased
     case stepBased
     case informational
 }
 
+// MARK: - Built-in activity library (science-backed, grogginess-busting)
+
 var activities: [Activity] = [
-    
-    Activity(id: "ritual_1", title: "Sunlight Exposure",
-             description: "Get 10-15 minutes of direct sunlight to refresh your senses and boost your energy.",
-             duration: 900,
-             category: "(Calm your mind)",
-             imageName: "ritual_1",
+
+    Activity(id: "ritual_1",  title: "Sunlight Exposure",
+             description: "Step outside for 10–15 minutes of natural light. Sunlight suppresses melatonin and resets your circadian clock.",
+             duration: 900, category: "Energy", imageName: "ritual_1",
              activityType: .timerBased,
-             steps: [
-                "Step outside or sit near a window",
-                "Expose your eyes to natural light",
-                "Relax and breathe normally"
-             ]),
-    
-    Activity(id: "ritual_2", title: "Screen Light Ramp",
-             description: "Gradually increase screen brightness or use warmer light settings.",
-             duration: nil,
-             category: "mindfulness",
-             imageName: "ritual_2",
-             activityType: .informational,
-             steps: [
-                "Start with low brightness",
-                "Gradually increase over time",
-                "Enable night shift or warm tones"
-             ]),
-    
-    Activity(id: "ritual_3", title: "Warm Sunlight",
-             description: "Feel the warmth of the sun on your skin.",
-             duration: 300,
-             category: "mindfulness",
-             imageName: "ritual_3",
-             activityType: .timerBased,
-             steps: [
-                "Step into sunlight",
-                "Close your eyes briefly",
-                "Focus on warmth on skin"
-             ]),
-    
-    Activity(id: "ritual_4", title: "Calm Sigh",
-             description: "Deep inhale, short inhale, long exhale.",
-             duration: 60,
-             category: "mindfulness",
-             imageName: "ritual_4",
+             steps: ["Step outside or sit near a window",
+                     "Let natural light reach your eyes — no sunglasses",
+                     "Breathe slowly and let your body wake up"]),
+
+    Activity(id: "ritual_2",  title: "Cold Splash",
+             description: "Splash cold water on your face to trigger the dive reflex, reducing sleepiness fast.",
+             duration: nil, category: "Alertness", imageName: "ritual_2",
              activityType: .stepBased,
-             steps: [
-                "Take a deep inhale",
-                "Take a second short inhale",
-                "Slowly exhale through mouth"
-             ]),
-    
-    Activity(id: "ritual_5", title: "Box Breathing",
-             description: "Inhale, hold, exhale, hold.",
-             duration: 168,
-             category: "mindfulness",
-             imageName: "ritual_5",
+             steps: ["Run cold water from the tap",
+                     "Splash your face 5–10 times",
+                     "Pat dry and notice how awake you feel"]),
+
+    Activity(id: "ritual_3",  title: "Box Breathing",
+             description: "4-4-4-4 breathing activates the parasympathetic nervous system, clearing brain fog.",
+             duration: 168, category: "Calm", imageName: "ritual_5",
              activityType: .timerBased,
-             steps: [
-                "Inhale while the dot moves up the first edge",
-                "Hold while it crosses the top edge",
-                "Exhale on the third edge and pause on the fourth",
-                "Complete 6 slow cycles"
-             ]),
-    
-    Activity(id: "ritual_6", title: "Extended Exhale",
-             description: "Exhale twice as long as inhale.",
-             duration: 120,
-             category: "mindfulness",
-             imageName: "ritual_6",
+             steps: ["Inhale for 4 counts",
+                     "Hold for 4 counts",
+                     "Exhale for 4 counts",
+                     "Hold for 4 counts — repeat 6 times"]),
+
+    Activity(id: "ritual_4",  title: "Physiological Sigh",
+             description: "Double inhale through the nose then a long exhale instantly lowers stress.",
+             duration: 60, category: "Calm", imageName: "ritual_4",
              activityType: .timerBased,
-             steps: [
-                "Inhale slowly",
-                "Exhale for double duration",
-                "Repeat rhythm calmly"
-             ]),
-    
-    Activity(id: "ritual_7", title: "Stability Pause",
-             description: "Stand still and balance.",
-             duration: 60,
-             category: "mindfulness",
-             imageName: "ritual_7",
+             steps: ["Inhale fully through your nose",
+                     "Take a second short inhale on top",
+                     "Exhale slowly through your mouth — longer than the inhale"]),
+
+    Activity(id: "ritual_5",  title: "Hydration",
+             description: "Drinking 1–2 glasses of water after waking replenishes overnight fluid loss and boosts alertness.",
+             duration: nil, category: "Energy", imageName: "ritual_20",
+             activityType: .stepBased,
+             steps: ["Pour a full glass of water",
+                     "Drink it slowly — no rush",
+                     "Notice how your body responds"]),
+
+    Activity(id: "ritual_6",  title: "Body Scan Stretch",
+             description: "A 2-minute head-to-toe stretch reduces cortisol and wakes up your muscles.",
+             duration: 120, category: "Physical", imageName: "ritual_10",
              activityType: .timerBased,
-             steps: [
-                "Stand upright",
-                "Focus on balance",
-                "Stay still without movement"
-             ]),
-    
-    Activity(id: "ritual_8", title: "Stand Posture",
-             description: "Align your spine.",
-             duration: nil,
-             category: "physical",
-             imageName: "ritual_8",
-             activityType: .informational,
-             steps: [
-                "Stand straight",
-                "Pull shoulders back",
-                "Align neck with spine"
-             ]),
-    
-    Activity(id: "ritual_9", title: "Short Walk",
-             description: "Take a walk.",
-             duration: 420,
-             category: "physical",
-             imageName: "ritual_9",
+             steps: ["Roll your neck gently left and right",
+                     "Shrug shoulders up to ears — release",
+                     "Reach arms above your head and stretch",
+                     "Slowly bend forward and hang"]),
+
+    Activity(id: "ritual_7",  title: "Gratitude Note",
+             description: "Writing one sentence of gratitude shifts your brain from threat-detection to positive focus.",
+             duration: nil, category: "Mindset", imageName: "ritual_19",
+             activityType: .stepBased,
+             steps: ["Pick up a pen or open notes",
+                     "Write one thing you are grateful for today",
+                     "Read it back and let it land"]),
+
+    Activity(id: "ritual_8",  title: "Top Priority",
+             description: "Identifying your single most important task reduces decision fatigue and primes focus.",
+             duration: nil, category: "Mindset", imageName: "ritual_17",
+             activityType: .stepBased,
+             steps: ["Think about everything on your plate today",
+                     "Pick ONE task that matters most",
+                     "Write it down or say it aloud"]),
+
+    Activity(id: "ritual_9",  title: "Short Walk",
+             description: "Even 5 minutes of walking increases dopamine, serotonin, and norepinephrine — all anti-grogginess.",
+             duration: 300, category: "Physical", imageName: "ritual_9",
              activityType: .timerBased,
-             steps: [
-                "Start walking at an easy pace",
-                "Aim to complete 100 steps",
-                "Keep the rhythm steady and relaxed"
-             ]),
-    
-    Activity(id: "ritual_10", title: "Neck Mobility",
-             description: "Gentle neck stretches.",
-             duration: 60,
-             category: "physical",
-             imageName: "ritual_10",
-             activityType: .stepBased,
-             steps: [
-                "Tilt head side to side",
-                "Rotate neck slowly",
-                "Stretch gently"
-             ]),
-    
-    Activity(id: "ritual_11", title: "Balance Hold",
-             description: "Stand on one leg.",
-             duration: 60,
-             category: "physical",
-             imageName: "ritual_11",
+             steps: ["Head outside or walk around your home",
+                     "Keep a steady comfortable pace",
+                     "No phone — just movement and observation"]),
+
+    Activity(id: "ritual_10", title: "Balance Hold",
+             description: "Single-leg balance activates the cerebellum and rapidly sharpens full-brain focus.",
+             duration: 60, category: "Physical", imageName: "ritual_11",
              activityType: .timerBased,
-             steps: [
-                "Lift one leg",
-                "Maintain balance",
-                "Switch sides"
-             ]),
-    
-    Activity(id: "ritual_12", title: "Reaction Tap",
-             description: "Tap rapidly.",
-             duration: 300,
-             category: "productivity",
-             imageName: "ritual_12",
+             steps: ["Stand near a wall for safety",
+                     "Lift one foot off the ground",
+                     "Hold for 30 seconds each side"]),
+
+    Activity(id: "ritual_11", title: "Reaction Taps",
+             description: "Visual reaction training fires fast-twitch neural circuits and eliminates mental sluggishness.",
+             duration: 300, category: "Alertness", imageName: "ritual_12",
              activityType: .timerBased,
-             steps: [
-                "Tap the dot as soon as it appears",
-                "Missed dots score zero",
-                "The dot speed increases as you go"
-             ]),
-    
-    Activity(id: "ritual_13", title: "Pattern Recognition",
-             description: "Find repeated shapes, colors, or movements around you.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_13",
-             activityType: .informational,
-             steps: [
-                "Observe surroundings",
-                "Identify repeating elements",
-                "Focus on patterns"
-             ]),
-    
-    Activity(id: "ritual_14", title: "Working Memory",
-             description: "Recall items.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_14",
-             activityType: .stepBased,
-             steps: [
-                "Think of yesterday",
-                "Recall 5 items",
-                "Repeat mentally"
-             ]),
-    
-    Activity(id: "ritual_15", title: "Focus Calibration",
-             description: "Stare at a point.",
-             duration: 60,
-             category: "productivity",
-             imageName: "ritual_15",
+             steps: ["Tap the dot the instant it appears",
+                     "Missed dots score zero — stay sharp",
+                     "Speed increases as your reaction improves"]),
+
+    Activity(id: "ritual_12", title: "Focus Calibration",
+             description: "Holding visual focus on a single point for 60 seconds trains attentional control.",
+             duration: 60, category: "Alertness", imageName: "ritual_15",
              activityType: .timerBased,
-             steps: [
-                "Pick a point",
-                "Focus your eyes",
-                "Avoid distractions"
-             ]),
-    
-    Activity(id: "ritual_16", title: "One Line Intention",
-             description: "Write a goal.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_16",
-             activityType: .stepBased,
-             steps: [
-                "Think of your goal",
-                "Write one sentence",
-                "Keep it simple"
-             ]),
-    
-    Activity(id: "ritual_17", title: "Top Priority",
-             description: "Find main task.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_17",
-             activityType: .stepBased,
-             steps: [
-                "List tasks",
-                "Pick most important",
-                "Commit to it"
-             ]),
-    
-    Activity(id: "ritual_18", title: "First Task",
-             description: "Start your task.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_18",
-             activityType: .stepBased,
-             steps: [
-                "Pick your task",
-                "Start immediately",
-                "Avoid distractions"
-             ]),
-    
-    Activity(id: "ritual_19", title: "Gratitude",
-             description: "Be grateful.",
-             duration: nil,
-             category: "productivity",
-             imageName: "ritual_19",
-             activityType: .stepBased,
-             steps: [
-                "Think of one thing",
-                "Feel gratitude",
-                "Write it down"
-             ]),
-    
-    Activity(id: "ritual_20", title: "Hydration",
-             description: "Drink water.",
-             duration: nil,
-             category: "nutrition",
-             imageName: "ritual_20",
-             activityType: .stepBased,
-             steps: [
-                "Fill a glass",
-                "Drink slowly",
-                "Notice temperature"
-             ]),
-    
-    Activity(id: "ritual_21", title: "Stillness Check",
-             description: "Eat quietly.",
-             duration: nil,
-             category: "nutrition",
-             imageName: "ritual_21",
-             activityType: .informational,
-             steps: [
-                "Sit calmly",
-                "Eat without distractions",
-                "Focus on food"
-             ]),
-    
-    Activity(id: "ritual_22", title: "Temperature Awareness",
-             description: "Notice food temperature.",
-             duration: nil,
-             category: "nutrition",
-             imageName: "ritual_22",
-             activityType: .informational,
-             steps: [
-                "Take a bite",
-                "Notice warmth/cold",
-                "Observe sensations"
-             ])
+             steps: ["Pick a fixed point across the room",
+                     "Lock your gaze on it — don't let it wander",
+                     "If your mind drifts, bring it back"]),
 ]
 
-var shuffledActivities = activities.shuffled()
+var shuffledActivities: [Activity] = activities.shuffled()
+
+// MARK: - Persistence helpers
+
+func loadActivities() {
+    guard let data = UserDefaults.standard.data(forKey: "activities"),
+          let saved = try? JSONDecoder().decode([Activity].self, from: data)
+    else { return }
+    activities = saved
+}
+
+func saveActivities() {
+    guard let data = try? JSONEncoder().encode(activities) else { return }
+    UserDefaults.standard.set(data, forKey: "activities")
+}

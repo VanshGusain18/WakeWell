@@ -5,6 +5,9 @@ class SoundTableViewController: UITableViewController {
 
     @IBOutlet weak var segmentView: UISegmentedControl!
 
+    @IBOutlet weak var outerviewSound: UIView!
+    
+    
     private var allSoundsData: [Sound] = allSounds
     private var filteredSounds: [Sound] = []
 
@@ -17,7 +20,7 @@ class SoundTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        applyTheme()
         filteredSounds = allSoundsData
 
         segmentView?.addTarget(self,
@@ -44,6 +47,22 @@ class SoundTableViewController: UITableViewController {
             action: #selector(closeTapped)
         )
 
+    }
+    private func applyTheme() {
+        view.backgroundColor = WakeWellTheme.background
+        tableView.backgroundColor = .clear
+        tableView.tableHeaderView?.backgroundColor = .clear
+        outerviewSound?.backgroundColor = .clear
+
+        segmentView?.selectedSegmentTintColor = WakeWellTheme.accentPurple
+        segmentView?.backgroundColor          = WakeWellTheme.cardElevated
+        segmentView?.layer.cornerRadius      = 16
+        segmentView?.clipsToBounds           = true
+        segmentView?.setTitleTextAttributes(
+            [.foregroundColor: UIColor.white,
+             .font: UIFont.systemFont(ofSize: 13, weight: .semibold)], for: .selected)
+        segmentView?.setTitleTextAttributes(
+            [.foregroundColor: WakeWellTheme.labelPrimary], for: .normal)
     }
 
    // Segment Control
@@ -94,18 +113,18 @@ class SoundTableViewController: UITableViewController {
 
         durationLabel.text = formatDuration(Int(duration))
         durationLabel.font = .systemFont(ofSize: 14)
-        durationLabel.textColor = .secondaryLabel
+        durationLabel.textColor = WakeWellTheme.labelSecondary
         durationLabel.sizeToFit()
         cell.accessoryView = durationLabel
 
         if sound.fileName == currentlyPlayingFileName {
-            cell.backgroundColor = UIColor.systemGray6
+            cell.backgroundColor = WakeWellTheme.purpleTint
             cell.textLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-            durationLabel.textColor = .systemBlue
+            durationLabel.textColor = WakeWellTheme.accentPurple
         } else {
             cell.backgroundColor = .clear
             cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            durationLabel.textColor = .secondaryLabel
+            durationLabel.textColor = WakeWellTheme.labelSecondary
         }
 
         return cell
@@ -239,8 +258,8 @@ class SoundTableViewController: UITableViewController {
     private func setupBackgroundGradient() {
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor.systemBackground.cgColor,
-            UIColor.systemGray6.cgColor
+            WakeWellTheme.background.cgColor,
+            WakeWellTheme.cardElevated.cgColor
         ]
         gradient.frame = view.bounds
 
@@ -250,5 +269,3 @@ class SoundTableViewController: UITableViewController {
         tableView.backgroundView = backgroundView
     }
 }
-
-

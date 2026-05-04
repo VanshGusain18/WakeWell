@@ -176,6 +176,11 @@
 				TargetAttributes = {
 					D63861B72FA1C4B500487988 = {
 						CreatedOnToolsVersion = 26.2;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
 					};
 					D67C6D722F2CC9F4004ECCDB = {
 						CreatedOnToolsVersion = 26.2;
@@ -260,12 +265,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "WakeWell Watch App Watch App/WakeWell_Watch_App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -293,12 +302,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "WakeWell Watch App Watch App/WakeWell_Watch_App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
 				LD_RUNPATH_SEARCH_PATHS = (

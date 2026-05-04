@@ -98,7 +98,7 @@ final class SmartAlarmEngine {
         transitionState(to: .monitoring)
     }
 
-    func recordCurrentInput(heartRate: Double, hrv: Double, motion: Double, phase: String) {
+    func recordCurrentInput(heartRate: Double, hrv: Double?, motion: Double, phase: String) {
         latestLiveInput = InputSnapshot(
             motion: motion,
             hr: heartRate,
@@ -127,6 +127,10 @@ final class SmartAlarmEngine {
 
     func evaluateWakeOpportunity() -> WakeDecision {
         let now = Date()
+
+        if let connectionDecision = watchConnectionDecision() {
+            return connectionDecision
+        }
 
         if let cooldownDecision = cooldownDecision(at: now) {
             logDecision(
@@ -205,6 +209,13 @@ final class SmartAlarmEngine {
 
         let vitals = fetchRecentVitals()
 
+        guard hasContinuousSignalWindow(vitals) else {
+            print("DATA STALE - NO DECISION")
+            freezeSignalState()
+            let decision = noDecision(reason: "stale_watch_data")
+            return decision
+        }
+
         guard vitals.count >= minimumRequiredSamples else {
             consecutiveHighScoreCount = 0
             motionIncreasingCount = 0
@@ -268,7 +279,7 @@ final class SmartAlarmEngine {
             remainingTimeToAlarm: timeToAlarm,
             withinWakeWindow: withinWakeWindow
         )
-        let shouldTrigger = triggerEvaluation.shouldTrigger
+        let shouldTrigger = safeTriggerAllowed(triggerEvaluation)
 
         let reason = shouldTrigger ? triggerEvaluation.reason : decisionReason(
             score: score,
@@ -308,7 +319,7 @@ final class SmartAlarmEngine {
                 avgHR: averages.avgHR,
                 avgHRV: averages.avgHRV,
                 avgMotion: averages.avgMotion,
-                reason: triggerEvaluation.reason
+                reason: shouldTrigger ? triggerEvaluation.reason : "safe_trigger_blocked"
             )
 
             logTriggerPath(triggerEvaluation, confidence: wakeConfidence)
@@ -330,6 +341,18 @@ final class SmartAlarmEngine {
         DatabaseManager.shared
             .fetchRecentVitals(limit: analysisWindowSize)
             .sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private func hasContinuousSignalWindow(_ vitals: [WatchVitalsModel]) -> Bool {
+        guard let latest = vitals.last else { return false }
+        guard Date().timeIntervalSince(latest.timestamp) <= 20 else { return false }
+        guard vitals.count >= minimumRequiredSamples else { return true }
+
+        let gaps = zip(vitals.dropFirst(), vitals).map {
+            $0.0.timestamp.timeIntervalSince($0.1.timestamp)
+        }
+
+        return gaps.allSatisfy { $0 <= 20 }
     }
 
     private func smoothedSeries(from vitals: [WatchVitalsModel]) -> [WatchVitalsModel] {
@@ -384,9 +407,14 @@ final class SmartAlarmEngine {
 
     private func resolveAverages(from vitals: [WatchVitalsModel]) -> VitalAverages {
         if !vitals.isEmpty {
+            let validHRVValues = vitals.map(\.hrv).filter { $0 > 0 }
+            if validHRVValues.isEmpty {
+                print("HRV MISSING - IGNORED NOT ZEROED")
+            }
+
             let averages = VitalAverages(
                 avgHR: average(for: vitals.map(\.heartRate)),
-                avgHRV: average(for: vitals.map(\.hrv)),
+                avgHRV: validHRVValues.isEmpty ? nil : average(for: validHRVValues),
                 avgMotion: average(for: vitals.map(\.motion))
             )
             lastKnownAverages = averages
@@ -399,7 +427,9 @@ final class SmartAlarmEngine {
     private func updateSignalWindows(with averages: VitalAverages) {
         appendWindowValue(&lastMotionValues, value: averages.avgMotion)
         appendWindowValue(&lastHRValues, value: averages.avgHR)
-        appendWindowValue(&lastHRVValues, value: averages.avgHRV)
+        if let avgHRV = averages.avgHRV {
+            appendWindowValue(&lastHRVValues, value: avgHRV)
+        }
     }
 
     private func analyzeTrends(rawVitals: [WatchVitalsModel], smoothedVitals: [WatchVitalsModel]) -> TrendAnalysis {
@@ -421,13 +451,18 @@ final class SmartAlarmEngine {
 
     private func computeScore(from averages: VitalAverages, signals: SignalState) -> ScoreBreakdown {
         let hrScore = normalize(averages.avgHR, minValue: 50, maxValue: 100)
-        let hrvScore = normalize(averages.avgHRV, minValue: 20, maxValue: 80)
         let motionScore = normalize(averages.avgMotion, minValue: 0.05, maxValue: 0.5)
 
-        let baseScore =
-            0.42 * hrScore +
-            0.33 * (1 - hrvScore) +
-            0.25 * motionScore
+        var baseScore =
+            0.62 * hrScore +
+            0.38 * motionScore
+
+        if let avgHRV = averages.avgHRV, avgHRV > 0 {
+            let hrvScore = normalize(avgHRV, minValue: 20, maxValue: 80)
+            baseScore += 0.05 * (1 - hrvScore)
+        } else {
+            print("HRV MISSING - IGNORED NOT ZEROED")
+        }
 
         let motionBoost = signals.motionSpike ? 0.05 : 0
         let hrBoost = signals.hrTrend ? 0.08 : 0
@@ -464,7 +499,7 @@ final class SmartAlarmEngine {
         let spikeBonus = signals.motionSpike ? 0.22 : 0
         let consecutiveBonus = min(Double(consecutiveHighScoreCount) * 0.08, 0.24)
         let motionIncreaseBonus = min(Double(motionIncreasingCount) * 0.035, 0.16)
-        let hrvTransitionBonus = score.finalScore > 0.50 && analysis.motionIncreasing ? 0.05 : 0
+        let hrvTransitionBonus: Double = 0
         let wakeWindowBonus = withinWakeWindow ? 0.05 : 0
         let timePressureBonus = timeToAlarm <= safetyTriggerWindow ? 0.05 : 0
         let targetConfidence = clamp(
@@ -640,6 +675,80 @@ final class SmartAlarmEngine {
 
     // MARK: - Decision Helpers
 
+    private func watchConnectionDecision() -> WakeDecision? {
+        let monitor = WatchConnectionMonitor.shared
+
+        guard monitor.state == .connected else {
+            print("WATCH DISCONNECTED - FREEZING ENGINE")
+            freezeSignalState()
+            return noDecision(reason: "watch_disconnected")
+        }
+
+        guard !monitor.isStaleData else {
+            print("DATA STALE - NO DECISION")
+            freezeSignalState()
+            return noDecision(reason: "stale_watch_data")
+        }
+
+        return nil
+    }
+
+    private func noDecision(reason: String) -> WakeDecision {
+        let decision = WakeDecision(
+            shouldTrigger: false,
+            confidence: wakeConfidence,
+            reason: reason
+        )
+
+        debugSnapshot = SmartAlarmDebugSnapshot(
+            currentHR: latestLiveInput.hr,
+            currentHRV: latestLiveInput.hrv ?? 0,
+            currentMotion: latestLiveInput.motion,
+            avgHR: lastKnownAverages?.avgHR ?? 0,
+            avgHRV: lastKnownAverages?.avgHRV ?? 0,
+            avgMotion: lastKnownAverages?.avgMotion ?? 0,
+            confidence: wakeConfidence,
+            score: debugSnapshot.score,
+            threshold: optimalTriggerThreshold,
+            motionIncreasingCount: motionIncreasingCount,
+            currentPhase: currentPhaseLabel,
+            alarmState: alarmState,
+            decisionReason: reason,
+            timeToAlarm: remainingTimeToAlarm(from: Date()).map(formattedMinutes) ?? "--"
+        )
+        publishDebugSnapshot(debugSnapshot)
+        return decision
+    }
+
+    private func freezeSignalState() {
+        consecutiveHighScoreCount = 0
+        motionIncreasingCount = 0
+        wakeConfidence = max(0, wakeConfidence - 0.02)
+    }
+
+    private func safeTriggerAllowed(_ evaluation: TriggerEvaluation) -> Bool {
+        guard evaluation.shouldTrigger else { return false }
+
+        let monitor = WatchConnectionMonitor.shared
+        let dataFresh = !monitor.isStaleData
+        let watchConnected = monitor.state == .connected
+        let confidencePassed = wakeConfidence > evaluation.thresholdUsed
+
+        if confidencePassed && dataFresh && watchConnected {
+            print("SAFE TRIGGER ALLOWED")
+            return true
+        }
+
+        print("SAFE TRIGGER BLOCKED")
+        if !watchConnected {
+            print("WATCH DISCONNECTED - FREEZING ENGINE")
+        }
+        if !dataFresh {
+            print("DATA STALE - NO DECISION")
+        }
+        return false
+    }
+
     private func cooldownDecision(at now: Date) -> WakeDecision? {
         guard let lastTriggerTime else { return nil }
 
@@ -760,7 +869,7 @@ final class SmartAlarmEngine {
         print("[INPUT]")
         print("- motion: \(formatted(input.motion))")
         print("- hr: \(formatted(input.hr))")
-        print("- hrv: \(formatted(input.hrv))")
+        print("- hrv: \(formattedOptional(input.hrv))")
     }
 
     private func logSignalWindow() {
@@ -819,10 +928,10 @@ final class SmartAlarmEngine {
 
         let snapshot = SmartAlarmDebugSnapshot(
             currentHR: latestLiveInput.hr,
-            currentHRV: latestLiveInput.hrv,
+            currentHRV: latestLiveInput.hrv ?? 0,
             currentMotion: latestLiveInput.motion,
             avgHR: averages.avgHR,
-            avgHRV: averages.avgHRV,
+            avgHRV: averages.avgHRV ?? 0,
             avgMotion: averages.avgMotion,
             confidence: decision.confidence,
             score: score.finalScore,
@@ -830,7 +939,7 @@ final class SmartAlarmEngine {
             motionIncreasingCount: motionIncreasingCount,
             currentPhase: currentPhaseLabel,
             alarmState: alarmState,
-            decisionReason: triggerEvaluation.reason,
+            decisionReason: decision.reason,
             timeToAlarm: formattedMinutes(timeToAlarm)
         )
         debugSnapshot = snapshot
@@ -923,6 +1032,11 @@ final class SmartAlarmEngine {
         String(format: "%.3f", value)
     }
 
+    private func formattedOptional(_ value: Double?) -> String {
+        guard let value, value > 0 else { return "--" }
+        return formatted(value)
+    }
+
     private func formattedMinutes(_ timeInterval: TimeInterval) -> String {
         String(format: "%.1f min", timeInterval / 60)
     }
@@ -934,10 +1048,10 @@ final class SmartAlarmEngine {
 
 private struct VitalAverages {
     let avgHR: Double
-    let avgHRV: Double
+    let avgHRV: Double?
     let avgMotion: Double
 
-    static let zero = VitalAverages(avgHR: 0, avgHRV: 0, avgMotion: 0)
+    static let zero = VitalAverages(avgHR: 0, avgHRV: nil, avgMotion: 0)
 }
 
 private struct SignalState {
@@ -982,9 +1096,9 @@ private struct TrendAnalysis {
 private struct InputSnapshot: Equatable {
     let motion: Double
     let hr: Double
-    let hrv: Double
+    let hrv: Double?
 
-    static let zero = InputSnapshot(motion: 0, hr: 0, hrv: 0)
+    static let zero = InputSnapshot(motion: 0, hr: 0, hrv: nil)
 }
 
 private struct ConfidenceComponents {

@@ -7,6 +7,7 @@ class HomeViewController: UIViewController {
 
     private let viewModel = HomeViewModel()
     private let demoButton = UIButton(type: .system)
+    private let liveVitalsController = UIHostingController(rootView: LiveVitalsPanel())
 
     // MARK: - Lifecycle
     private var isAnimatingMetrics = false
@@ -17,6 +18,7 @@ class HomeViewController: UIViewController {
         collectionView.dataSource      = self
         collectionView.allowsSelection = true
         registerCells()
+        configureLiveVitalsPanel()
         configureDemoButton()
 
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -81,7 +83,7 @@ class HomeViewController: UIViewController {
 
     private func configureDemoButton() {
         var configuration = UIButton.Configuration.filled()
-        configuration.title = "Start Smart Alarm Demo"
+        configuration.title = "Open Smart Alarm Debug"
         configuration.cornerStyle = .capsule
         configuration.baseBackgroundColor = .systemBlue
         configuration.baseForegroundColor = .white
@@ -89,7 +91,7 @@ class HomeViewController: UIViewController {
 
         demoButton.configuration = configuration
         demoButton.translatesAutoresizingMaskIntoConstraints = false
-        demoButton.addTarget(self, action: #selector(startDemoTapped), for: .touchUpInside)
+        demoButton.addTarget(self, action: #selector(openSmartDebugTapped), for: .touchUpInside)
 
         view.addSubview(demoButton)
 
@@ -104,8 +106,27 @@ class HomeViewController: UIViewController {
         collectionView.verticalScrollIndicatorInsets.bottom = 100
     }
 
-    @objc private func startDemoTapped() {
-        WatchDataManager.shared.startDemo()
+    private func configureLiveVitalsPanel() {
+        addChild(liveVitalsController)
+        liveVitalsController.view.translatesAutoresizingMaskIntoConstraints = false
+        liveVitalsController.view.backgroundColor = .clear
+
+        view.addSubview(liveVitalsController.view)
+
+        NSLayoutConstraint.activate([
+            liveVitalsController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            liveVitalsController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            liveVitalsController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8)
+        ])
+
+        liveVitalsController.didMove(toParent: self)
+
+        collectionView.contentInset.top = 132
+        collectionView.verticalScrollIndicatorInsets.top = 132
+    }
+
+    @objc private func openSmartDebugTapped() {
+        WatchDataManager.shared.startDebugSession()
 
         let debugView = SmartDebugView()
         let controller = UIHostingController(rootView: debugView)
@@ -116,6 +137,90 @@ class HomeViewController: UIViewController {
             let wrapped = UINavigationController(rootViewController: controller)
             present(wrapped, animated: true)
         }
+    }
+}
+
+private struct LiveVitalsPanel: View {
+    @ObservedObject private var connection = AppConnectionState.shared
+    @ObservedObject private var vitals = LiveVitalsViewModel.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(statusText)
+                    .font(.headline)
+                Spacer()
+                Text(lastUpdateText)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 12) {
+                metric(title: "Heart Rate", value: "\(Int(vitals.heartRate.rounded()))", unit: "BPM")
+                metric(title: "Motion", value: String(format: "%.3f", vitals.motion), unit: "")
+                metric(title: "HRV", value: String(format: "%.1f", vitals.hrv), unit: "ms")
+            }
+
+            HStack {
+                Text("HR: HealthKit")
+                Spacer()
+                Text("HRV: \(vitals.hrvStatus)")
+                Spacer()
+                Text("Motion: CoreMotion")
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+
+            Text("Alert: \(vitals.alertStatus)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 5)
+    }
+
+    private var statusText: String {
+        switch connection.state {
+        case .waitingForWatch:
+            return "🟡 Waiting for Apple Watch..."
+        case .liveWatch:
+            return "🟢 Live Watch Connected"
+        }
+    }
+
+    private var lastUpdateText: String {
+        guard let lastUpdated = vitals.lastUpdated else {
+            return "Last update: --"
+        }
+
+        return "Last update: \(Self.timeFormatter.string(from: lastUpdated))"
+    }
+
+    private static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .medium
+        formatter.dateStyle = .none
+        return formatter
+    }()
+
+    private func metric(title: String, value: String, unit: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.headline.monospacedDigit())
+                if !unit.isEmpty {
+                    Text(unit)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

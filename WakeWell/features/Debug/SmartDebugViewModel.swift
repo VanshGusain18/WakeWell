@@ -20,6 +20,6 @@ final class SmartDebugViewModel: ObservableObject {
     }
 
     func clear() {
-        WatchDataManager.shared.resetDemoEnvironment()
+        WatchDataManager.shared.resetDebugEnvironment()
     }
 }

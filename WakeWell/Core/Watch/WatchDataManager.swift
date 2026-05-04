@@ -4,23 +4,7 @@ final class WatchDataManager {
 
     static let shared = WatchDataManager()
 
-    var useSimulation = true {
-        didSet {
-            configureProvider()
-        }
-    }
-
-    private var provider: VitalDataProvider = MockWatchProvider()
-
-    private init() {
-        configureProvider()
-    }
-
-    func setProvider(_ provider: VitalDataProvider) {
-        stop()
-        self.provider = provider
-        configureProviderCallback()
-    }
+    private init() {}
 
     func process(vitalData: VitalData) {
         if Thread.isMainThread {
@@ -33,47 +17,40 @@ final class WatchDataManager {
     }
 
     func start(resetData: Bool = true) {
-        stop()
-
         if resetData {
             DatabaseManager.shared.clearVitals()
             SmartAlarmEngine.shared.reset()
         }
 
+        print("Using provider: LiveWatchPayloadStream")
         SmartAlarmEngine.shared.beginMonitoring()
-        print("[STATE] Using provider:", useSimulation ? "MockWatchProvider" : "RealWatchProvider")
-        provider.start()
     }
 
-    func startDemo() {
-        resetDemoEnvironment()
-
-        let alarmTime = Date().addingTimeInterval(5 * 60)
-        AlarmManager.shared.setAlarm(AlarmModel(time: alarmTime))
-        NotificationCenter.default.post(name: .alarmTimeDidChange, object: nil)
-
+    func startDebugSession() {
+        resetMonitoringState()
         start(resetData: false)
     }
 
-    func resetDemoEnvironment() {
-        stop()
+    func resetDebugEnvironment() {
+        resetMonitoringState()
+    }
+
+    func stop() {}
+
+    private func resetMonitoringState() {
         NotificationManager.shared.cancelAllScheduledAlarms()
         DatabaseManager.shared.clearVitals()
         SmartAlarmEngine.shared.reset()
     }
 
-    private func configureProvider() {
-        provider = useSimulation ? MockWatchProvider() : RealWatchProvider()
-        configureProviderCallback()
-    }
-
-    private func configureProviderCallback() {
-        provider.onData = { [weak self] data in
-            self?.handleIncomingData(data)
-        }
-    }
-
     private func handleIncomingData(_ data: VitalData) {
+        LiveVitalsViewModel.shared.update(
+            heartRate: data.heartRate,
+            motion: data.motion,
+            hrv: data.hrv ?? LiveVitalsViewModel.shared.hrv,
+            hrvStatus: data.hrv == nil ? "unavailable" : "HealthKit"
+        )
+
         SmartAlarmEngine.shared.recordCurrentInput(
             heartRate: data.heartRate,
             hrv: data.hrv,
@@ -86,6 +63,7 @@ final class WatchDataManager {
         let decision = SmartAlarmEngine.shared.evaluateWakeOpportunity()
 
         if decision.shouldTrigger {
+            LiveVitalsViewModel.shared.updateAlertStatus("Alert triggered")
             NotificationManager.shared.triggerImmediateAlarm()
             SleepSessionManager.shared.endSession(
                 triggerTime: Date(),
@@ -93,10 +71,8 @@ final class WatchDataManager {
                 confidence: decision.confidence
             )
             stop()
+        } else {
+            LiveVitalsViewModel.shared.updateAlertStatus(decision.reason)
         }
-    }
-
-    func stop() {
-        provider.stop()
     }
 }

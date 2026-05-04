@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct WakeWell_Watch_App_Watch_AppApp: App {
+    init() {
+        _ = WatchConnectivityManager.shared
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

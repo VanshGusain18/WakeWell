@@ -6,7 +6,7 @@ struct TriggerResult {
 
     let finalScore: Double
     let avgHR: Double
-    let avgHRV: Double
+    let avgHRV: Double?
     let avgMotion: Double
 
     let reason: String

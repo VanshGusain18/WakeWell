@@ -7,6 +7,8 @@ final class HealthKitManager {
     private let healthStore = HKHealthStore()
     private let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)
     private let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)
+    private let activeEnergyType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)
+    private let stepCountType = HKObjectType.quantityType(forIdentifier: .stepCount)
     
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
 
@@ -23,17 +25,24 @@ final class HealthKitManager {
             return
         }
 
-        let readTypes: Set<HKObjectType> = [
+        var readTypes: Set<HKObjectType> = [
             sleepType,
             heartRateType,
             hrvType
         ]
+        if let activeEnergyType {
+            readTypes.insert(activeEnergyType)
+        }
+        if let stepCountType {
+            readTypes.insert(stepCountType)
+        }
 
         let shareTypes: Set<HKSampleType> = [
             sleepType
         ]
 
         healthStore.requestAuthorization(toShare: shareTypes, read: readTypes) { success, error in
+            print("iPhone HealthKit auth:", success, error?.localizedDescription ?? "")
             DispatchQueue.main.async {
                 completion(success)
             }

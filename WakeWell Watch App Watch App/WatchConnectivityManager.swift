@@ -1,17 +1,24 @@
+import Combine
 import Foundation
 import WatchConnectivity
-import Combine
 
 final class WatchConnectivityManager: NSObject, ObservableObject {
 
     static let shared = WatchConnectivityManager()
 
     @Published var lastHeartRate: Double = 0
-    @Published var statusText = "Preparing stream..."
+    @Published var lastMotion: Double = 0
+    @Published var lastHRV: Double = 0
+    @Published var lastHRVUpdatedAt: Date?
+    @Published var isReachable = false
+    @Published var hasSentPayload = false
+    @Published var hasHealthDataAccess = true
+    @Published var statusText = "LIVE HEALTH DATA MODE"
 
     private let session = WCSession.default
-    private var timer: Timer?
-    private var motionValue: Double = 0.15
+    private let aggregator = UnifiedVitalsAggregator.shared
+    private var isActivated = false
+    private var pendingVitals: WatchVitals?
 
     private override init() {
         super.init()
@@ -27,48 +34,88 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
         session.delegate = self
         session.activate()
-        statusText = "Activating connection..."
+        isReachable = session.isReachable
     }
 
     func startStreaming() {
-        stopStreaming()
+        HealthKitManager.shared.requestPermissions { [weak self] success in
+            guard let self else { return }
 
-        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
-            self?.sendMockVitals()
+            self.hasHealthDataAccess = success
+            guard success else {
+                self.statusText = "No Health Data Access"
+                MotionManager.shared.stop()
+                HealthKitWorkoutManager.shared.stop()
+                HRVManager.shared.stop()
+                self.aggregator.stop()
+                return
+            }
+
+            self.statusText = "LIVE HEALTH DATA MODE"
+
+            self.aggregator.onVitalsReady = { [weak self] vitals in
+                self?.handleAggregatedVitals(vitals)
+            }
+            self.aggregator.start()
+
+            HealthKitWorkoutManager.shared.onHeartRate = { [weak self] heartRate in
+                self?.lastHeartRate = heartRate
+                self?.aggregator.addHeartRate(heartRate)
+            }
+            HealthKitWorkoutManager.shared.start()
+
+            HRVManager.shared.onHRV = { [weak self] hrv, timestamp in
+                self?.lastHRV = hrv
+                self?.lastHRVUpdatedAt = timestamp
+                self?.aggregator.updateHRV(hrv, timestamp: timestamp)
+            }
+            HRVManager.shared.onUnavailable = { [weak self] reason in
+                self?.aggregator.markHRVUnavailable(reason: reason)
+            }
+            HRVManager.shared.start()
+
+            MotionManager.shared.start { [weak self] motion in
+                self?.lastMotion = motion
+                self?.aggregator.addMotion(motion)
+            }
         }
     }
 
-    private func stopStreaming() {
-        timer?.invalidate()
-        timer = nil
+    private func handleAggregatedVitals(_ vitals: WatchVitals) {
+        lastHeartRate = vitals.heartRate
+        lastMotion = vitals.motion
+        lastHRV = vitals.hrv ?? lastHRV
+        send(vitals: vitals)
     }
 
-    private func sendMockVitals() {
-        let heartRate = Double.random(in: 55...75)
-        let hrv = Double.random(in: 50...80)
-        motionValue = min(motionValue + 0.04, 0.95)
+    private func send(vitals: WatchVitals) {
+        let payload = vitals.payload
 
-        let payload: [String: Any] = [
-            "heartRate": heartRate,
-            "motion": motionValue,
-            "hrv": hrv,
-            "timestamp": Date().timeIntervalSince1970
-        ]
+        isReachable = session.isReachable
 
-        lastHeartRate = heartRate
+        print("Watch HR:", vitals.heartRate)
+        if let hrv = vitals.hrv {
+            print("Watch HRV:", hrv)
+        } else {
+            print("Watch HRV unavailable:", vitals.hrvUnavailableReason ?? "unknown")
+        }
+        print("Watch Motion:", vitals.motion)
+        print("📤 Sending payload:", payload)
 
-        guard session.isReachable else {
-            statusText = "Waiting for iPhone..."
+        guard isActivated else {
+            pendingVitals = vitals
+            statusText = "Activating connection..."
             return
         }
 
-        session.sendMessage(payload, replyHandler: nil) { [weak self] error in
-            DispatchQueue.main.async {
-                self?.statusText = "Send failed: \(error.localizedDescription)"
-            }
+        do {
+            try session.updateApplicationContext(payload)
+            hasSentPayload = true
+            statusText = "LIVE HEALTH DATA MODE"
+        } catch {
+            statusText = "Context failed: \(error.localizedDescription)"
+            hasSentPayload = false
         }
-
-        statusText = "Streaming to iPhone..."
     }
 }
 
@@ -78,8 +125,19 @@ extension WatchConnectivityManager: WCSessionDelegate {
             if let error {
                 self.statusText = "Activation error: \(error.localizedDescription)"
             } else {
-                self.statusText = "Streaming to iPhone..."
+                self.isActivated = true
+                self.isReachable = session.isReachable
+                if let pendingVitals = self.pendingVitals {
+                    self.pendingVitals = nil
+                    self.send(vitals: pendingVitals)
+                }
             }
+        }
+    }
+
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        DispatchQueue.main.async {
+            self.isReachable = session.isReachable
         }
     }
 }

@@ -106,17 +106,4 @@ final class HomeDataProvider {
     func getGroggy()  -> GroggyModel      { GroggyModel(value: 5) }
     func getNote()    -> MorningNoteModel  { MorningNoteModel(text: "", date: Date()) }
 
-    // MARK: - Rise Ritual
-    func getRiseRitual() -> RiseRitualModel {
-        let savedIDs = UserDefaults.standard.stringArray(forKey: "wakewell.selectedActivityIDs")
-                       ?? ["ritual_1", "ritual_3"]
-        let count = savedIDs.count
-        let desc: String
-        switch count {
-        case 0:  desc = "Add activities to build your personal morning ritual."
-        case 1:  desc = "1 activity ready — tap Start Ritual to begin."
-        default: desc = "\(count) activities ready — start your morning ritual."
-        }
-        return RiseRitualModel(title: "Rise Ritual", category: "MORNING ROUTINE", description: desc)
-    }
 }

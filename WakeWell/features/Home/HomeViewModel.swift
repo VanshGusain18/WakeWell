@@ -22,7 +22,6 @@ final class HomeViewModel {
 
     init() {
         allCards = [
-            .riseRitual(provider.getRiseRitual()),
             .sleepRing(provider.getSleepRing()),  
             .alarm(provider.getAlarm()),
             .liveVitals,
@@ -32,10 +31,6 @@ final class HomeViewModel {
         ]
 
         updateSleepDebtCard(with: provider.getSleepDebt())
-    }
-
-    func removeRiseRitualCard() {
-        allCards.removeAll { if case .riseRitual = $0 { return true }; return false }
     }
 
     func removeSleepDebtCard() {
@@ -56,10 +51,6 @@ final class HomeViewModel {
         let sleepDebtViewModel = SleepDebtViewModel(model: model)
         guard sleepDebtViewModel.shouldShowCard() else { return }
 
-        let insertIndex = allCards.firstIndex {
-            if case .riseRitual = $0 { return true }
-            return false
-        }.map { $0 + 1 } ?? 0
-        allCards.insert(.sleepDebt(model), at: insertIndex)
+        allCards.insert(.sleepDebt(model), at: 0)
     }
 }

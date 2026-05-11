@@ -144,10 +144,6 @@ class HomeViewController: UIViewController {
             forCellWithReuseIdentifier: SleepDebtViewCardCell.identifier
         )
         collectionView.register(
-            UINib(nibName: RiseRitualCollectionViewCell.identifier, bundle: nil),
-            forCellWithReuseIdentifier: RiseRitualCollectionViewCell.identifier
-        )
-        collectionView.register(
             UINib(nibName: SleepRingCollectionViewCell.identifier, bundle: nil),
             forCellWithReuseIdentifier: SleepRingCollectionViewCell.identifier
         )
@@ -203,37 +199,6 @@ extension HomeViewController: UICollectionViewDataSource {
                 self.viewModel.removeSleepDebtCard()
                 self.collectionView.performBatchUpdates {
                     self.collectionView.deleteItems(at: [indexPath])
-                }
-            }
-            return cell
-
-        case .riseRitual(let model):
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RiseRitualCollectionViewCell.identifier,
-                for: indexPath
-            ) as! RiseRitualCollectionViewCell
-            cell.configure(with: RiseRitualViewModel(model: model))
-            cell.onStartRitual = { [weak self] in
-                guard let self else { return }
-                WatchConnectivityReceiver.shared.startRiseRitualOnWatch()
-
-                let alert = UIAlertController(
-                    title: "Opening on Apple Watch",
-                    message: "WakeWell sent Rise Ritual to your watch.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.present(alert, animated: true)
-            }
-            cell.onClose = { [weak self] in
-                guard let self else { return }
-                guard let currentIndex = self.viewModel.cards.firstIndex(where: {
-                    if case .riseRitual = $0 { return true }
-                    return false
-                }) else { return }
-                self.viewModel.removeRiseRitualCard()
-                self.collectionView.performBatchUpdates {
-                    self.collectionView.deleteItems(at: [IndexPath(item: currentIndex, section: 0)])
                 }
             }
             return cell
@@ -353,7 +318,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
         switch viewModel.cards[indexPath.item] {
         case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
-        case .riseRitual:   return CGSize(width: fullWidth, height: 92)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .liveVitals:   return CGSize(width: fullWidth, height: 190)

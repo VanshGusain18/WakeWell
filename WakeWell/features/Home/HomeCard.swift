@@ -2,7 +2,6 @@ import Foundation
 
 enum HomeCardModel {
     case sleepDebt(SleepDebtModel)
-    case riseRitual(RiseRitualModel)
     case sleepRing(SleepRingModel)
     case alarm(AlarmModel)               
     case liveVitals

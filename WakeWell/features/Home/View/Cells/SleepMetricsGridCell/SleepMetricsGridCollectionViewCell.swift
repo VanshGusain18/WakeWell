@@ -72,42 +72,42 @@ class SleepMetricsGridCollectionViewCell: UICollectionViewCell {
         durationTitleLabel.text     = m[0].title
         durationTitleLabel.textColor = WakeWellTheme.labelSecondary
         durationScoreLabel.text     = m[0].valueText
-        durationScoreLabel.textColor = WakeWellTheme.accentGold
+        durationScoreLabel.textColor = m[0].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         durationTrendLabel.text     = m[0].trendText
         durationTrendLabel.textColor = m[0].trendColor
 
         efficiencyTitleLabel.text     = m[1].title
         efficiencyTitleLabel.textColor = WakeWellTheme.labelSecondary
         efficiencyScoreLabel.text     = m[1].valueText
-        efficiencyScoreLabel.textColor = WakeWellTheme.accentGold
+        efficiencyScoreLabel.textColor = m[1].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         efficiencyTrendLabel.text     = m[1].trendText
         efficiencyTrendLabel.textColor = m[1].trendColor
 
         architectureTitleLabel.text     = m[2].title
         architectureTitleLabel.textColor = WakeWellTheme.labelSecondary
         architectureScoreLabel.text     = m[2].valueText
-        architectureScoreLabel.textColor = WakeWellTheme.accentGold
+        architectureScoreLabel.textColor = m[2].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         architectureTrendLabel.text     = m[2].trendText
         architectureTrendLabel.textColor = m[2].trendColor
 
         continuityTitleLabel.text     = m[3].title
         continuityTitleLabel.textColor = WakeWellTheme.labelSecondary
         continuityScoreLabel.text     = m[3].valueText
-        continuityScoreLabel.textColor = WakeWellTheme.accentGold
+        continuityScoreLabel.textColor = m[3].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         continuityTrendLabel.text     = m[3].trendText
         continuityTrendLabel.textColor = m[3].trendColor
 
         calmnessTitleLabel.text     = m[4].title
         calmnessTitleLabel.textColor = WakeWellTheme.labelSecondary
         calmnessScoreLabel.text     = m[4].valueText
-        calmnessScoreLabel.textColor = WakeWellTheme.accentGold
+        calmnessScoreLabel.textColor = m[4].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         calmnessTrendLabel.text     = m[4].trendText
         calmnessTrendLabel.textColor = m[4].trendColor
 
         consistencyTitleLabel.text     = m[5].title
         consistencyTitleLabel.textColor = WakeWellTheme.labelSecondary
         consistencyScoreLabel.text     = m[5].valueText
-        consistencyScoreLabel.textColor = WakeWellTheme.accentGold
+        consistencyScoreLabel.textColor = m[5].valueText == "—" ? WakeWellTheme.labelSecondary : WakeWellTheme.accentGold
         consistencyTrendLabel.text     = m[5].trendText
         consistencyTrendLabel.textColor = m[5].trendColor
     }

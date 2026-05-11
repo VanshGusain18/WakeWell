@@ -9,6 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationManager.shared.configure()
         WatchConnectivityReceiver.shared.activate()
         DatabaseManager.shared.createUserProfileTable()
+        DatabaseManager.shared.createDailyJournalTable()
 
         HealthKitManager.shared.requestAuthorization { success in
 //            print("HealthKit Permission:", success)

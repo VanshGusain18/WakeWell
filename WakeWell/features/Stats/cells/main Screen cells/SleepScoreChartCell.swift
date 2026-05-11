@@ -5,6 +5,7 @@ class SleepScoreChartCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var chartView:  LineChartView!
+    private let emptyStateLabel = UILabel()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -13,6 +14,7 @@ class SleepScoreChartCell: UITableViewCell {
         titleLabel?.font      = .systemFont(ofSize: 16, weight: .semibold)
         titleLabel?.textColor = WakeWellTheme.labelPrimary
         setupChart()
+        setupEmptyState()
     }
 
     private func setupChart() {
@@ -39,8 +41,34 @@ class SleepScoreChartCell: UITableViewCell {
         leftAxis.labelCount              = 6
     }
 
+    private func setupEmptyState() {
+        emptyStateLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateLabel.textAlignment = .center
+        emptyStateLabel.numberOfLines = 0
+        emptyStateLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        emptyStateLabel.textColor = WakeWellTheme.labelSecondary
+        emptyStateLabel.text = "No sleep data yet.\nWear your Apple Watch tonight to start building your analytics."
+        emptyStateLabel.isHidden = true
+        contentView.addSubview(emptyStateLabel)
+
+        NSLayoutConstraint.activate([
+            emptyStateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            emptyStateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            emptyStateLabel.centerYAnchor.constraint(equalTo: chartView.centerYAnchor)
+        ])
+    }
+
     func configure(for range: StatsTimeRange) {
         let dataPoints = MetricDataProvider.overallScores(for: range)
+        guard !dataPoints.isEmpty else {
+            chartView.data = nil
+            chartView.isHidden = true
+            emptyStateLabel.isHidden = false
+            return
+        }
+
+        chartView.isHidden = false
+        emptyStateLabel.isHidden = true
         let labels     = dataPoints.map { $0.day }
         let entries    = dataPoints.enumerated().map {
             ChartDataEntry(x: Double($0.offset), y: $0.element.value.raw)
@@ -69,5 +97,12 @@ class SleepScoreChartCell: UITableViewCell {
         chartView.data = LineChartData(dataSet: dataSet)
         chartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: labels)
         chartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        chartView.data = nil
+        chartView.isHidden = false
+        emptyStateLabel.isHidden = true
     }
 }

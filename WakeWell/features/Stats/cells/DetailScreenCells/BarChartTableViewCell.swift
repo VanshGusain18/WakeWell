@@ -6,6 +6,7 @@ class BarChartTableViewCell: UITableViewCell {
     @IBOutlet weak var glassContainer: UIView!
     @IBOutlet weak var titleLabel:     UILabel!
     @IBOutlet weak var barChartView:   BarChartView!
+    private let emptyStateLabel = UILabel()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,6 +21,7 @@ class BarChartTableViewCell: UITableViewCell {
         titleLabel.font      = .systemFont(ofSize: 18, weight: .semibold)
         titleLabel.textColor = WakeWellTheme.labelPrimary
         setupChartAppearance()
+        setupEmptyState()
     }
 
     private func setupChartAppearance() {
@@ -49,9 +51,34 @@ class BarChartTableViewCell: UITableViewCell {
         legend.textColor           = WakeWellTheme.labelSecondary
     }
 
+    private func setupEmptyState() {
+        emptyStateLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateLabel.textAlignment = .center
+        emptyStateLabel.numberOfLines = 0
+        emptyStateLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        emptyStateLabel.textColor = WakeWellTheme.labelSecondary
+        emptyStateLabel.text = "No chart data yet.\nOnce the watch collects enough nights, this view will populate automatically."
+        emptyStateLabel.isHidden = true
+        contentView.addSubview(emptyStateLabel)
+
+        NSLayoutConstraint.activate([
+            emptyStateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            emptyStateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            emptyStateLabel.centerYAnchor.constraint(equalTo: barChartView.centerYAnchor)
+        ])
+    }
+
     func configure(title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         titleLabel.text = title
-        guard !dataSets.isEmpty else { barChartView.data = nil; return }
+        guard !dataSets.isEmpty else {
+            barChartView.data = nil
+            barChartView.isHidden = true
+            emptyStateLabel.isHidden = false
+            return
+        }
+
+        barChartView.isHidden = false
+        emptyStateLabel.isHidden = true
 
         let palette: [UIColor] = [
             WakeWellTheme.accentPurple,
@@ -94,5 +121,10 @@ class BarChartTableViewCell: UITableViewCell {
         barChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
-    override func prepareForReuse() { super.prepareForReuse(); barChartView.data = nil }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        barChartView.data = nil
+        barChartView.isHidden = false
+        emptyStateLabel.isHidden = true
+    }
 }

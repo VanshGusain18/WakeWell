@@ -21,17 +21,40 @@ final class HomeViewModel {
     var cardCount: Int { cards.count }
 
     init() {
-        allCards = [
-            .riseRitual(provider.getRiseRitual()),
-            .sleepRing(provider.getSleepRing()),  
-            .alarm(provider.getAlarm()),
-            .liveVitals,
-            .metrics(provider.getMetrics()),
-            .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
-            .sounds
-        ]
+        rebuildCards()
 
         updateSleepDebtCard(with: provider.getSleepDebt())
+    }
+
+    func refreshDynamicContent() {
+        allCards = allCards.map { card in
+            switch card {
+            case .sleepRing:
+                return .sleepRing(provider.getSleepRing())
+            case .alarm:
+                return .alarm(provider.getAlarm())
+            case .metrics:
+                return .metrics(provider.getMetrics())
+            case .groggyNotes:
+                return .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote())
+            case .sleepDebt:
+                return .sleepDebt(provider.getSleepDebt())
+            case .riseRitual, .liveVitals, .sounds:
+                return card
+            }
+        }
+    }
+
+    func saveGroggyValue(_ value: Float) {
+        provider.saveGroggy(value)
+    }
+
+    func saveMorningNote(_ text: String) {
+        provider.saveMorningNote(text)
+    }
+
+    func finalizeTodayJournal(groggyValue: Float, morningNote: String) {
+        provider.finalizeTodayJournal(groggyValue: groggyValue, morningNote: morningNote)
     }
 
     func removeRiseRitualCard() {
@@ -43,7 +66,7 @@ final class HomeViewModel {
     }
 
     func reloadSleepDebtFromHealthKit() {
-        updateSleepDebtCard(with: provider.getSleepDebt())
+        refreshDynamicContent()
     }
 
     func toggleMetricsCard() {
@@ -61,5 +84,17 @@ final class HomeViewModel {
             return false
         }.map { $0 + 1 } ?? 0
         allCards.insert(.sleepDebt(model), at: insertIndex)
+    }
+
+    private func rebuildCards() {
+        allCards = [
+            .riseRitual(provider.getRiseRitual()),
+            .sleepRing(provider.getSleepRing()),
+            .alarm(provider.getAlarm()),
+            .liveVitals,
+            .metrics(provider.getMetrics()),
+            .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
+            .sounds
+        ]
     }
 }

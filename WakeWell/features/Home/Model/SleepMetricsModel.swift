@@ -8,6 +8,7 @@ struct SleepMetricItem {
 }
 
 struct SleepMetricsModel {
+    let hasData: Bool
     let sleepScore: Int
     let metrics:    [SleepMetricItem]
 }

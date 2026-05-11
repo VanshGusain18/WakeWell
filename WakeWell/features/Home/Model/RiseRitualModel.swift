@@ -9,7 +9,7 @@ struct RiseRitualModel {
         return RiseRitualModel(
             title: "Rise Ritual",
             category: "MORNING ROUTINE",
-            description: "Awaken your mind with a guided 5-minute movement and mindfulness flow."
+            description: "No ritual selected yet. Add activities in My Rituals to build a routine that fits your mornings."
         )
     }
 }

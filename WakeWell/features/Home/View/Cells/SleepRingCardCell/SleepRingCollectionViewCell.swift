@@ -127,6 +127,11 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         subtitleLabel?.text = viewModel.subtitleText
 
         progressRingLayer.strokeEnd = 0
+        if !viewModel.hasData {
+            progressRingLayer.removeAllAnimations()
+            progressRingLayer.strokeEnd = 0
+            return
+        }
         let anim                    = CABasicAnimation(keyPath: "strokeEnd")
         anim.toValue                = viewModel.progress
         anim.duration               = 0.9

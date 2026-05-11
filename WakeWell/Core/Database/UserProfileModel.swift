@@ -5,13 +5,38 @@
 
 import Foundation
 
+struct UserProfileInput {
+    let firstName: String
+    let email: String
+    let password: String
+    let wakeUpGoalTime: Date
+    let sleepGoalHours: Double
+    let biologicalSex: String
+    let ageRange: String
+    let bedtimeGoal: Date
+    let wakeTimeGoal: Date
+    let sleepDifficultyTypes: [String]
+    let healthKitPermissionGranted: Bool
+    let watchStatus: String
+    let notificationPermissionGranted: Bool
+}
+
 struct UserProfileModel {
     let id: Int
-    let name: String
+    let firstName: String
     let email: String
     let passwordHash: String   // SHA-256 hex of password
-    let age: Int
-    let gender: String         // "male" / "female" / "other"
-    let sleepGoalHours: Double // e.g. 8.0
+    let wakeUpGoalTime: Date
+    let sleepGoalHours: Double
+    let biologicalSex: String
+    let ageRange: String
+    let bedtimeGoal: Date
+    let wakeTimeGoal: Date
+    let sleepDifficultyTypes: [String]
+    let healthKitPermissionGranted: Bool
+    let watchStatus: String
+    let notificationPermissionGranted: Bool
     let createdAt: Date
+
+    var name: String { firstName }
 }

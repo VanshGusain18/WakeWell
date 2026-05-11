@@ -5,15 +5,43 @@ final class HomeDataProvider {
     static let shared = HomeDataProvider()
     private init() {}
 
+    private let ringRange: StatsTimeRange = .week
+
     // MARK: - Alarm
     func getAlarm() -> AlarmModel {
         let savedTime = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
-        return AlarmModel(time: savedTime)
+        if let savedTime {
+            return AlarmModel(time: savedTime)
+        }
+
+        let profileGoal = DatabaseManager.shared.fetchUserProfile()?.wakeUpGoalTime
+        return AlarmModel(time: profileGoal)
     }
 
     // MARK: - Sleep Ring
     func getSleepRing() -> SleepRingModel {
-        return SleepRingModel(score: 82, subtitle: "Good Sleep")
+        let records = HealthKitSleepRepository.shared.records(for: ringRange)
+        guard !records.isEmpty else {
+            return SleepRingModel(
+                score: nil,
+                subtitle: "Wear your Apple Watch tonight to start building your sleep history."
+            )
+        }
+
+        let stats = SleepStatsAggregator.aggregate(for: ringRange)
+        let score = SleepScoreCalculator.combinedScore(
+            duration: stats.duration,
+            efficiency: stats.efficiency,
+            architecture: stats.architecture,
+            continuity: stats.continuity,
+            calmness: stats.calmness,
+            consistency: stats.consistency
+        )
+
+        return SleepRingModel(
+            score: Int(score.rounded()),
+            subtitle: "\(records.count) nights tracked this week"
+        )
     }
 
     // MARK: - Metrics
@@ -23,6 +51,7 @@ final class HomeDataProvider {
     //                  half approximates "last week". We compare the two
     //                  averages to derive a real trend direction and %.
     func getMetrics() -> SleepMetricsModel {
+        let currentRecords = HealthKitSleepRepository.shared.records(for: .week)
 
         let current  = scoresFor(range: .week)
         let previous = scoresFor(range: .month)
@@ -42,6 +71,7 @@ final class HomeDataProvider {
         ).rounded())
 
         return SleepMetricsModel(
+            hasData: !currentRecords.isEmpty,
             sleepScore: combined,
             metrics: [
                 SleepMetricItem(title: "Duration",
@@ -103,13 +133,42 @@ final class HomeDataProvider {
     }
 
     // MARK: - Groggy / Notes
-    func getGroggy()  -> GroggyModel      { GroggyModel(value: 5) }
-    func getNote()    -> MorningNoteModel  { MorningNoteModel(text: "", date: Date()) }
+    func getGroggy() -> GroggyModel {
+        let journal = DatabaseManager.shared.fetchDailyJournalEntry()
+        return GroggyModel(
+            value: journal.map { max(0, min(10, $0.groggyValue)) } ?? 0,
+            isLocked: journal?.isLocked ?? false
+        )
+    }
+
+    func getNote() -> MorningNoteModel {
+        let journal = DatabaseManager.shared.fetchDailyJournalEntry()
+        return MorningNoteModel(
+            text: journal?.morningNote ?? "",
+            date: journal?.date ?? Date(),
+            isLocked: journal?.isLocked ?? false
+        )
+    }
+
+    func saveGroggy(_ value: Float) {
+        _ = DatabaseManager.shared.saveDailyJournal(groggyValue: value)
+    }
+
+    func saveMorningNote(_ text: String) {
+        _ = DatabaseManager.shared.saveDailyJournal(morningNote: text)
+    }
+
+    func finalizeTodayJournal(groggyValue: Float, morningNote: String) {
+        _ = DatabaseManager.shared.saveDailyJournal(
+            groggyValue: groggyValue,
+            morningNote: morningNote,
+            locked: true
+        )
+    }
 
     // MARK: - Rise Ritual
     func getRiseRitual() -> RiseRitualModel {
-        let savedIDs = UserDefaults.standard.stringArray(forKey: "wakewell.selectedActivityIDs")
-                       ?? ["ritual_1", "ritual_3"]
+        let savedIDs = UserDefaults.standard.stringArray(forKey: "wakewell.selectedActivityIDs") ?? []
         let count = savedIDs.count
         let desc: String
         switch count {

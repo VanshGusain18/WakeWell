@@ -285,10 +285,15 @@ final class LoginTableViewController: UITableViewController {
         else { showError("Please fill all fields. Password must be ≥ 6 chars.", button: button); return }
 
         let genderOptions = ["male", "female", "other"]
-        guard DatabaseManager.shared.insertUserProfile(
+        switch DatabaseManager.shared.insertUserProfile(
             name: name, email: email, password: passwordText,
-            age: age, gender: genderOptions[0], sleepGoalHours: sleepGoal) != nil
-        else { showError("An account with this email already exists.", button: button); return }
+            age: age, gender: genderOptions[0], sleepGoalHours: sleepGoal) {
+        case .success:
+            break
+        case .failure(let error):
+            showError(error.localizedDescription, button: button)
+            return
+        }
 
         UserDefaults.standard.set(true, forKey: "ww_logged_in")
         navigateToMainApp()

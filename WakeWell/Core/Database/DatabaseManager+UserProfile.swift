@@ -8,15 +8,44 @@ import Foundation
 import SQLite3
 import CryptoKit
 
+enum UserProfileDatabaseError: LocalizedError {
+    case databaseOpenFailed
+    case tableCreationFailed(String)
+    case prepareFailed(String)
+    case duplicateEmail
+    case insertFailed(String)
+    case updateFailed(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .databaseOpenFailed:
+            return "Unable to open the database."
+        case .tableCreationFailed(let message):
+            return "Unable to prepare your account store: \(message)"
+        case .prepareFailed(let message):
+            return "Unable to prepare the database request: \(message)"
+        case .duplicateEmail:
+            return "An account with this email already exists."
+        case .insertFailed(let message):
+            return "Could not create your account: \(message)"
+        case .updateFailed(let message):
+            return "Could not update your profile: \(message)"
+        }
+    }
+}
+
 extension DatabaseManager {
 
     // MARK: - Table Creation
 
     func createUserProfileTable() {
+        _ = ensureUserProfileTable()
+    }
+
+    private func ensureUserProfileTable() -> Result<Void, UserProfileDatabaseError> {
         var db: OpaquePointer?
         guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else {
-            print("Cannot open DB for user_profile table")
-            return
+            return .failure(.databaseOpenFailed)
         }
         defer { sqlite3_close(db) }
 
@@ -35,25 +64,34 @@ extension DatabaseManager {
 
         if sqlite3_exec(db, sql, nil, nil, nil) == SQLITE_OK {
             print("user_profile table ready")
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print("user_profile table error:", err)
+            return .success(())
         }
+
+        let err = String(cString: sqlite3_errmsg(db))
+        print("user_profile table error:", err)
+        return .failure(.tableCreationFailed(err))
     }
 
     // MARK: - Insert / Register
 
-    /// Returns the new row id on success, or nil on failure (e.g. duplicate email).
+    /// Returns the new row id on success, or a specific database error on failure.
     @discardableResult
     func insertUserProfile(name: String,
                            email: String,
                            password: String,
                            age: Int,
                            gender: String,
-                           sleepGoalHours: Double) -> Int? {
+                           sleepGoalHours: Double) -> Result<Int, UserProfileDatabaseError> {
+
+        switch ensureUserProfileTable() {
+        case .success:
+            break
+        case .failure(let error):
+            return .failure(error)
+        }
 
         var db: OpaquePointer?
-        guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return nil }
+        guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return .failure(.databaseOpenFailed) }
         defer { sqlite3_close(db) }
 
         let hash = sha256(password)
@@ -66,7 +104,10 @@ extension DatabaseManager {
         """
 
         var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return nil }
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+            let err = String(cString: sqlite3_errmsg(db))
+            return .failure(.prepareFailed(err))
+        }
         defer { sqlite3_finalize(stmt) }
 
         sqlite3_bind_text(stmt, 1, (name       as NSString).utf8String, -1, nil)
@@ -80,17 +121,31 @@ extension DatabaseManager {
         if sqlite3_step(stmt) == SQLITE_DONE {
             let rowID = Int(sqlite3_last_insert_rowid(db))
             print("User profile saved, id =", rowID)
-            return rowID
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print("Insert user_profile failed:", err)
-            return nil
+            return .success(rowID)
         }
+
+        let errorCode = sqlite3_errcode(db)
+        let err = String(cString: sqlite3_errmsg(db))
+        print("Insert user_profile failed:", err)
+
+        if errorCode == SQLITE_CONSTRAINT {
+            return .failure(.duplicateEmail)
+        }
+
+        return .failure(.insertFailed(err))
     }
 
     // MARK: - Fetch
 
     func fetchUserProfile() -> UserProfileModel? {
+        switch ensureUserProfileTable() {
+        case .success:
+            break
+        case .failure(let error):
+            print(error.localizedDescription)
+            return nil
+        }
+
         var db: OpaquePointer?
         guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return nil }
         defer { sqlite3_close(db) }
@@ -123,6 +178,14 @@ extension DatabaseManager {
 
     /// Returns `true` if email + password match the stored profile.
     func validateLogin(email: String, password: String) -> Bool {
+        switch ensureUserProfileTable() {
+        case .success:
+            break
+        case .failure(let error):
+            print(error.localizedDescription)
+            return false
+        }
+
         var db: OpaquePointer?
         guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return false }
         defer { sqlite3_close(db) }
@@ -141,14 +204,34 @@ extension DatabaseManager {
 
     // MARK: - Update Profile
 
-    func updateUserProfile(name: String, age: Int, gender: String, sleepGoalHours: Double) {
+    @discardableResult
+    func updateUserProfile(name: String, age: Int, gender: String, sleepGoalHours: Double) -> Result<Void, UserProfileDatabaseError> {
+        switch ensureUserProfileTable() {
+        case .success:
+            break
+        case .failure(let error):
+            return .failure(error)
+        }
+
         var db: OpaquePointer?
-        guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return }
+        guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return .failure(.databaseOpenFailed) }
         defer { sqlite3_close(db) }
 
-        let sql = "UPDATE user_profile SET name = ?, age = ?, gender = ?, sleep_goal_hrs = ?;"
+        let sql = """
+        UPDATE user_profile
+        SET name = ?, age = ?, gender = ?, sleep_goal_hrs = ?
+        WHERE id = (
+            SELECT id
+            FROM user_profile
+            ORDER BY id DESC
+            LIMIT 1
+        );
+        """
         var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return }
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+            let err = String(cString: sqlite3_errmsg(db))
+            return .failure(.prepareFailed(err))
+        }
         defer { sqlite3_finalize(stmt) }
 
         sqlite3_bind_text(stmt, 1, (name as NSString).utf8String, -1, nil)
@@ -156,13 +239,20 @@ extension DatabaseManager {
         sqlite3_bind_text(stmt, 3, (gender as NSString).utf8String, -1, nil)
         sqlite3_bind_double(stmt, 4, sleepGoalHours)
 
-        sqlite3_step(stmt)
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            let err = String(cString: sqlite3_errmsg(db))
+            return .failure(.updateFailed(err))
+        }
+
         print("user_profile updated")
+        return .success(())
     }
 
     // MARK: - Delete (logout / reset)
 
     func deleteUserProfile() {
+        _ = ensureUserProfileTable()
+
         var db: OpaquePointer?
         guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return }
         defer { sqlite3_close(db) }

@@ -59,9 +59,11 @@ struct RitualBlockCard: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: block.sfSymbol)
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Color(riseHex: "#FFD36A"))
+                .foregroundStyle(.white)
                 .frame(width: 46, height: 46)
-                .background(Color(riseHex: "#FFD36A").opacity(0.16))
+                .background(
+                    LinearGradient(colors: block.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 6) {

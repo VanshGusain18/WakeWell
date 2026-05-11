@@ -6,5 +6,6 @@ enum RitualCategory: String, CaseIterable, Hashable {
     case hydration
     case mindfulness
     case sunlight
+    case activation
     case focus
 }

@@ -2,54 +2,35 @@ import SwiftUI
 
 struct RiseRitualRootView: View {
     @StateObject private var viewModel = RiseRitualFeatureViewModel()
-    @State private var route: RiseRitualRoute?
 
     var body: some View {
         NavigationStack {
-            MoodSelectionView(viewModel: viewModel) { mood in
-                route = .loading
-                viewModel.beginGeneration(for: mood) {
-                    route = .preview
-                }
-            }
-            .navigationDestination(item: $route) { destination in
-                switch destination {
-                case .loading:
+            ZStack {
+                switch viewModel.sessionState {
+                case .idle, .selectingMood:
+                    MoodSelectionView(viewModel: viewModel) { mood in
+                        viewModel.beginGeneration(for: mood)
+                    }
+                    .transition(.opacity)
+
+                case .generating:
                     RitualLoadingView()
+                        .transition(.opacity)
 
                 case .preview:
-                    RitualPreviewView(viewModel: viewModel) {
-                        route = .guided
-                    }
+                    RitualPreviewView(viewModel: viewModel)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
 
-                case .guided:
-                    GuidedRitualView(viewModel: viewModel) {
-                        viewModel.resetCompletionInput()
-                        route = .completion
-                    }
+                case .inProgress:
+                    GuidedRitualView(viewModel: viewModel)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
 
-                case .completion:
-                    RitualCompletionView(viewModel: viewModel) {
-                        route = nil
-                    }
+                case .completed:
+                    RitualCompletionView(viewModel: viewModel)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             }
-        }
-    }
-}
-
-private enum RiseRitualRoute: Hashable, Identifiable {
-    case loading
-    case preview
-    case guided
-    case completion
-
-    var id: String {
-        switch self {
-        case .loading: return "loading"
-        case .preview: return "preview"
-        case .guided: return "guided"
-        case .completion: return "completion"
+            .animation(.easeInOut(duration: 0.22), value: viewModel.sessionState)
         }
     }
 }

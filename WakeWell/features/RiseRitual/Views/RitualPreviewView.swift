@@ -2,7 +2,6 @@ import SwiftUI
 
 struct RitualPreviewView: View {
     @ObservedObject var viewModel: RiseRitualFeatureViewModel
-    let onStart: () -> Void
 
     var body: some View {
         ZStack {
@@ -30,20 +29,20 @@ struct RitualPreviewView: View {
 
                     VStack(spacing: 10) {
                         Button("Start Ritual") {
-                            onStart()
+                            viewModel.startGuidedSession()
                         }
                         .buttonStyle(RisePrimaryButtonStyle())
 
                         HStack(spacing: 10) {
                             Button {
-                                viewModel.shuffleOneBlock()
+                                viewModel.shuffleRandomBlock()
                             } label: {
                                 Label("Shuffle Block", systemImage: "shuffle")
                             }
                             .buttonStyle(RiseSecondaryButtonStyle())
 
                             Button {
-                                viewModel.shuffleAll()
+                                viewModel.regenerateCurrentRitual()
                             } label: {
                                 Label("Shuffle All", systemImage: "arrow.triangle.2.circlepath")
                             }

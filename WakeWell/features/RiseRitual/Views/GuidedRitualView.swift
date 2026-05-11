@@ -2,27 +2,54 @@ import SwiftUI
 
 struct GuidedRitualView: View {
     @ObservedObject var viewModel: RiseRitualFeatureViewModel
-    let onComplete: () -> Void
 
     var body: some View {
         ZStack {
             RiseRitualBackground()
 
             VStack(spacing: 26) {
-                ProgressView(value: viewModel.progress)
-                    .tint(Color(riseHex: "#FFD36A"))
-                    .padding(.horizontal, 24)
+                VStack(spacing: 10) {
+                    ProgressView(value: viewModel.ritualProgress)
+                        .tint(Color(riseHex: "#FFD36A"))
+
+                    HStack {
+                        Text("Step \(viewModel.currentStepIndex + 1)")
+                        Spacer()
+                        Text("\(viewModel.elapsedSeconds)s elapsed")
+                        Text(viewModel.timerText)
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.72))
+                }
+                .padding(.horizontal, 24)
 
                 Spacer(minLength: 12)
 
                 if let block = viewModel.currentBlock {
                     VStack(spacing: 18) {
-                        Image(systemName: block.sfSymbol)
-                            .font(.system(size: 64, weight: .semibold))
-                            .foregroundStyle(Color(riseHex: "#FFD36A"))
-                            .frame(width: 118, height: 118)
-                            .background(Color.white.opacity(0.12))
-                            .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
+                        ZStack {
+                            Circle()
+                                .stroke(.white.opacity(0.12), lineWidth: 10)
+                            Circle()
+                                .trim(from: 0, to: min(viewModel.blockProgress, 1))
+                                .stroke(
+                                    Color(riseHex: "#FFD36A"),
+                                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                                )
+                                .rotationEffect(.degrees(-90))
+                                .animation(.linear(duration: 0.2), value: viewModel.blockProgress)
+
+                            Image(systemName: block.sfSymbol)
+                                .font(.system(size: 54, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 118, height: 118)
+                                .background(
+                                    LinearGradient(colors: block.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                                )
+                                .clipShape(Circle())
+                                .padding(18)
+                        }
+                        .frame(width: 170, height: 170)
 
                         Text(block.title)
                             .font(.system(size: 32, weight: .bold, design: .rounded))
@@ -42,16 +69,12 @@ struct GuidedRitualView: View {
 
                 VStack(spacing: 10) {
                     Button("Done") {
-                        if viewModel.markCurrentStepDone() {
-                            onComplete()
-                        }
+                        viewModel.markCurrentStepDone()
                     }
                     .buttonStyle(RisePrimaryButtonStyle())
 
                     Button("Skip") {
-                        if viewModel.skipCurrentStep() {
-                            onComplete()
-                        }
+                        viewModel.skipCurrentStep()
                     }
                     .buttonStyle(RiseSecondaryButtonStyle())
                 }
@@ -61,5 +84,10 @@ struct GuidedRitualView: View {
             .padding(.top, 24)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            if viewModel.sessionState != .inProgress {
+                viewModel.cancelTimer()
+            }
+        }
     }
 }

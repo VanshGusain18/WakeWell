@@ -1,6 +1,6 @@
-import Foundation
+import SwiftUI
 
-struct RitualBlock: Identifiable, Hashable {
+struct RitualBlock: Identifiable {
     let id: UUID
     let title: String
     let subtitle: String
@@ -8,6 +8,7 @@ struct RitualBlock: Identifiable, Hashable {
     let category: RitualCategory
     let sfSymbol: String
     let instructions: String
+    let gradientColors: [Color]
 
     init(
         id: UUID = UUID(),
@@ -16,7 +17,8 @@ struct RitualBlock: Identifiable, Hashable {
         duration: Int,
         category: RitualCategory,
         sfSymbol: String,
-        instructions: String
+        instructions: String,
+        gradientColors: [Color]
     ) {
         self.id = id
         self.title = title
@@ -25,5 +27,18 @@ struct RitualBlock: Identifiable, Hashable {
         self.category = category
         self.sfSymbol = sfSymbol
         self.instructions = instructions
+        self.gradientColors = gradientColors
+    }
+}
+
+extension RitualBlock: Equatable {
+    static func == (lhs: RitualBlock, rhs: RitualBlock) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+extension RitualBlock: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

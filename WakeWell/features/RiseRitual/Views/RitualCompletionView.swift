@@ -2,7 +2,6 @@ import SwiftUI
 
 struct RitualCompletionView: View {
     @ObservedObject var viewModel: RiseRitualFeatureViewModel
-    let onFinish: () -> Void
 
     var body: some View {
         ZStack {
@@ -49,7 +48,7 @@ struct RitualCompletionView: View {
                 Spacer()
 
                 Button("Finish") {
-                    onFinish()
+                    viewModel.finishCompletion()
                 }
                 .buttonStyle(RisePrimaryButtonStyle())
             }

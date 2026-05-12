@@ -24,7 +24,7 @@ final class HomeDataProvider {
         guard !records.isEmpty else {
             return SleepRingModel(
                 score: nil,
-                subtitle: "Wear your Apple Watch tonight to start building your sleep history."
+                subtitle: "Start tonight"
             )
         }
 
@@ -40,7 +40,7 @@ final class HomeDataProvider {
 
         return SleepRingModel(
             score: Int(score.rounded()),
-            subtitle: "\(records.count) nights tracked this week"
+            subtitle: SleepRingModel.subtitle(for: stats, score: score)
         )
     }
 

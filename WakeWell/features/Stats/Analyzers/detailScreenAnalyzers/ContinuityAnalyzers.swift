@@ -20,7 +20,7 @@ final class SleepContinuityAnalyzer {
                                totalAwakeTime: $0.totalAwakeMin)
             }
         case .month:
-            return weeklyAveraged(records, fields: { [Double($0.awakenings), $0.totalAwakeMin] }).map {
+            return fourWeeklyAveraged(records, fields: { [Double($0.awakenings), $0.totalAwakeMin] }).map {
                 ContinuityData(day: $0.label,
                                awakenings: Int($0.values[0].rounded()),
                                totalAwakeTime: $0.values[1])

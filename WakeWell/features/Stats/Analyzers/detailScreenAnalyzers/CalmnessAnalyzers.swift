@@ -23,7 +23,7 @@ final class SleepCalmnessAnalyzer {
                              movementIndex:    $0.movementIndex)
             }
         case .month:
-            return weeklyAveraged(records, fields: { [$0.restingHR, $0.hrv, $0.movementIndex] }).map {
+            return fourWeeklyAveraged(records, fields: { [$0.restingHR, $0.hrv, $0.movementIndex] }).map {
                 CalmnessData(day: $0.label,
                              restingHeartRate: $0.values[0],
                              hrv:              $0.values[1],
@@ -68,12 +68,48 @@ final class SleepCalmnessAnalyzer {
         )
     }
 
+    static func componentBreakdownChartData(from data: [CalmnessData],
+                                             rhrMin: Double = 40, rhrMax: Double = 100,
+                                             hrvMin: Double = 20, hrvMax: Double = 80)
+        -> (title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
+
+        let labels = data.map { $0.day }
+
+        let sRHR = data.enumerated().map { idx, d in
+            BarChartDataEntryModel(xIndex: Double(idx),
+                                   value: max(0, min(100, 100 * (rhrMax - d.restingHeartRate) / (rhrMax - rhrMin))))
+        }
+        let sHRV = data.enumerated().map { idx, d in
+            BarChartDataEntryModel(xIndex: Double(idx),
+                                   value: max(0, min(100, 100 * (d.hrv - hrvMin) / (hrvMax - hrvMin))))
+        }
+        let sMovement = data.enumerated().map { idx, d in
+            BarChartDataEntryModel(xIndex: Double(idx),
+                                   value: max(0, min(100, 100 * (1 - d.movementIndex))))
+        }
+
+        return (
+            title: "Calmness Components (0–100)",
+            dataSets: [
+                BarChartDataSetModel(label: "sHRV (40%)",      values: sHRV),
+                BarChartDataSetModel(label: "sRHR (40%)",      values: sRHR),
+                BarChartDataSetModel(label: "sMovement (20%)", values: sMovement)
+            ],
+            xAxisLabels: labels
+        )
+    }
+
     static func calmnessInfo() -> String {
         """
         This reflects how calm and relaxed your body was during sleep.
 
-        A calm night means your heart stayed steady and your body wasn't too active.
-        The more relaxed you are, the better your body can recover overnight.
+        The score combines three signals:
+        • HRV (40%) — higher heart-rate variability means your nervous system was more relaxed.
+        • Resting HR (40%) — a lower heart rate during sleep signals deeper rest.
+        • Movement (20%) — less physical restlessness means more restorative sleep.
+
+        Each signal is normalised to 0–100 before being blended, so no single reading \
+        dominates unfairly.
         """
     }
 

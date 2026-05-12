@@ -20,7 +20,7 @@ final class SleepConsistencyAnalyzer {
                                      wakeTime: $0.wakeTime)
             }
         case .month:
-            return weeklyAveraged(records, fields: { [$0.bedtime, $0.wakeTime] }).map {
+            return fourWeeklyAveraged(records, fields: { [$0.bedtime, $0.wakeTime] }).map {
                 SleepConsistencyData(day: $0.label, bedtime: $0.values[0], wakeTime: $0.values[1])
             }
         case .year:

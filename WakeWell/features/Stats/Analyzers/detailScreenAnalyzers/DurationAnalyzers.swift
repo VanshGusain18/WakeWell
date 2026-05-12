@@ -20,7 +20,7 @@ final class SleepDurationAnalyzer {
                 DurationData(day: weekdayLabel($0.date), hoursSlept: $0.hoursSlept)
             }
         case .month:
-            return weeklyAveraged(records).map {
+            return fourWeeklyAveraged(records).map {
                 DurationData(day: $0.label, hoursSlept: $0.values[0])
             }
         case .year:
@@ -86,6 +86,31 @@ func weeklyAveraged(_ records: [NightRecord],
     return buckets.sorted { $0.key < $1.key }.enumerated().map { idx, pair in
         let avg = average(pair.value.map(fields))
         return AggregatedBucket(label: "W\(idx + 1)", values: avg)
+    }
+}
+
+func fourWeeklyAveraged(_ records: [NightRecord],
+                        fields: (NightRecord) -> [Double] = { [$0.hoursSlept] }) -> [AggregatedBucket] {
+    guard !records.isEmpty else { return [] }
+
+    let cal = Calendar.current
+    let sorted = records.sorted { $0.date < $1.date }
+    let startDay = cal.startOfDay(for: sorted.first!.date)
+    let endDay = cal.startOfDay(for: sorted.last!.date)
+    let totalDays = max(1, (cal.dateComponents([.day], from: startDay, to: endDay).day ?? 0) + 1)
+    let bucketSize = max(1, Int(ceil(Double(totalDays) / 4.0)))
+    let columnCount = max(1, fields(sorted[0]).count)
+
+    var buckets: [[NightRecord]] = Array(repeating: [], count: 4)
+    for record in sorted {
+        let dayOffset = max(0, cal.dateComponents([.day], from: startDay, to: cal.startOfDay(for: record.date)).day ?? 0)
+        let bucketIndex = min(3, dayOffset / bucketSize)
+        buckets[bucketIndex].append(record)
+    }
+
+    return buckets.enumerated().map { idx, bucket in
+        let values = bucket.isEmpty ? Array(repeating: 0, count: columnCount) : average(bucket.map(fields))
+        return AggregatedBucket(label: "W\(idx + 1)", values: values)
     }
 }
 

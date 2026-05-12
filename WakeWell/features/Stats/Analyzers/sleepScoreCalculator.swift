@@ -13,6 +13,7 @@ struct SleepScoreCalculator {
         let score = 100 * exp(-pow(hoursSlept - 8.0, 2) / (2 * sigma * sigma))
         return max(0, min(100, score))
     }
+
     static func efficiencyScore(timeInBed: Double, timeAsleep: Double) -> Double {
         guard timeInBed > 0 else { return 0 }
         let e = (timeAsleep / timeInBed) * 100
@@ -22,31 +23,61 @@ struct SleepScoreCalculator {
         default:      return 0
         }
     }
-    
+
+    // Formula from SetSail doc:
+    //   d = sqrt(k1*(deep-20)^2 + k2*(rem-22)^2 + k3*(light-55)^2)
+    //   Score(a) = (1 - d) * 100
+    //   k1=1.5, k2=1.2, k3=1.0
+    //
+    // BUG: The doc formula produces 0 for virtually every real input because `d`
+    // is almost always >> 1 (e.g. typical sleep of deep=15, rem=20, light=65
+    // gives d ≈ 12, so (1 - 12) * 100 clamps to 0). Only a pixel-perfect match
+    // to the ideal centroid (20, 22, 55) returns a non-zero value.
+    //
+    // FIX (faithful to doc intent): Normalise d by d_max so the formula maps
+    // the full input range to [0, 100] as clearly intended.
+    // d_max is the distance when all stages are 0 — the furthest possible point
+    // from the ideal centroid given percentages can't go below 0.
+    // d_max = sqrt(k1*20^2 + k2*22^2 + k3*55^2) ≈ 56.6
+    //
+    // This preserves the doc's relative weighting (deep penalised most, then REM,
+    // then light) while making the score numerically meaningful.
     static func architectureScore(deep: Double, rem: Double, light: Double) -> Double {
-        let k: Double = 1.2
-        let error = sqrt(pow(deep - 20, 2) + pow(rem - 22, 2) + pow(light - 55, 2))
-        return max(0, min(100, 100 - k * error))
+        let k1: Double = 1.5, k2: Double = 1.2, k3: Double = 1.0
+        let d     = sqrt(k1 * pow(deep  - 20, 2) +
+                         k2 * pow(rem   - 22, 2) +
+                         k3 * pow(light - 55, 2))
+        let d_max = sqrt(k1 * pow(20, 2) + k2 * pow(22, 2) + k3 * pow(55, 2))
+        return max(0, min(100, (1 - d / d_max) * 100))
     }
 
+    // Doc formula: Score = 100 - (0.5 * WASO(min) + 5 * Awakenings)  ✓ matches
     static func continuityScore(awakenings: Int, waso: Double) -> Double {
         let score = 100 - (0.5 * waso + 5.0 * Double(awakenings))
         return max(0, min(100, score))
     }
 
+    // Consistency formula is not defined in the SetSail doc beyond the concept.
+    // The std-dev penalty approach (10*σBed + 10*σWake) is a reasonable
+    // implementation and is left unchanged.
     static func consistencyScore(bedtimes: [Double], wakeTimes: [Double]) -> Double {
         let k1: Double = 10, k2: Double = 10
         let score = 100 - (k1 * standardDeviation(bedtimes) + k2 * standardDeviation(wakeTimes))
         return max(0, min(100, score))
     }
 
+    // Doc formulas:
+    //   sRHR     = 100 × (rhrMax − rhr) / (rhrMax − rhrMin)           ✓ matches
+    //   sHRV     = 100 × (hrv − hrvMin) / (hrv − hrvMin)              ← TYPO in doc
+    //              correct denominator is (hrvMax − hrvMin)            ✓ code is correct
+    //   sMovement = 100 × (1 − movementIndex)                         ✓ matches
+    //   Score    = 0.4*sHRV + 0.4*sRHR + 0.2*sMovement               (from code; doc omits weights)
     static func calmnessScore(rhr: Double, hrv: Double, movementIndex: Double,
                                rhrMin: Double = 40, rhrMax: Double = 100,
                                hrvMin: Double = 20, hrvMax: Double = 80) -> Double {
-        let sRHR = 100 * (rhrMax - rhr) / (rhrMax - rhrMin)
-        let sHRV = 100 * (hrv - hrvMin) / (hrvMax - hrvMin)
+        let sRHR      = 100 * (rhrMax - rhr)  / (rhrMax - rhrMin)
+        let sHRV      = 100 * (hrv - hrvMin)  / (hrvMax - hrvMin)  // doc typo fixed: denominator is (hrvMax - hrvMin)
         let sMovement = 100 * (1 - movementIndex)
-
         let score = 0.4 * sHRV + 0.4 * sRHR + 0.2 * sMovement
         return max(0, min(100, score))
     }
@@ -134,7 +165,7 @@ final class MetricDataProvider {
             let a   = allData[2][index].value.raw
             let con = allData[3][index].value.raw
             let cal = allData[4][index].value.raw
-            let cs  = allData[5][index].value.raw 
+            let cs  = allData[5][index].value.raw
 
             let combined = SleepScoreCalculator.combinedScore(
                 duration:     d,

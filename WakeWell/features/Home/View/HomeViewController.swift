@@ -12,6 +12,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         applyTheme()
+        collectionView.contentInsetAdjustmentBehavior = .automatic
         collectionView.delegate        = self
         collectionView.dataSource      = self
         collectionView.allowsSelection = true

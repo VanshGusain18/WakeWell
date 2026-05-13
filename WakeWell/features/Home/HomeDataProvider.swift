@@ -119,6 +119,8 @@ final class HomeDataProvider {
     // MARK: - Sleep Debt
     func getSleepDebt() -> SleepDebtModel {
         let records = HealthKitSleepRepository.shared.records(for: .week)
+        let todayRecord = records.first(where: { Calendar.current.isDateInToday($0.date) })
+        let yesterdayRecord = records.first(where: { Calendar.current.isDateInYesterday($0.date) })
         let history = records
             .filter { $0.hoursSlept > 0 }
             .sorted { $0.date > $1.date }
@@ -129,7 +131,11 @@ final class HomeDataProvider {
                 )
             }
 
-        return SleepDebtModel(sleepHistory: history)
+        return SleepDebtModel(
+            todaySleepDuration: todayRecord?.hoursSlept,
+            yesterdaySleepDuration: yesterdayRecord?.hoursSlept,
+            sleepHistory: history
+        )
     }
 
     // MARK: - Groggy / Notes

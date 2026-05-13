@@ -31,16 +31,27 @@ final class HomeViewModel {
             switch card {
             case .sleepRing:
                 return .sleepRing(provider.getSleepRing())
+
             case .alarm:
                 return .alarm(provider.getAlarm())
+
             case .metrics:
                 return .metrics(provider.getMetrics())
+
             case .groggyNotes:
-                return .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote())
+                return .groggyNotes(
+                    groggy: provider.getGroggy(),
+                    notes: provider.getNote()
+                )
+
             case .sleepDebt:
                 return .sleepDebt(provider.getSleepDebt())
-            case .riseRitual, .liveVitals, .sounds:
-                return card
+
+            case .sounds:
+                return .sounds
+
+            case .liveVitals:
+                return .liveVitals
             }
         }
     }
@@ -55,10 +66,6 @@ final class HomeViewModel {
 
     func finalizeTodayJournal(groggyValue: Float, morningNote: String) {
         provider.finalizeTodayJournal(groggyValue: groggyValue, morningNote: morningNote)
-    }
-
-    func removeRiseRitualCard() {
-        allCards.removeAll { if case .riseRitual = $0 { return true }; return false }
     }
 
     func removeSleepDebtCard() {
@@ -79,16 +86,11 @@ final class HomeViewModel {
         let sleepDebtViewModel = SleepDebtViewModel(model: model)
         guard sleepDebtViewModel.shouldShowCard() else { return }
 
-        let insertIndex = allCards.firstIndex {
-            if case .riseRitual = $0 { return true }
-            return false
-        }.map { $0 + 1 } ?? 0
-        allCards.insert(.sleepDebt(model), at: insertIndex)
+        allCards.insert(.sleepDebt(model), at: 0)
     }
 
     private func rebuildCards() {
         allCards = [
-            .riseRitual(provider.getRiseRitual()),
             .sleepRing(provider.getSleepRing()),
             .alarm(provider.getAlarm()),
             .liveVitals,

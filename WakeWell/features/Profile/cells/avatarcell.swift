@@ -10,10 +10,12 @@ class AvatarCell: UITableViewCell {
     // MARK: Private views
 
     private let avatarCircle    = UIView()
+    private let avatarImageView  = UIImageView()
     private let initialsLabel   = UILabel()
     private let nameLabel       = UILabel()
     private let emailLabel      = UILabel()
     private let memberSinceLabel = UILabel()
+    private var avatarLoadTask: URLSessionDataTask?
 
     // MARK: Init
 
@@ -26,6 +28,15 @@ class AvatarCell: UITableViewCell {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        avatarLoadTask?.cancel()
+        avatarLoadTask = nil
+        avatarImageView.image = nil
+        avatarImageView.isHidden = true
+        initialsLabel.isHidden = false
+    }
 
     // MARK: Layout
 
@@ -59,6 +70,12 @@ class AvatarCell: UITableViewCell {
         // Gold border ring on the circle
         avatarCircle.layer.borderWidth = 2.5
         avatarCircle.layer.borderColor = WakeWellTheme.accentGold.cgColor
+
+        avatarImageView.contentMode = .scaleAspectFill
+        avatarImageView.clipsToBounds = true
+        avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+        avatarImageView.isHidden = true
+        avatarCircle.addSubview(avatarImageView)
 
         // ── Initials ──────────────────────────────────────────────────────
         initialsLabel.font          = .systemFont(ofSize: 30, weight: .bold)
@@ -101,6 +118,10 @@ class AvatarCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             // Initials inside avatar
+            avatarImageView.topAnchor.constraint(equalTo: avatarCircle.topAnchor),
+            avatarImageView.bottomAnchor.constraint(equalTo: avatarCircle.bottomAnchor),
+            avatarImageView.leadingAnchor.constraint(equalTo: avatarCircle.leadingAnchor),
+            avatarImageView.trailingAnchor.constraint(equalTo: avatarCircle.trailingAnchor),
             initialsLabel.centerXAnchor.constraint(equalTo: avatarCircle.centerXAnchor),
             initialsLabel.centerYAnchor.constraint(equalTo: avatarCircle.centerYAnchor),
 
@@ -118,10 +139,34 @@ class AvatarCell: UITableViewCell {
 
     // MARK: Configure
 
-    func configure(initials: String, name: String, email: String, memberSince: String) {
+    func configure(initials: String, name: String, email: String, memberSince: String, avatarURL: String? = nil) {
         initialsLabel.text    = initials.isEmpty ? "?" : initials.uppercased()
         nameLabel.text        = name
         emailLabel.text       = email
         memberSinceLabel.text = memberSince.isEmpty ? "" : "Member since \(memberSince)"
+
+        if let avatarURL, let url = URL(string: avatarURL) {
+            loadAvatar(from: url)
+        } else {
+            avatarImageView.image = nil
+            avatarImageView.isHidden = true
+            initialsLabel.isHidden = false
+        }
+    }
+
+    private func loadAvatar(from url: URL) {
+        initialsLabel.isHidden = false
+        avatarImageView.isHidden = true
+
+        avatarLoadTask?.cancel()
+        avatarLoadTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let self, let data, let image = UIImage(data: data) else { return }
+            DispatchQueue.main.async {
+                self.avatarImageView.image = image
+                self.avatarImageView.isHidden = false
+                self.initialsLabel.isHidden = true
+            }
+        }
+        avatarLoadTask?.resume()
     }
 }

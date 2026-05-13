@@ -14,14 +14,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let tabBarLeadingPadding: CGFloat = 16
     private let tabBarItemWidth: CGFloat = 84
     private let tabBarItemSpacing: CGFloat = 8
+    private var authObserver: NSObjectProtocol?
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
-        configureTabsAfterLayout()
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        authObserver = NotificationCenter.default.addObserver(
+            forName: .authStateDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateRootController(animated: true)
+        }
+
+        if window == nil {
+            window = UIWindow(windowScene: windowScene)
+        }
+
+        updateRootController(animated: false)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -52,6 +63,43 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+
+    deinit {
+        if let authObserver {
+            NotificationCenter.default.removeObserver(authObserver)
+        }
+    }
+
+    private func updateRootController(animated: Bool) {
+        guard let window else { return }
+
+        let shouldShowMainApp = AuthStateManager.shared.isAuthenticated
+        let targetRoot = rootController(forMainApp: shouldShowMainApp)
+
+        if window.rootViewController == nil {
+            window.rootViewController = targetRoot
+            window.makeKeyAndVisible()
+            configureTabsAfterLayout()
+            return
+        }
+
+        let transitionOptions: UIView.AnimationOptions = animated ? .transitionCrossDissolve : []
+        UIView.transition(with: window, duration: animated ? 0.25 : 0.0, options: transitionOptions, animations: {
+            window.rootViewController = targetRoot
+        }, completion: { _ in
+            if shouldShowMainApp {
+                self.configureTabsAfterLayout()
+            }
+        })
+    }
+
+    private func rootController(forMainApp: Bool) -> UIViewController {
+        if forMainApp {
+            return UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() ?? UIViewController()
+        }
+
+        return OnboardingContainerTableViewController()
     }
 
     private func configureTabsAfterLayout() {

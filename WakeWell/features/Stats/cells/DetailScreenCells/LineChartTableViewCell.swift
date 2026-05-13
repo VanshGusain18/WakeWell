@@ -6,6 +6,7 @@ class LineChartTableViewCell: UITableViewCell {
     @IBOutlet weak var glassContainer: UIView!
     @IBOutlet weak var titleLabel:     UILabel!
     @IBOutlet weak var lineChartView:  LineChartView!
+    private let emptyStateLabel = UILabel()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,6 +21,7 @@ class LineChartTableViewCell: UITableViewCell {
         titleLabel.font      = .systemFont(ofSize: 18, weight: .semibold)
         titleLabel.textColor = WakeWellTheme.labelPrimary
         setupChartAppearance()
+        setupEmptyState()
     }
 
     private func setupChartAppearance() {
@@ -46,9 +48,34 @@ class LineChartTableViewCell: UITableViewCell {
         lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
+    private func setupEmptyState() {
+        emptyStateLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateLabel.textAlignment = .center
+        emptyStateLabel.numberOfLines = 0
+        emptyStateLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        emptyStateLabel.textColor = WakeWellTheme.labelSecondary
+        emptyStateLabel.text = "No history yet.\nKeep wearing your Apple Watch and this chart will fill in automatically."
+        emptyStateLabel.isHidden = true
+        contentView.addSubview(emptyStateLabel)
+
+        NSLayoutConstraint.activate([
+            emptyStateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            emptyStateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            emptyStateLabel.centerYAnchor.constraint(equalTo: lineChartView.centerYAnchor)
+        ])
+    }
+
     func configure(title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         titleLabel.text = title
-        guard !dataSets.isEmpty else { lineChartView.data = nil; return }
+        guard !dataSets.isEmpty else {
+            lineChartView.data = nil
+            lineChartView.isHidden = true
+            emptyStateLabel.isHidden = false
+            return
+        }
+
+        lineChartView.isHidden = false
+        emptyStateLabel.isHidden = true
 
         let chartDataSets: [LineChartDataSet] = dataSets.map { model in
             let entries = model.values.map { ChartDataEntry(x: $0.xIndex, y: $0.value) }
@@ -79,5 +106,10 @@ class LineChartTableViewCell: UITableViewCell {
         lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
-    override func prepareForReuse() { super.prepareForReuse(); lineChartView.data = nil }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        lineChartView.data = nil
+        lineChartView.isHidden = false
+        emptyStateLabel.isHidden = true
+    }
 }

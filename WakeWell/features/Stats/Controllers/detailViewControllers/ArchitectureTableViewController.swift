@@ -23,7 +23,7 @@ class ArchitectureTableViewController: BaseMetricTableViewController {
             let cell = dequeueHeader(tableView, indexPath: indexPath)
             cell.configure(
                 title: "Architecture",
-                description: "Distribution of deep, REM and light sleep stages across the \(range.title.lowercased())."
+                description: "Weighted balance of deep (1.5×), REM (1.2×) and light (1.0×) sleep stages across the \(range.title.lowercased())."
             )
             return cell
 

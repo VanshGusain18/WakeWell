@@ -24,8 +24,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     deinit { NotificationCenter.default.removeObserver(self) }
 
     @objc private func refreshFromUserDefaults() {
-        let savedTime = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
-        configure(with: HomeAlarmViewModel(model: AlarmModel(time: savedTime)))
+        configure(with: HomeAlarmViewModel(model: HomeDataProvider.shared.getAlarm()))
     }
 
     override func layoutSubviews() {

@@ -14,25 +14,35 @@ struct SleepMetricsViewModel {
 
     init(model: SleepMetricsModel) {
 
-        sleepScoreText = "Sleep Score: \(model.sleepScore)"
+        sleepScoreText = model.hasData ? "Sleep Score: \(model.sleepScore)" : "Sleep Score: --"
 
         metrics = model.metrics.map { item in
-
             let arrow: String
             let color: UIColor
+            let valueText: String
+            let trendText: String
 
-            if item.trendPercent > 0 {
-                arrow = "↑"; color = .systemGreen
-            } else if item.trendPercent < 0 {
-                arrow = "↓"; color = .systemRed
+            if model.hasData {
+                if item.trendPercent > 0 {
+                    arrow = "↑"; color = .systemGreen
+                } else if item.trendPercent < 0 {
+                    arrow = "↓"; color = .systemRed
+                } else {
+                    arrow = "→"; color = .systemGray
+                }
+                valueText = "\(item.score)"
+                trendText = "\(arrow) \(abs(item.trendPercent))%"
             } else {
-                arrow = "→"; color = .systemGray
+                arrow = "•"
+                color = WakeWellTheme.labelTertiary
+                valueText = "—"
+                trendText = "No data"
             }
 
             return MetricUI(
                 title:      item.title,
-                valueText:  "\(item.score)",          // just the number, out of 100
-                trendText:  "\(arrow) \(abs(item.trendPercent))%",
+                valueText:  valueText,
+                trendText:  trendText,
                 trendColor: color
             )
         }

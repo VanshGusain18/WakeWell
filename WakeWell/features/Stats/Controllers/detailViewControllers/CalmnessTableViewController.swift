@@ -38,7 +38,7 @@ class CalmnessTableViewController: BaseMetricTableViewController {
 
         case .fragmentation:
             let cell = dequeueBarChart(tableView, indexPath: indexPath)
-            let chartData = SleepCalmnessAnalyzer.movementChartData(from: data)
+            let chartData = SleepCalmnessAnalyzer.componentBreakdownChartData(from: data)
             cell.configure(title: chartData.title,
                            dataSets: chartData.dataSets,
                            xAxisLabels: chartData.xAxisLabels)

@@ -15,9 +15,17 @@ private struct StatRow {
 
 final class ProfileTableViewController: UITableViewController {
     private var stats: [StatRow] = [
-        StatRow(title: "Age",        sfSymbol: "birthday.cake",           value: "—"),
-        StatRow(title: "Sleep Goal", sfSymbol: "moon.zzz",                value: "—"),
-        StatRow(title: "Member Since", sfSymbol: "calendar.badge.clock",  value: "—")
+        StatRow(title: "Wake-up Goal", sfSymbol: "alarm", value: "—"),
+        StatRow(title: "Sleep Goal", sfSymbol: "moon.zzz", value: "—"),
+        StatRow(title: "Biological Sex", sfSymbol: "person.text.rectangle", value: "—"),
+        StatRow(title: "Age Range", sfSymbol: "calendar", value: "—"),
+        StatRow(title: "Bedtime Goal", sfSymbol: "moon.stars", value: "—"),
+        StatRow(title: "Wake Time Goal", sfSymbol: "sunrise", value: "—"),
+        StatRow(title: "HealthKit", sfSymbol: "heart.text.square", value: "—"),
+        StatRow(title: "Watch Status", sfSymbol: "applewatch", value: "—"),
+        StatRow(title: "Notifications", sfSymbol: "bell", value: "—"),
+        StatRow(title: "Sleep Difficulties", sfSymbol: "exclamationmark.triangle", value: "—"),
+        StatRow(title: "Member Since", sfSymbol: "calendar.badge.clock", value: "—")
     ]
 
     private var profileName     = ""
@@ -73,20 +81,37 @@ final class ProfileTableViewController: UITableViewController {
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
     private func loadProfile() {
-        guard let profile = DatabaseManager.shared.fetchUserProfile() else { return }
+        guard let profile = DatabaseManager.shared.fetchUserProfile() else {
+            profileName = ""
+            profileEmail = ""
+            profileInitials = "?"
+            profileMemberSince = ""
+            for index in stats.indices {
+                stats[index].value = "—"
+            }
+            return
+        }
 
-        profileName  = profile.name
+        profileName  = profile.firstName
         profileEmail = profile.email
 
-        let parts = profile.name.split(separator: " ")
+        let parts = profile.firstName.split(separator: " ")
         profileInitials = parts.prefix(2).compactMap { $0.first }.map { String($0) }.joined()
 
         let df = DateFormatter(); df.dateStyle = .medium
         profileMemberSince = df.string(from: profile.createdAt)
 
-        stats[0].value = "\(profile.age) years"
+        stats[0].value = timeFormatter.string(from: profile.wakeUpGoalTime)
         stats[1].value = String(format: "%.1f hours", profile.sleepGoalHours)
-        stats[2].value = profileMemberSince
+        stats[2].value = profile.biologicalSex
+        stats[3].value = profile.ageRange
+        stats[4].value = timeFormatter.string(from: profile.bedtimeGoal)
+        stats[5].value = timeFormatter.string(from: profile.wakeTimeGoal)
+        stats[6].value = profile.healthKitPermissionGranted ? "Granted" : "Not granted"
+        stats[7].value = profile.watchStatus
+        stats[8].value = profile.notificationPermissionGranted ? "Granted" : "Not granted"
+        stats[9].value = profile.sleepDifficultyTypes.isEmpty ? "None selected" : profile.sleepDifficultyTypes.joined(separator: ", ")
+        stats[10].value = profileMemberSince
     }
     override func numberOfSections(in tableView: UITableView) -> Int {
         ProfileSection.allCases.count
@@ -185,6 +210,13 @@ final class ProfileTableViewController: UITableViewController {
         case .stats:   return "Details"
         case .actions: return nil
         }
+    }
+
+    private var timeFormatter: DateFormatter {
+        let df = DateFormatter()
+        df.timeStyle = .short
+        df.dateStyle = .none
+        return df
     }
     private func styleCard(_ cell: UITableViewCell, isFirst: Bool, isLast: Bool) {
         cell.backgroundColor             = .clear

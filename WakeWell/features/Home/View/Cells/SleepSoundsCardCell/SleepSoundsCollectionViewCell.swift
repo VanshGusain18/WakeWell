@@ -33,6 +33,25 @@ class SleepSoundsCollectionViewCell: UICollectionViewCell {
     }
 
     func configure(with viewModel: SleepSoundsViewModel) {
-        titleLabel.text = viewModel.title
+        titleLabel.attributedText = makeTitle(with: viewModel.title)
+    }
+
+    private func makeTitle(with title: String) -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        if let image = UIImage(systemName: "music.note.list") {
+            let attachment = NSTextAttachment()
+            attachment.image = image.withTintColor(WakeWellTheme.accentPurple, renderingMode: .alwaysOriginal)
+            attachment.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+            result.append(NSAttributedString(attachment: attachment))
+            result.append(NSAttributedString(string: "  "))
+        }
+        result.append(NSAttributedString(
+            string: title,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                .foregroundColor: WakeWellTheme.labelPrimary
+            ]
+        ))
+        return result
     }
 }

@@ -45,7 +45,7 @@ class HomeViewController: UIViewController {
             object: nil
         )
 
-        refreshSleepDebtFromHealthKit()
+        refreshHomeCardsFromHealthKit()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -61,10 +61,17 @@ class HomeViewController: UIViewController {
         collectionView.reloadItems(at: [IndexPath(item: alarmIndex, section: 0)])
     }
 
-    private func refreshSleepDebtFromHealthKit() {
-        HealthKitSleepRepository.shared.prefetch(for: .week) { [weak self] in
+    private func refreshHomeCardsFromHealthKit() {
+        let group = DispatchGroup()
+        for range in [StatsTimeRange.week, .month, .year] {
+            group.enter()
+            HealthKitSleepRepository.shared.prefetch(for: range) {
+                group.leave()
+            }
+        }
+        group.notify(queue: .main) { [weak self] in
             guard let self else { return }
-            self.viewModel.reloadSleepDebtFromHealthKit()
+            self.viewModel.refreshDynamicContent()
             self.collectionView.reloadData()
         }
     }
@@ -287,6 +294,27 @@ extension HomeViewController: UICollectionViewDataSource {
             ) as! GroggyNotesCollectionViewCell
             cell.onBeginEditing = { [weak self] in
                 self?.focusGroggyNotesCard()
+            }
+            cell.onGroggyChange = { [weak self] value in
+                self?.viewModel.saveGroggyValue(value)
+            }
+            cell.onTextChange = { [weak self] text in
+                self?.viewModel.saveMorningNote(text)
+            }
+            cell.onPrimaryActionTapped = { [weak self] groggyValue, text, action in
+                guard let self else { return }
+                self.viewModel.finalizeTodayJournal(groggyValue: groggyValue, morningNote: text)
+                self.viewModel.refreshDynamicContent()
+                self.collectionView.reloadItems(at: [indexPath])
+                let alert = UIAlertController(
+                    title: "Noted",
+                    message: action == .set
+                        ? "Your grogginess score has been set."
+                        : "Your grogginess score has been updated.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
             }
             cell.configure(
                 groggy: GroggySliderViewModel(model: groggyModel),

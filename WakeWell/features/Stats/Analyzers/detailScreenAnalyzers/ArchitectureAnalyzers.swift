@@ -31,7 +31,7 @@ final class SleepArchitectureAnalyzer {
             }
         case .month:
             let validRecords = records.filter { toPct($0) != nil }
-            return weeklyAveraged(validRecords, fields: {
+            return fourWeeklyAveraged(validRecords, fields: {
                 guard let p = toPct($0) else { return [] }
                 return [p.deep, p.rem, p.light]
             }).map {
@@ -91,10 +91,14 @@ final class SleepArchitectureAnalyzer {
 
     static func architectureInfo() -> String {
         """
-        This shows how balanced your sleep was.
+        This shows how balanced your sleep stages were throughout the night.
 
-        A good night of sleep includes the right mix of deep, light, and dream (REM) sleep.
-        The closer your sleep matches this balance, the better you recover and feel the next day.
+        A healthy night includes around 15–25% deep sleep, 20–25% REM, and 50–60% light sleep. \
+        Deep sleep matters most for physical recovery, REM for memory and mood, \
+        and light sleep bridges the two.
+
+        Your score is penalised more for missing deep sleep (weight 1.5×) than REM (1.2×) \
+        or light sleep (1.0×), reflecting their relative importance to overnight recovery.
         """
     }
 

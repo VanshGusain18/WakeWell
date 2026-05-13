@@ -3,9 +3,16 @@ import UIKit
 class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
 
     static let identifier = "GroggyNotesCollectionViewCell"
+    enum PrimaryAction {
+        case set
+        case update
+    }
+
     var onBeginEditing: (() -> Void)?
     var onEndEditing: (() -> Void)?
+    var onGroggyChange: ((Float) -> Void)?
     var onTextChange: ((String) -> Void)?
+    var onPrimaryActionTapped: ((Float, String, PrimaryAction) -> Void)?
 
     @IBOutlet weak var groggyTitleLabel: UILabel!
     @IBOutlet weak var groggySlider:     UISlider!
@@ -15,11 +22,31 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
     @IBOutlet weak var notesTitleLabel:  UILabel!
     @IBOutlet weak var notesTextView:    UITextView!
 
+    private var hasSavedValue = false
+    private var isEditingGroggy = false
+
+    private let setButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Set", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        button.setTitleColor(WakeWellTheme.accentPurple, for: .normal)
+        button.setTitleColor(WakeWellTheme.labelTertiary, for: .disabled)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     override func awakeFromNib() {
         super.awakeFromNib()
         setupCard()
         setupGroggySection()
         setupNotesSection()
+        groggySlider.addTarget(self, action: #selector(groggyChanged), for: .valueChanged)
+        setButton.addTarget(self, action: #selector(setTapped), for: .touchUpInside)
+        contentView.addSubview(setButton)
+        NSLayoutConstraint.activate([
+            setButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            setButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+        ])
     }
 
     override func layoutSubviews() {
@@ -96,6 +123,10 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         onTextChange?(textView.text)
     }
 
+    @objc private func groggyChanged() {
+        onGroggyChange?(groggySlider.value)
+    }
+
     func configure(groggy groggyVM: GroggySliderViewModel,
                    notes  notesVM:  MorningNotesViewModel) {
         groggyTitleLabel.text = groggyVM.title
@@ -103,6 +134,9 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         rightLabel.text       = groggyVM.rightLabel
         groggySlider.value    = groggyVM.value
         notesTitleLabel.text  = notesVM.title
+        hasSavedValue = groggyVM.isLocked || notesVM.isLocked
+        isEditingGroggy = false
+        updateGroggyInteractionState(animated: false)
         if notesVM.text.isEmpty {
             notesTextView.text      = notesVM.placeholderText
             notesTextView.textColor = WakeWellTheme.labelSecondary
@@ -112,10 +146,62 @@ class GroggyNotesCollectionViewCell: UICollectionViewCell, UITextViewDelegate {
         }
     }
 
+    @objc private func setTapped() {
+        if hasSavedValue && !isEditingGroggy {
+            isEditingGroggy = true
+            updateGroggyInteractionState(animated: true)
+            return
+        }
+
+        let action: PrimaryAction = hasSavedValue ? .update : .set
+        onPrimaryActionTapped?(groggySlider.value, notesTextView.text, action)
+
+        hasSavedValue = true
+        isEditingGroggy = false
+        updateGroggyInteractionState(animated: true)
+    }
+
     override func prepareForReuse() {
         super.prepareForReuse()
         onBeginEditing = nil
         onEndEditing = nil
+        onGroggyChange = nil
         onTextChange = nil
+        onPrimaryActionTapped = nil
+    }
+
+    private func updateGroggyInteractionState(animated: Bool) {
+        let targetTitle: String
+        let targetEnabled: Bool
+        let targetAlpha: CGFloat
+
+        if !hasSavedValue {
+            targetTitle = "Set"
+            targetEnabled = true
+            targetAlpha = 1.0
+        } else if isEditingGroggy {
+            targetTitle = "Update"
+            targetEnabled = true
+            targetAlpha = 1.0
+        } else {
+            targetTitle = "Update"
+            targetEnabled = false
+            targetAlpha = 0.95
+        }
+
+        let updates = {
+            self.setButton.setTitle(targetTitle, for: .normal)
+            self.groggySlider.isEnabled = targetEnabled
+            self.setButton.isEnabled = true
+            self.setButton.alpha = targetAlpha
+        }
+
+        if animated {
+            UIView.transition(with: setButton, duration: 0.18, options: .transitionCrossDissolve, animations: {
+                updates()
+            })
+        } else {
+            updates()
+        }
     }
 }

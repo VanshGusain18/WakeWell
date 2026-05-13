@@ -48,13 +48,27 @@ final class HealthKitSleepRepository {
 
     // Simple in-memory cache keyed by range raw value
     private var cache: [String: [NightRecord]] = [:]
-
-    // MARK: - Public API
-
-    /// Returns cached records synchronously if available, otherwise fetches async.
-    /// Callers that need data synchronously should call `prefetch(for:)` once on app launch.
     func records(for range: StatsTimeRange) -> [NightRecord] {
-        return cache[range.cacheKey] ?? []
+#if DEBUG
+        if StatsSampleData.mode == .sampleOnly {
+            return StatsSampleData.records(for: range)
+        }
+#endif
+
+        if let cached = cache[range.cacheKey] {
+            return cached
+        }
+
+#if DEBUG
+        if StatsSampleData.mode == .automatic {
+            let sampleRecords = StatsSampleData.records(for: range)
+            if !sampleRecords.isEmpty {
+                return sampleRecords
+            }
+        }
+#endif
+
+        return []
     }
 
     /// Async prefetch — call this when the user opens the stats screen.

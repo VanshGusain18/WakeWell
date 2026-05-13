@@ -50,6 +50,13 @@ class StatsTableViewController: UITableViewController {
     }
 
     private func loadSleepData() {
+        let currentRecords = HealthKitSleepRepository.shared.records(for: currentRange)
+        guard !currentRecords.isEmpty else {
+            metrics = []
+            tableView.reloadData()
+            return
+        }
+
         let currentStats = SleepStatsAggregator.aggregate(for: currentRange)
 
         let previousStats: SleepStats?

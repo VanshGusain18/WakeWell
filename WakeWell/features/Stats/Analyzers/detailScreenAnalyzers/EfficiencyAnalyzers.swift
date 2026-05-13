@@ -20,7 +20,7 @@ final class EfficiencyAnalyzer {
                                timeAsleep: $0.hoursSlept)
             }
         case .month:
-            return weeklyAveraged(records, fields: { [$0.timeInBed, $0.hoursSlept] }).map {
+            return fourWeeklyAveraged(records, fields: { [$0.timeInBed, $0.hoursSlept] }).map {
                 EfficiencyData(day: $0.label, timeInBed: $0.values[0], timeAsleep: $0.values[1])
             }
         case .year:

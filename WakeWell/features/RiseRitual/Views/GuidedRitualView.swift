@@ -5,89 +5,77 @@ struct GuidedRitualView: View {
 
     var body: some View {
         ZStack {
-            RiseRitualBackground()
+            RiseRitualStyle.backgroundGradient.ignoresSafeArea()
 
-            VStack(spacing: 26) {
-                VStack(spacing: 10) {
-                    ProgressView(value: viewModel.ritualProgress)
-                        .tint(Color(riseHex: "#FFD36A"))
+            VStack(spacing: 0) {
+                RiseRitualTopBar(
+                    title: "Guided Ritual",
+                    subtitle: viewModel.timerText,
+                    leadingSystemImage: "xmark",
+                    trailingText: stepText,
+                    onLeadingTap: viewModel.backToCarousel
+                )
 
-                    HStack {
-                        Text("Step \(viewModel.currentStepIndex + 1)")
-                        Spacer()
-                        Text("\(viewModel.elapsedSeconds)s elapsed")
-                        Text(viewModel.timerText)
-                    }
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.72))
-                }
-                .padding(.horizontal, 24)
+                ProgressView(value: viewModel.progress)
+                    .tint(RiseRitualStyle.gold)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 24)
 
                 if let block = viewModel.currentBlock {
-                    VStack(spacing: 18) {
-                        ZStack {
-                            Circle()
-                                .stroke(.white.opacity(0.12), lineWidth: 10)
-                            Circle()
-                                .trim(from: 0, to: min(viewModel.blockProgress, 1))
-                                .stroke(
-                                    Color(riseHex: "#FFD36A"),
-                                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
-                                )
-                                .rotationEffect(.degrees(-90))
-                                .animation(.linear(duration: 0.2), value: viewModel.blockProgress)
-
-                            Image(systemName: block.sfSymbol)
-                                .font(.system(size: 54, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(width: 118, height: 118)
-                                .background(
-                                    LinearGradient(colors: block.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                                )
-                                .clipShape(Circle())
-                                .padding(18)
-                        }
-                        .frame(width: 170, height: 170)
-
-                        Text(block.title)
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                    VStack(spacing: 26) {
+                        Image(systemName: block.sfSymbol)
+                            .font(.system(size: 78, weight: .semibold))
                             .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
+                            .frame(width: 154, height: 154)
+                            .background(
+                                LinearGradient(colors: RiseRitualStyle.gradient(for: viewModel.currentCardIndex), startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
 
-                        Text(block.instructions)
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.78))
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(4)
-                            .padding(.horizontal, 28)
+                        VStack(spacing: 12) {
+                            Text(block.title)
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .foregroundStyle(RiseRitualStyle.text)
+                                .multilineTextAlignment(.center)
+                            Text(block.subtitle)
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(RiseRitualStyle.secondaryText)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.horizontal, 24)
+
+                        Text(viewModel.timerText)
+                            .font(.system(size: 42, weight: .bold, design: .rounded))
+                            .foregroundStyle(RiseRitualStyle.purple)
                     }
                 }
 
-                Spacer()
-
-                VStack(spacing: 10) {
-                    Button("Done") {
-                        viewModel.markCurrentStepDone()
-                    }
-                    .buttonStyle(RisePrimaryButtonStyle())
-
-                    Button("Skip") {
-                        viewModel.skipCurrentStep()
-                    }
-                    .buttonStyle(RiseSecondaryButtonStyle())
+                Spacer(minLength: 20)
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: 12) {
+                Button("Skip") {
+                    viewModel.skipCurrentBlock()
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 22)
+                .buttonStyle(RiseRitualSecondaryButton())
+
+                Button("Done") {
+                    viewModel.completeCurrentBlock()
+                }
+                .buttonStyle(RiseRitualPrimaryButton())
             }
-            .padding(.top, 24)
+            .padding(.horizontal, 20)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
+            .background(.ultraThinMaterial.opacity(0.4))
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .onDisappear {
-            if viewModel.sessionState != .inProgress {
-                viewModel.cancelTimer()
-            }
-        }
+    }
+
+    private var stepText: String {
+        let total = viewModel.currentRitual?.blocks.count ?? 0
+        return "\(min(viewModel.currentCardIndex + 1, max(total, 1))) of \(max(total, 1))"
     }
 }

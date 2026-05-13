@@ -2,288 +2,315 @@ import Combine
 import Foundation
 
 final class RiseRitualFeatureViewModel: ObservableObject {
-    @Published var sessionState: RitualSessionState = .selectingMood
-    @Published var selectedMood: RiseMood?
+    enum Mood: String, CaseIterable, Identifiable {
+        case foggy
+        case lowEnergy
+        case distracted
+        case restless
+        case slowStart
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .foggy: return "Foggy"
+            case .lowEnergy: return "Low Energy"
+            case .distracted: return "Distracted"
+            case .restless: return "Restless"
+            case .slowStart: return "Slow Start"
+            }
+        }
+
+        var subtitle: String {
+            switch self {
+            case .foggy: return "Clear the haze with light activation."
+            case .lowEnergy: return "Build energy with movement and sunlight."
+            case .distracted: return "Reset attention with a simple focus ritual."
+            case .restless: return "Calm the body before starting the day."
+            case .slowStart: return "Ease into the morning without force."
+            }
+        }
+
+        var symbol: String {
+            switch self {
+            case .foggy: return "cloud.fog.fill"
+            case .lowEnergy: return "bolt.heart.fill"
+            case .distracted: return "brain.head.profile"
+            case .restless: return "wind"
+            case .slowStart: return "sunrise.fill"
+            }
+        }
+    }
+
+    enum Screen {
+        case mood
+        case carousel
+        case guided
+        case completion
+    }
+
+    @Published var screen: Screen = .mood
+    @Published var selectedMood: Mood?
     @Published var currentRitual: RiseRitual?
-    @Published var currentStepIndex = 0
-    @Published var isGenerating = false
-    @Published var elapsedSeconds = 0
+    @Published var currentCardIndex = 0
     @Published var remainingSeconds = 0
-    @Published var autoAdvanceEnabled = true
-    @Published var energyLevel: Double = 0.55
+    @Published var elapsedSeconds = 0
+    @Published var energyLevel = 0.6
     @Published var notes = ""
-    @Published private(set) var latestCompletion: RitualCompletion?
 
     private var timer: Timer?
-    private var completedBlocksCount = 0
-    private var skippedBlocksCount = 0
-    private var recentRitualSignatures: [String] = []
+    private var generationSeed = 0
 
     deinit {
-        invalidateTimer()
+        stopTimer()
     }
 
     var currentBlock: RitualBlock? {
         guard let currentRitual,
-              currentRitual.blocks.indices.contains(currentStepIndex) else {
+              currentRitual.blocks.indices.contains(currentCardIndex) else {
             return nil
         }
-        return currentRitual.blocks[currentStepIndex]
+        return currentRitual.blocks[currentCardIndex]
     }
 
-    var ritualProgress: Double {
+    var progress: Double {
         guard let currentRitual, !currentRitual.blocks.isEmpty else { return 0 }
-        return Double(currentStepIndex) / Double(currentRitual.blocks.count)
-    }
-
-    var blockProgress: Double {
-        let totalSeconds = max(blockDurationSeconds, 1)
-        return Double(elapsedSeconds) / Double(totalSeconds)
-    }
-
-    var blockDurationSeconds: Int {
-        max((currentBlock?.duration ?? 0) * 60, 0)
+        return Double(currentCardIndex + 1) / Double(currentRitual.blocks.count)
     }
 
     var timerText: String {
-        format(seconds: remainingSeconds)
+        let minutes = remainingSeconds / 60
+        let seconds = remainingSeconds % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
-    func beginGeneration(for mood: RiseMood) {
-        invalidateTimer()
+    func selectMood(_ mood: Mood) {
+        stopTimer()
         selectedMood = mood
-        isGenerating = true
-        sessionState = .generating
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            guard let self, self.selectedMood == mood else { return }
-            self.currentRitual = self.generateRitual(for: mood)
-            self.currentStepIndex = 0
-            self.isGenerating = false
-            self.sessionState = .preview
-        }
+        currentRitual = generateRitual(for: mood)
+        currentCardIndex = 0
+        screen = .carousel
     }
 
-    func generateRitual(for mood: RiseMood) -> RiseRitual {
-        var candidate = makeRitual(for: mood)
-        var attempts = 0
-
-        while recentRitualSignatures.contains(signature(for: candidate.blocks)) && attempts < 8 {
-            candidate = makeRitual(for: mood)
-            attempts += 1
-        }
-
-        rememberSignature(for: candidate.blocks)
-        return candidate
-    }
-
-    func shuffleBlock(at index: Int) {
+    func shuffleCurrentCard() {
         guard let ritual = currentRitual,
-              ritual.blocks.indices.contains(index) else {
+              let mood = selectedMood,
+              ritual.blocks.indices.contains(currentCardIndex) else {
             return
         }
 
-        let original = ritual.blocks[index]
-        let usedIDs = Set(ritual.blocks.map(\.id))
-        let sameCategoryOptions = RitualLibrary.blocks(for: original.category)
-            .filter { !usedIDs.contains($0.id) }
-            .shuffled()
-        let fallbackOptions = RitualLibrary.allBlocks
-            .filter { !usedIDs.contains($0.id) }
-            .shuffled()
-
-        guard let replacement = sameCategoryOptions.first ?? fallbackOptions.first else { return }
-
         var blocks = ritual.blocks
-        blocks[index] = replacement
-        currentRitual = RiseRitual(title: ritual.title, blocks: blocks)
-        rememberSignature(for: blocks)
+        let current = blocks[currentCardIndex]
+        let replacement = replacementBlock(for: current, mood: mood, excluding: Set(blocks.map(\.title)))
+        blocks[currentCardIndex] = replacement
+        currentRitual = RiseRitual(title: ritual.title, mood: ritual.mood, blocks: blocks)
     }
 
-    func shuffleRandomBlock() {
-        guard let ritual = currentRitual, !ritual.blocks.isEmpty else { return }
-        shuffleBlock(at: Int.random(in: ritual.blocks.indices))
-    }
-
-    func regenerateCurrentRitual() {
+    func shuffleAllCards() {
         guard let selectedMood else { return }
-        invalidateTimer()
         currentRitual = generateRitual(for: selectedMood)
-        currentStepIndex = 0
-        resetTimerForCurrentBlock()
-        sessionState = .preview
+        currentCardIndex = 0
     }
 
-    func startGuidedSession() {
+    func startRitualFlow() {
         guard currentRitual != nil else { return }
-        completedBlocksCount = 0
-        skippedBlocksCount = 0
-        currentStepIndex = 0
-        sessionState = .inProgress
-        resetTimerForCurrentBlock()
-        startTimer()
+        currentCardIndex = 0
+        screen = .guided
+        startTimerForCurrentBlock()
     }
 
-    func markCurrentStepDone() {
-        completedBlocksCount += 1
-        advanceToNextStep()
+    func completeCurrentBlock() {
+        advanceGuidedFlow()
     }
 
-    func skipCurrentStep() {
-        skippedBlocksCount += 1
-        advanceToNextStep()
+    func skipCurrentBlock() {
+        advanceGuidedFlow()
     }
 
-    func resetCompletionInput() {
-        energyLevel = 0.55
-        notes = ""
+    func backToMoodSelection() {
+        stopTimer()
+        selectedMood = nil
+        currentRitual = nil
+        currentCardIndex = 0
+        screen = .mood
+    }
+
+    func backToCarousel() {
+        stopTimer()
+        currentCardIndex = 0
+        screen = currentRitual == nil ? .mood : .carousel
     }
 
     func finishCompletion() {
-        guard let selectedMood, let currentRitual else {
-            sessionState = .selectingMood
-            return
+        stopTimer()
+        selectedMood = nil
+        currentRitual = nil
+        currentCardIndex = 0
+        remainingSeconds = 0
+        elapsedSeconds = 0
+        energyLevel = 0.6
+        notes = ""
+        screen = .mood
+    }
+
+    private func generateRitual(for mood: Mood) -> RiseRitual {
+        generationSeed += 1
+        let plan = categoryPlan(for: mood)
+        var usedCategories = Set<String>()
+        var usedTitles = Set<String>()
+
+        let blocks = plan.compactMap { category -> RitualBlock? in
+            guard !usedCategories.contains(category) else { return nil }
+            let block = block(for: category, mood: mood, excluding: usedTitles)
+            usedCategories.insert(block.category)
+            usedTitles.insert(block.title)
+            return block
         }
 
-        latestCompletion = RitualCompletion(
-            selectedMood: selectedMood,
-            ritualTitle: currentRitual.title,
-            energyLevel: energyLevel,
-            morningNote: notes,
-            completedBlocksCount: completedBlocksCount,
-            skippedBlocksCount: skippedBlocksCount,
-            totalDuration: currentRitual.totalDuration
+        return RiseRitual(
+            title: ritualTitle(for: mood),
+            mood: mood.title,
+            blocks: Array(blocks.prefix(5))
         )
-        sessionState = .selectingMood
     }
 
-    func cancelTimer() {
-        invalidateTimer()
-    }
-
-    private func makeRitual(for mood: RiseMood) -> RiseRitual {
-        let categories = weightedCategories(for: mood)
-        var usedIDs = Set<UUID>()
-        var selectedBlocks: [RitualBlock] = []
-
-        for category in categories {
-            guard selectedBlocks.count < 4 else { break }
-            guard let block = RitualLibrary.blocks(for: category)
-                .filter({ !usedIDs.contains($0.id) })
-                .randomElement() else {
-                continue
-            }
-            selectedBlocks.append(block)
-            usedIDs.insert(block.id)
-        }
-
-        if selectedBlocks.count < 4 {
-            let extras = RitualLibrary.allBlocks
-                .filter { !usedIDs.contains($0.id) }
-                .shuffled()
-                .prefix(4 - selectedBlocks.count)
-            selectedBlocks.append(contentsOf: extras)
-        }
-
-        return RiseRitual(title: "\(mood.title) Rise Ritual", blocks: selectedBlocks)
-    }
-
-    private func weightedCategories(for mood: RiseMood) -> [RitualCategory] {
-        let priority: [RitualCategory]
+    private func categoryPlan(for mood: Mood) -> [String] {
         switch mood {
         case .foggy:
-            priority = [.hydration, .movement, .activation]
+            return ["hydration", "sunlight", "breathing", "activation"]
         case .lowEnergy:
-            priority = [.movement, .sunlight, .activation]
+            return ["movement", "posture", "breathing", "hydration"]
         case .distracted:
-            priority = [.focus, .breathing]
+            return ["focus", "breathing", "hydration", "intention"]
         case .restless:
-            priority = [.mindfulness, .breathing]
+            return ["breathing", "movement", "grounding", "mindfulness"]
         case .slowStart:
-            priority = [.hydration, .sunlight, .breathing]
-        }
-
-        var weighted = priority + priority + RitualCategory.allCases.shuffled()
-        var unique: [RitualCategory] = []
-        while unique.count < 4, !weighted.isEmpty {
-            let category = weighted.remove(at: Int.random(in: weighted.indices))
-            if !unique.contains(category) {
-                unique.append(category)
-            }
-        }
-        return unique
-    }
-
-    private func advanceToNextStep() {
-        guard let ritual = currentRitual else { return }
-
-        if currentStepIndex < ritual.blocks.count - 1 {
-            currentStepIndex += 1
-            resetTimerForCurrentBlock()
-            startTimer()
-        } else {
-            completeGuidedSession()
+            return ["movement", "sunlight", "hydration", "activation"]
         }
     }
 
-    private func completeGuidedSession() {
-        invalidateTimer()
-        resetCompletionInput()
-        sessionState = .completed
+    private func ritualTitle(for mood: Mood) -> String {
+        switch mood {
+        case .foggy: return "Clear Morning"
+        case .lowEnergy: return "Wake Pulse"
+        case .distracted: return "Focused Reset"
+        case .restless: return "Calm Start"
+        case .slowStart: return "Soft Launch"
+        }
     }
 
-    private func resetTimerForCurrentBlock() {
-        invalidateTimer()
+    private func block(for category: String, mood: Mood, excluding usedTitles: Set<String>) -> RitualBlock {
+        let options = Self.library[category, default: []]
+            .filter { !usedTitles.contains($0.title) }
+        guard !options.isEmpty else {
+            return Self.library.values.flatMap { $0 }.first { !usedTitles.contains($0.title) } ?? Self.fallbackBlock
+        }
+        let index = abs((generationSeed + mood.rawValue.count + category.count) % options.count)
+        return options[index]
+    }
+
+    private func replacementBlock(for block: RitualBlock, mood: Mood, excluding usedTitles: Set<String>) -> RitualBlock {
+        let options = Self.library[block.category, default: []]
+            .filter { !usedTitles.contains($0.title) }
+        guard !options.isEmpty else {
+            return self.block(for: block.category, mood: mood, excluding: usedTitles.subtracting([block.title]))
+        }
+        generationSeed += 1
+        return options[abs(generationSeed % options.count)]
+    }
+
+    private func startTimerForCurrentBlock() {
+        stopTimer()
+        remainingSeconds = max((currentBlock?.duration ?? 1) * 60, 1)
         elapsedSeconds = 0
-        remainingSeconds = blockDurationSeconds
-    }
-
-    private func startTimer() {
-        invalidateTimer()
-        guard sessionState == .inProgress, remainingSeconds > 0 else { return }
-
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.tickTimer()
+            self?.tick()
         }
     }
 
-    private func tickTimer() {
-        guard sessionState == .inProgress else {
-            invalidateTimer()
+    private func tick() {
+        guard screen == .guided else {
+            stopTimer()
             return
         }
-
         elapsedSeconds += 1
-        remainingSeconds = max(blockDurationSeconds - elapsedSeconds, 0)
-
+        remainingSeconds = max(remainingSeconds - 1, 0)
         if remainingSeconds == 0 {
-            invalidateTimer()
-            if autoAdvanceEnabled {
-                completedBlocksCount += 1
-                advanceToNextStep()
-            }
+            advanceGuidedFlow()
         }
     }
 
-    private func invalidateTimer() {
+    private func advanceGuidedFlow() {
+        guard let ritual = currentRitual else { return }
+        if currentCardIndex < ritual.blocks.count - 1 {
+            currentCardIndex += 1
+            startTimerForCurrentBlock()
+        } else {
+            stopTimer()
+            screen = .completion
+        }
+    }
+
+    private func stopTimer() {
         timer?.invalidate()
         timer = nil
     }
+}
 
-    private func signature(for blocks: [RitualBlock]) -> String {
-        blocks.map { $0.id.uuidString }.joined(separator: "|")
-    }
+private extension RiseRitualFeatureViewModel {
+    static let fallbackBlock = RitualBlock(
+        title: "Breathe",
+        subtitle: "A simple reset.",
+        duration: 1,
+        sfSymbol: "wind",
+        category: "breathing"
+    )
 
-    private func rememberSignature(for blocks: [RitualBlock]) {
-        recentRitualSignatures.append(signature(for: blocks))
-        if recentRitualSignatures.count > 6 {
-            recentRitualSignatures.removeFirst(recentRitualSignatures.count - 6)
-        }
-    }
-
-    private func format(seconds: Int) -> String {
-        let minutes = seconds / 60
-        let seconds = seconds % 60
-        return String(format: "%d:%02d", minutes, seconds)
-    }
+    static let library: [String: [RitualBlock]] = [
+        "hydration": [
+            RitualBlock(title: "Mineral Sip", subtitle: "Wake with a steady sip.", duration: 1, sfSymbol: "waterbottle.fill", category: "hydration"),
+            RitualBlock(title: "Hydrate", subtitle: "A full glass before momentum.", duration: 1, sfSymbol: "drop.fill", category: "hydration"),
+            RitualBlock(title: "Cold Splash", subtitle: "Freshen the senses.", duration: 1, sfSymbol: "drop.degreesign.fill", category: "hydration")
+        ],
+        "sunlight": [
+            RitualBlock(title: "Fresh Air", subtitle: "Open a window or step outside.", duration: 1, sfSymbol: "cloud.sun.fill", category: "sunlight"),
+            RitualBlock(title: "Sunlight Reset", subtitle: "Let bright light cue your body.", duration: 1, sfSymbol: "sun.max.fill", category: "sunlight"),
+            RitualBlock(title: "Window Pause", subtitle: "Face morning light softly.", duration: 1, sfSymbol: "sunrise.fill", category: "sunlight")
+        ],
+        "breathing": [
+            RitualBlock(title: "Deep Breathing", subtitle: "Slow inhales, longer exhales.", duration: 1, sfSymbol: "lungs.fill", category: "breathing"),
+            RitualBlock(title: "Box Breathing", subtitle: "Four counts in each direction.", duration: 1, sfSymbol: "wind", category: "breathing"),
+            RitualBlock(title: "Fast Breathing", subtitle: "Twenty controlled bright breaths.", duration: 1, sfSymbol: "lungs", category: "breathing")
+        ],
+        "activation": [
+            RitualBlock(title: "Fast Activation", subtitle: "20 seconds of movement.", duration: 1, sfSymbol: "bolt.fill", category: "activation"),
+            RitualBlock(title: "Arm Swings", subtitle: "Simple rhythmic motion.", duration: 1, sfSymbol: "figure.arms.open", category: "activation"),
+            RitualBlock(title: "Wake Pulse", subtitle: "March in place with energy.", duration: 1, sfSymbol: "figure.run", category: "activation")
+        ],
+        "movement": [
+            RitualBlock(title: "Mini Squats", subtitle: "Warm the legs gently.", duration: 1, sfSymbol: "figure.cross.training", category: "movement"),
+            RitualBlock(title: "Neck Stretch", subtitle: "Release sleep stiffness.", duration: 1, sfSymbol: "figure.cooldown", category: "movement"),
+            RitualBlock(title: "Easy Walk", subtitle: "Move without strain.", duration: 2, sfSymbol: "figure.walk", category: "movement")
+        ],
+        "posture": [
+            RitualBlock(title: "Power Posture", subtitle: "Stand tall and breathe.", duration: 1, sfSymbol: "figure.stand", category: "posture"),
+            RitualBlock(title: "Shoulder Reset", subtitle: "Open the chest and ribs.", duration: 1, sfSymbol: "figure.strengthtraining.functional", category: "posture")
+        ],
+        "focus": [
+            RitualBlock(title: "Focus Prompt", subtitle: "Name the first useful action.", duration: 1, sfSymbol: "target", category: "focus"),
+            RitualBlock(title: "Clear Surface", subtitle: "Reduce visual noise.", duration: 1, sfSymbol: "rectangle.and.hand.point.up.left.fill", category: "focus")
+        ],
+        "intention": [
+            RitualBlock(title: "Intention Reset", subtitle: "Choose how to begin.", duration: 1, sfSymbol: "sparkles", category: "intention"),
+            RitualBlock(title: "Top Three", subtitle: "Pick three simple priorities.", duration: 1, sfSymbol: "checklist", category: "intention")
+        ],
+        "grounding": [
+            RitualBlock(title: "Grounding", subtitle: "Feel your feet and slow down.", duration: 1, sfSymbol: "leaf.fill", category: "grounding"),
+            RitualBlock(title: "Five Senses", subtitle: "Name what is here now.", duration: 1, sfSymbol: "eye.fill", category: "grounding")
+        ],
+        "mindfulness": [
+            RitualBlock(title: "Calm Check-In", subtitle: "Notice one good thing.", duration: 1, sfSymbol: "heart.fill", category: "mindfulness"),
+            RitualBlock(title: "Body Scan", subtitle: "Relax one tense spot.", duration: 1, sfSymbol: "person.fill.checkmark", category: "mindfulness")
+        ]
+    ]
 }

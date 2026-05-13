@@ -4,33 +4,22 @@ struct RiseRitualRootView: View {
     @StateObject private var viewModel = RiseRitualFeatureViewModel()
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                switch viewModel.sessionState {
-                case .idle, .selectingMood:
-                    MoodSelectionView(viewModel: viewModel) { mood in
-                        viewModel.beginGeneration(for: mood)
-                    }
+        ZStack {
+            switch viewModel.screen {
+            case .mood:
+                MoodSelectionView(viewModel: viewModel)
                     .transition(.opacity)
-
-                case .generating:
-                    RitualLoadingView()
-                        .transition(.opacity)
-
-                case .preview:
-                    RitualPreviewView(viewModel: viewModel)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-
-                case .inProgress:
-                    GuidedRitualView(viewModel: viewModel)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-
-                case .completed:
-                    RitualCompletionView(viewModel: viewModel)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                }
+            case .carousel:
+                RitualCarouselView(viewModel: viewModel)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .guided:
+                GuidedRitualView(viewModel: viewModel)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .completion:
+                RitualCompletionView(viewModel: viewModel)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-            .animation(.easeInOut(duration: 0.22), value: viewModel.sessionState)
         }
+        .animation(.easeInOut(duration: 0.22), value: String(describing: viewModel.screen))
     }
 }

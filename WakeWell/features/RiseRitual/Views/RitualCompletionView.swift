@@ -2,59 +2,57 @@ import SwiftUI
 
 struct RitualCompletionView: View {
     @ObservedObject var viewModel: RiseRitualFeatureViewModel
+    @FocusState private var notesFocused: Bool
 
     var body: some View {
         ZStack {
-            RiseRitualBackground()
+            RiseRitualStyle.backgroundGradient.ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 24) {
-                Spacer(minLength: 40)
-
-                VStack(alignment: .leading, spacing: 8) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
                     Text("You're Up.")
-                        .font(.system(size: 38, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(RiseRitualStyle.text)
 
-                    Text("Save how this morning feels.")
-                        .font(.system(size: 17, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.72))
-                }
-
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("Energy")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-
-                    HStack {
-                        Text("Sleepy")
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("How refreshed do you feel?")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(RiseRitualStyle.text)
                         Slider(value: $viewModel.energyLevel, in: 0...1)
-                            .tint(Color(riseHex: "#FFD36A"))
-                        Text("Charged")
+                            .tint(RiseRitualStyle.gold)
                     }
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.74))
+                    .padding(18)
+                    .background(RiseRitualStyle.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Morning Notes")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(RiseRitualStyle.text)
+                        TextField("Optional note", text: $viewModel.notes, axis: .vertical)
+                            .lineLimit(4...7)
+                            .focused($notesFocused)
+                            .padding(16)
+                            .background(RiseRitualStyle.card)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
                 }
-                .padding(18)
-                .background(Color.white.opacity(0.11))
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-
-                TextField("Optional notes", text: $viewModel.notes, axis: .vertical)
-                    .lineLimit(3...5)
-                    .padding(16)
-                    .foregroundStyle(.white)
-                    .background(Color.white.opacity(0.11))
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                Spacer()
-
-                Button("Finish") {
-                    viewModel.finishCompletion()
-                }
-                .buttonStyle(RisePrimaryButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.top, 44)
+                .padding(.bottom, 120)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 26)
+            .scrollDismissesKeyboard(.interactively)
         }
-        .navigationBarBackButtonHidden(true)
+        .safeAreaInset(edge: .bottom) {
+            Button("Finish") {
+                notesFocused = false
+                viewModel.finishCompletion()
+            }
+            .buttonStyle(RiseRitualPrimaryButton())
+            .padding(.horizontal, 20)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
+            .background(.ultraThinMaterial.opacity(0.4))
+        }
     }
 }

@@ -7,6 +7,7 @@ struct RitualBlock: Identifiable, Equatable {
     let duration: Int
     let sfSymbol: String
     let category: String
+    let moodTags: [String]
 
     init(
         id: UUID = UUID(),
@@ -14,7 +15,8 @@ struct RitualBlock: Identifiable, Equatable {
         subtitle: String,
         duration: Int,
         sfSymbol: String,
-        category: String
+        category: String,
+        moodTags: [String] = []
     ) {
         self.id = id
         self.title = title
@@ -22,5 +24,6 @@ struct RitualBlock: Identifiable, Equatable {
         self.duration = duration
         self.sfSymbol = sfSymbol
         self.category = category
+        self.moodTags = moodTags
     }
 }

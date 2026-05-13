@@ -375,7 +375,14 @@ private extension RiseRitualFeatureViewModel {
         duration: 1,
         sfSymbol: "wind",
         category: "breathing",
-        moodTags: Mood.allCases.map(\.rawValue)
+        moodTags: Mood.allCases.map(\.rawValue),
+        detailedInstructions: [
+            "Sit or stand comfortably.",
+            "Inhale through your nose.",
+            "Exhale a little longer than you inhaled.",
+            "Repeat until your body feels steadier."
+        ],
+        interactionType: .breathingPacer
     )
 
     static func meaningfulTokens(in text: String) -> Set<String> {
@@ -394,14 +401,160 @@ private extension RiseRitualFeatureViewModel {
         _ category: String,
         _ moods: Mood...
     ) -> RitualBlock {
-        RitualBlock(
+        let interaction = defaultInteractionType(title: title, category: category)
+
+        let block = RitualBlock(
             title: title,
             subtitle: subtitle,
             duration: duration,
             sfSymbol: sfSymbol,
             category: category,
-            moodTags: moods.map(\.rawValue)
+            moodTags: moods.map(\.rawValue),
+            detailedInstructions: defaultInstructions(
+                title: title,
+                subtitle: subtitle,
+                category: category,
+                interactionType: interaction
+            ),
+            interactionType: interaction,
+            interactionTarget: defaultInteractionTarget(
+                title: title,
+                category: category,
+                interactionType: interaction
+            ),
+            interactionPrompts: defaultInteractionPrompts(
+                title: title,
+                category: category,
+                interactionType: interaction
+            )
         )
+
+        return block
+    }
+
+    static func defaultInteractionType(title: String, category: String) -> RitualInteractionType {
+        if ["breathing"].contains(category) {
+            return .breathingPacer
+        }
+        if ["focus", "planning", "declutter", "intention"].contains(category) {
+            return .focusPrompt
+        }
+        if ["brain", "mind"].contains(category) || title.contains("Countdown") || title.contains("Clarity") {
+            return .mentalActivation
+        }
+        if ["grounding", "sensory", "mindfulness", "calming", "release"].contains(category) {
+            return .grounding
+        }
+        if ["movement", "activation", "circulation", "posture", "mobility", "stretch", "walking", "gentle"].contains(category) {
+            return title.contains("Finger") || title.contains("Hand") ? .tapCounter : .bodyActivation
+        }
+        return .instruction
+    }
+
+    static func defaultInteractionTarget(title: String, category: String, interactionType: RitualInteractionType) -> Int {
+        switch interactionType {
+        case .tapCounter:
+            return title.contains("Finger") ? 20 : 16
+        case .bodyActivation:
+            if title.contains("Jumping") || title.contains("High Knees") { return 20 }
+            if title.contains("Squats") || title.contains("Calf") { return 12 }
+            if title.contains("Shoulder") || title.contains("Roll") { return 8 }
+            return 10
+        case .focusPrompt, .grounding:
+            return 3
+        case .mentalActivation:
+            return 1
+        case .breathingPacer, .instruction:
+            return 0
+        }
+    }
+
+    static func defaultInteractionPrompts(
+        title: String,
+        category: String,
+        interactionType: RitualInteractionType
+    ) -> [String] {
+        switch interactionType {
+        case .focusPrompt:
+            if category == "declutter" {
+                return ["Move one visual distraction", "Name the first task", "Leave your phone face down"]
+            }
+            if category == "planning" {
+                return ["First task", "Next task", "Later task"]
+            }
+            return ["One useful action", "One avoidable distraction", "One clear next step"]
+        case .mentalActivation:
+            if title.contains("Countdown") {
+                return ["Count backward from 30 by 3s: 30, 27, 24..."]
+            }
+            if title.contains("Date") {
+                return ["Say the day, date, and one thing you will do next."]
+            }
+            return ["Find 3 blue objects nearby.", "Count backward from 20 by 2s.", "Name one thing you need, one thing you can ignore."]
+        case .grounding:
+            return ["Something bright", "Something cool", "Something textured"]
+        default:
+            return []
+        }
+    }
+
+    static func defaultInstructions(
+        title: String,
+        subtitle: String,
+        category: String,
+        interactionType: RitualInteractionType
+    ) -> [String] {
+        switch interactionType {
+        case .breathingPacer:
+            return [
+                "Sit or stand upright and let your shoulders drop.",
+                "Follow the pulse: inhale as it grows, exhale as it softens.",
+                "Keep your jaw relaxed.",
+                "Let the last exhale be the slowest one."
+            ]
+        case .tapCounter:
+            return [
+                "Place your thumb where it feels natural.",
+                "Tap the circle with a steady rhythm.",
+                "Keep breathing while you tap.",
+                "Finish when the counter fills."
+            ]
+        case .focusPrompt:
+            return [
+                subtitle,
+                "Complete each small prompt without overthinking.",
+                "Keep the answer practical and close to the next hour.",
+                "Press Done when the next step feels clear."
+            ]
+        case .mentalActivation:
+            return [
+                subtitle,
+                "Do the prompt in your head or say it quietly.",
+                "Aim for alertness, not perfection.",
+                "Take one breath before moving on."
+            ]
+        case .bodyActivation:
+            return [
+                subtitle,
+                "Start at a comfortable pace.",
+                "Keep the motion clean and light.",
+                "Tap Done after the reps feel complete."
+            ]
+        case .grounding:
+            return [
+                subtitle,
+                "Look around slowly.",
+                "Tap each observation as you notice it.",
+                "Take one longer exhale before finishing."
+            ]
+        case .instruction:
+            return [
+                subtitle,
+                "Make it small enough that you can do it right now.",
+                "Notice how your body feels after.",
+                "Press Done when complete."
+            ]
+        }
     }
 
     static let allBlocks: [RitualBlock] = [
@@ -527,6 +680,34 @@ private extension RiseRitualFeatureViewModel {
         b("Name the Date", "Say the day, date, and next action.", 1, "calendar", "brain", .foggy),
         b("Mental Clarity Reset", "Ask what matters in the next hour.", 1, "questionmark.circle.fill", "brain", .distracted, .foggy),
         b("Window Air Reset", "Fresh air, open chest, clear eyes.", 1, "wind", "sensory", .foggy),
-        b("Texture Wake-Up", "Touch something cool and name the texture.", 1, "hand.point.up.left.fill", "sensory", .foggy)
+        b("Texture Wake-Up", "Touch something cool and name the texture.", 1, "hand.point.up.left.fill", "sensory", .foggy),
+        b("Color Scan", "Find three bright colors around you.", 1, "eyedropper.halffull", "sensory", .foggy, .distracted),
+        b("Room Orientation", "Name where you are and what comes next.", 1, "location.fill", "brain", .foggy),
+        b("Quick Sequence", "Touch thumb to each finger twice.", 1, "hand.tap.fill", "activation", .foggy),
+        b("Light Switch Walk", "Walk to one light source and back.", 1, "lightbulb.led.fill", "movement", .foggy, .slowStart),
+
+        b("Momentum Tap", "Tap a steady rhythm before moving.", 1, "hand.tap.fill", "activation", .lowEnergy),
+        b("Power March", "March with arms for a short burst.", 1, "figure.walk.motion", "movement", .lowEnergy),
+        b("Standing Reach Reps", "Reach high, lower slowly, repeat.", 1, "figure.flexibility", "circulation", .lowEnergy),
+        b("Chair Rise", "Stand up and sit down with control.", 1, "chair.fill", "movement", .lowEnergy),
+        b("Wake Clap", "Clap lightly to build rhythm and alertness.", 1, "hands.clap.fill", "activation", .lowEnergy, .foggy),
+
+        b("Three Object Focus", "Find three objects of the same color.", 1, "scope", "focus", .distracted),
+        b("One Line Plan", "Say your first task in one sentence.", 1, "text.line.first.and.arrowtriangle.forward", "planning", .distracted),
+        b("Distraction Parking", "Name one thought to handle later.", 1, "parkingsign.circle.fill", "declutter", .distracted),
+        b("Attention Reset Tap", "Tap once for each thing you will ignore.", 1, "hand.tap.fill", "focus", .distracted),
+        b("Memory Spark", "Recall three useful things from yesterday.", 1, "brain", "mind", .distracted),
+
+        b("Cool Surface Grounding", "Touch a cool surface and slow your breath.", 1, "thermometer.low", "grounding", .restless),
+        b("Texture Grounding", "Notice three textures without rushing.", 1, "hand.point.up.left.fill", "grounding", .restless),
+        b("Palm Press", "Press palms together, then release.", 1, "hands.sparkles.fill", "release", .restless),
+        b("Slow Blink Reset", "Blink slowly while relaxing your forehead.", 1, "eye", "calming", .restless),
+        b("Quiet Count", "Count five exhales with both feet planted.", 1, "number.circle.fill", "breathing", .restless),
+
+        b("Blanket Fold", "Fold or straighten one small thing nearby.", 1, "rectangle.compress.vertical", "gentle", .slowStart),
+        b("Soft Step Pattern", "Step left, step right, pause, breathe.", 1, "shoeprints.fill", "gentle", .slowStart),
+        b("Warm Hands", "Rub hands together and place them on chest.", 1, "hands.sparkles.fill", "activation", .slowStart),
+        b("Tiny Tidy", "Clear one small surface without rushing.", 1, "sparkles.rectangle.stack.fill", "declutter", .slowStart, .distracted),
+        b("Low-Pressure Start", "Choose the easiest useful action available.", 1, "checkmark.circle.fill", "focus", .slowStart)
     ]
 }

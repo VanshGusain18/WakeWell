@@ -6,11 +6,13 @@ struct MorningNotesViewModel {
     let placeholderText: String
     let text: String
     let isLocked: Bool
+    let hasEntry: Bool
 
     init(model: MorningNoteModel) {
         title = "Morning Notes"
         placeholderText = "Write how you feel today..."
         text = model.text
         isLocked = model.isLocked
+        hasEntry = model.hasEntry
     }
 }

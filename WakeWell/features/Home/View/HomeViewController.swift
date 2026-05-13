@@ -295,26 +295,11 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.onBeginEditing = { [weak self] in
                 self?.focusGroggyNotesCard()
             }
-            cell.onGroggyChange = { [weak self] value in
-                self?.viewModel.saveGroggyValue(value)
-            }
-            cell.onTextChange = { [weak self] text in
-                self?.viewModel.saveMorningNote(text)
-            }
-            cell.onPrimaryActionTapped = { [weak self] groggyValue, text, action in
+            cell.onPrimaryActionTapped = { [weak self] groggyValue, text in
                 guard let self else { return }
                 self.viewModel.finalizeTodayJournal(groggyValue: groggyValue, morningNote: text)
                 self.viewModel.refreshDynamicContent()
                 self.collectionView.reloadItems(at: [indexPath])
-                let alert = UIAlertController(
-                    title: "Noted",
-                    message: action == .set
-                        ? "Your grogginess score has been set."
-                        : "Your grogginess score has been updated.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.present(alert, animated: true)
             }
             cell.configure(
                 groggy: GroggySliderViewModel(model: groggyModel),

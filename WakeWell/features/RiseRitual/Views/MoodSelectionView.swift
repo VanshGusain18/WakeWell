@@ -11,10 +11,10 @@ struct MoodSelectionView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Rise Ritual")
-                            .font(.system(size: 38, weight: .bold, design: .rounded))
+                            .font(RiseRitualStyle.titleFont(size: 38))
                             .foregroundStyle(RiseRitualStyle.text)
-                        Text("Choose how your morning feels. WakeWell will build one focused ritual.")
-                            .font(.system(size: 17, weight: .medium))
+                        Text("Choose how your morning feels. SetSail will build one focused ritual.")
+                            .font(RiseRitualStyle.bodyFont(size: 17))
                             .foregroundStyle(RiseRitualStyle.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -47,7 +47,7 @@ private struct MoodCard: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: mood.symbol)
-                .font(.system(size: 34, weight: .semibold))
+                .font(RiseRitualStyle.bodyFont(size: 34, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 68, height: 68)
                 .background(
@@ -57,10 +57,10 @@ private struct MoodCard: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(mood.title)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(RiseRitualStyle.headlineFont(size: 24))
                     .foregroundStyle(RiseRitualStyle.text)
                 Text(mood.subtitle)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(RiseRitualStyle.bodyFont(size: 15))
                     .foregroundStyle(RiseRitualStyle.secondaryText)
                     .lineLimit(2)
             }

@@ -4,6 +4,7 @@ struct GuidedRitualView: View {
     @ObservedObject var viewModel: RiseRitualFeatureViewModel
     @State private var tapCount = 0
     @State private var completedPrompts: Set<String> = []
+    @State private var promptResponses: [String: String] = [:]
 
     var body: some View {
         ZStack {
@@ -12,22 +13,21 @@ struct GuidedRitualView: View {
             VStack(spacing: 0) {
                 RiseRitualTopBar(
                     title: "Guided Ritual",
-                    subtitle: viewModel.timerText,
+                    subtitle: "Stay with the ritual",
                     leadingSystemImage: "xmark",
                     trailingText: stepText,
                     onLeadingTap: viewModel.backToCarousel
                 )
 
-                ProgressView(value: viewModel.progress)
-                    .tint(RiseRitualStyle.gold)
-                    .padding(.horizontal, 24)
+                GuidedTimerHeader(timerText: viewModel.timerText, progress: viewModel.progress)
+                    .padding(.horizontal, 20)
                     .padding(.top, 8)
 
                 ScrollView(showsIndicators: false) {
                     if let block = viewModel.currentBlock {
                         VStack(spacing: 22) {
                             Image(systemName: block.sfSymbol)
-                                .font(.system(size: 68, weight: .semibold))
+                                .font(RiseRitualStyle.bodyFont(size: 68, weight: .semibold))
                                 .foregroundStyle(.white)
                                 .frame(width: 132, height: 132)
                                 .background(
@@ -38,13 +38,13 @@ struct GuidedRitualView: View {
 
                             VStack(spacing: 10) {
                                 Text(block.title)
-                                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                                    .font(RiseRitualStyle.titleFont(size: 34))
                                     .foregroundStyle(RiseRitualStyle.text)
                                     .multilineTextAlignment(.center)
                                     .minimumScaleFactor(0.75)
 
                                 Text(block.subtitle)
-                                    .font(.system(size: 17, weight: .medium))
+                                    .font(RiseRitualStyle.bodyFont(size: 17))
                                     .foregroundStyle(RiseRitualStyle.secondaryText)
                                     .multilineTextAlignment(.center)
                                     .lineSpacing(3)
@@ -54,20 +54,18 @@ struct GuidedRitualView: View {
                             InteractionPanel(
                                 block: block,
                                 tapCount: $tapCount,
-                                completedPrompts: $completedPrompts
+                                completedPrompts: $completedPrompts,
+                                promptResponses: $promptResponses
                             )
 
                             InstructionSteps(steps: block.detailedInstructions)
-
-                            Text(viewModel.timerText)
-                                .font(.system(size: 34, weight: .bold, design: .rounded))
-                                .foregroundStyle(RiseRitualStyle.purple)
                         }
-                        .padding(.top, 24)
+                        .padding(.top, 20)
                         .padding(.horizontal, 20)
                         .padding(.bottom, 110)
                     }
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
         }
         .onChange(of: viewModel.currentBlock?.id) { _ in
@@ -102,6 +100,46 @@ struct GuidedRitualView: View {
     private func resetInteraction() {
         tapCount = 0
         completedPrompts.removeAll()
+        promptResponses.removeAll()
+    }
+}
+
+private struct GuidedTimerHeader: View {
+    let timerText: String
+    let progress: Double
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Time remaining")
+                        .font(RiseRitualStyle.bodyFont(size: 12, weight: .semibold))
+                        .foregroundStyle(RiseRitualStyle.secondaryText)
+                    Text(timerText)
+                        .font(RiseRitualStyle.titleFont(size: 30))
+                        .foregroundStyle(RiseRitualStyle.purple)
+                }
+
+                Spacer()
+
+                Image(systemName: "timer")
+                    .font(RiseRitualStyle.headlineFont(size: 24))
+                    .foregroundStyle(RiseRitualStyle.gold)
+                    .frame(width: 46, height: 46)
+                    .background(RiseRitualStyle.gold.opacity(0.12))
+                    .clipShape(Circle())
+            }
+
+            ProgressView(value: progress)
+                .tint(RiseRitualStyle.gold)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial.opacity(0.72))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(RiseRitualStyle.border, lineWidth: 1)
+        )
     }
 }
 
@@ -109,6 +147,7 @@ private struct InteractionPanel: View {
     let block: RitualBlock
     @Binding var tapCount: Int
     @Binding var completedPrompts: Set<String>
+    @Binding var promptResponses: [String: String]
 
     var body: some View {
         VStack(spacing: 14) {
@@ -120,9 +159,9 @@ private struct InteractionPanel: View {
             case .breathingPacer:
                 BreathingPacerPanel()
             case .focusPrompt:
-                PromptChecklistPanel(prompts: prompts, completedPrompts: $completedPrompts)
+                PromptEntryPanel(prompts: prompts, responses: $promptResponses)
             case .mentalActivation:
-                MentalActivationPanel(prompt: prompts.first ?? "Count backward from 20 by 2s.")
+                MentalActivationPanel(prompt: prompts.first ?? "Count backward from 20 by 2s.", responses: $promptResponses)
             case .bodyActivation:
                 BodyActivationPanel(target: max(block.interactionTarget, 8), title: block.title)
             case .grounding:
@@ -154,9 +193,9 @@ private struct TapCounterPanel: View {
         } label: {
             VStack(spacing: 10) {
                 Text("\(tapCount)")
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .font(RiseRitualStyle.titleFont(size: 44))
                 Text("Tap to \(target)")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(RiseRitualStyle.bodyFont(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.82))
             }
             .foregroundStyle(.white)
@@ -191,13 +230,13 @@ private struct BreathingPacerPanel: View {
                     .frame(width: 108, height: 108)
                     .scaleEffect(expanded ? 1.16 : 0.82)
                 Text(expanded ? "Inhale" : "Exhale")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .font(RiseRitualStyle.headlineFont(size: 18))
                     .foregroundStyle(RiseRitualStyle.purple)
             }
             .animation(.easeInOut(duration: 3.4).repeatForever(autoreverses: true), value: expanded)
 
             Text("Follow the pulse. Let the exhale feel unhurried.")
-                .font(.system(size: 14, weight: .medium))
+                .font(RiseRitualStyle.bodyFont(size: 14))
                 .foregroundStyle(RiseRitualStyle.secondaryText)
                 .multilineTextAlignment(.center)
         }
@@ -221,10 +260,10 @@ private struct PromptChecklistPanel: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: completedPrompts.contains(prompt) ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(RiseRitualStyle.bodyFont(size: 22, weight: .semibold))
                             .foregroundStyle(completedPrompts.contains(prompt) ? RiseRitualStyle.gold : RiseRitualStyle.secondaryText)
                         Text(prompt)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(RiseRitualStyle.bodyFont(size: 15, weight: .semibold))
                             .foregroundStyle(RiseRitualStyle.text)
                             .multilineTextAlignment(.leading)
                         Spacer()
@@ -239,21 +278,74 @@ private struct PromptChecklistPanel: View {
     }
 }
 
+private struct PromptEntryPanel: View {
+    let prompts: [String]
+    @Binding var responses: [String: String]
+    @FocusState private var focusedPrompt: String?
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(prompts, id: \.self) { prompt in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(prompt)
+                        .font(RiseRitualStyle.bodyFont(size: 14, weight: .semibold))
+                        .foregroundStyle(RiseRitualStyle.secondaryText)
+
+                    TextField("Type a short response", text: binding(for: prompt), axis: .vertical)
+                        .font(RiseRitualStyle.bodyFont(size: 16))
+                        .foregroundStyle(RiseRitualStyle.text)
+                        .lineLimit(1...3)
+                        .textInputAutocapitalization(.sentences)
+                        .submitLabel(.next)
+                        .focused($focusedPrompt, equals: prompt)
+                        .padding(12)
+                        .background(RiseRitualStyle.elevated)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(focusedPrompt == prompt ? RiseRitualStyle.purple.opacity(0.65) : RiseRitualStyle.border, lineWidth: 1)
+                        )
+                }
+            }
+        }
+    }
+
+    private func binding(for prompt: String) -> Binding<String> {
+        Binding(
+            get: { responses[prompt, default: ""] },
+            set: { responses[prompt] = $0 }
+        )
+    }
+}
+
 private struct MentalActivationPanel: View {
     let prompt: String
+    @Binding var responses: [String: String]
+    @FocusState private var focused: Bool
 
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "brain.head.profile")
-                .font(.system(size: 32, weight: .semibold))
+                .font(RiseRitualStyle.bodyFont(size: 32, weight: .semibold))
                 .foregroundStyle(RiseRitualStyle.gold)
             Text(prompt)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(RiseRitualStyle.headlineFont(size: 18))
                 .foregroundStyle(RiseRitualStyle.text)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+            TextField("Your answer", text: Binding(
+                get: { responses[prompt, default: ""] },
+                set: { responses[prompt] = $0 }
+            ), axis: .vertical)
+            .font(RiseRitualStyle.bodyFont(size: 16))
+            .foregroundStyle(RiseRitualStyle.text)
+            .lineLimit(1...3)
+            .focused($focused)
+            .padding(12)
+            .background(RiseRitualStyle.elevated)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             Text("Do it quietly. You only need enough effort to wake the mind.")
-                .font(.system(size: 14, weight: .medium))
+                .font(RiseRitualStyle.bodyFont(size: 14))
                 .foregroundStyle(RiseRitualStyle.secondaryText)
                 .multilineTextAlignment(.center)
         }
@@ -267,13 +359,13 @@ private struct BodyActivationPanel: View {
     var body: some View {
         VStack(spacing: 10) {
             Text("\(target)")
-                .font(.system(size: 42, weight: .bold, design: .rounded))
+                .font(RiseRitualStyle.titleFont(size: 42))
                 .foregroundStyle(RiseRitualStyle.purple)
             Text("clean reps")
-                .font(.system(size: 15, weight: .bold))
+                .font(RiseRitualStyle.bodyFont(size: 15, weight: .bold))
                 .foregroundStyle(RiseRitualStyle.secondaryText)
             Text("Do the movement, then press Done. Keep it light enough to feel good.")
-                .font(.system(size: 14, weight: .medium))
+                .font(RiseRitualStyle.bodyFont(size: 14))
                 .foregroundStyle(RiseRitualStyle.secondaryText)
                 .multilineTextAlignment(.center)
         }
@@ -286,7 +378,7 @@ private struct PassivePanel: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 15, weight: .semibold))
+            .font(RiseRitualStyle.bodyFont(size: 15, weight: .semibold))
             .foregroundStyle(RiseRitualStyle.secondaryText)
             .multilineTextAlignment(.center)
             .padding(.vertical, 8)
@@ -301,14 +393,14 @@ private struct InstructionSteps: View {
             ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                 HStack(alignment: .top, spacing: 12) {
                     Text("\(index + 1)")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(RiseRitualStyle.bodyFont(size: 13, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 24, height: 24)
                         .background(RiseRitualStyle.purple)
                         .clipShape(Circle())
 
                     Text(step)
-                        .font(.system(size: 15, weight: .medium))
+                        .font(RiseRitualStyle.bodyFont(size: 15))
                         .foregroundStyle(RiseRitualStyle.text)
                         .fixedSize(horizontal: false, vertical: true)
 

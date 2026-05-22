@@ -197,7 +197,7 @@ private final class WakeAlarmViewController: UIViewController {
         view.backgroundColor = WakeWellTheme.background
 
         let titleLabel = UILabel()
-        titleLabel.text = "WakeWell"
+        titleLabel.text = "SetSail"
         titleLabel.font = .systemFont(ofSize: 34, weight: .bold)
         titleLabel.textColor = WakeWellTheme.labelPrimary
         titleLabel.textAlignment = .center
@@ -328,7 +328,7 @@ final class NotificationManager: NSObject {
                 let content = self.makeAlarmContent(
                     title: "Rise & Shine",
                     subtitle: "Your alarm",
-                    body: "WakeWell is ready to wake you.",
+                    body: "SetSail is ready to wake you.",
                     fireDate: fireDate,
                     isImmediate: false
                 )
@@ -397,7 +397,7 @@ final class NotificationManager: NSObject {
                 let content = self.makeAlarmContent(
                     title: "Wake Now",
                     subtitle: "Smart wake trigger",
-                    body: "WakeWell detected the right wake moment.",
+                    body: "SetSail detected the right wake moment.",
                     fireDate: fireDate,
                     isImmediate: true
                 )

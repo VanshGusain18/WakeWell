@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  WakeWell Watch App Watch App
+//  SetSail Watch App Watch App
 //
 //  Created by geu on 29/04/26.
 //
@@ -16,7 +16,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("WakeWell")
+                            Text("SetSail")
                                 .font(.system(.title3, design: .rounded).weight(.bold))
                                 .foregroundStyle(WatchTheme.primaryText)
                             Text("Watch")

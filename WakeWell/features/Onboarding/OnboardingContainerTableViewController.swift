@@ -25,14 +25,14 @@ final class OnboardingContainerTableViewController: UITableViewController {
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             sfSymbol:    "sailboat.fill",
-            title:       "Welcome to WakeWell",
+            title:       "Welcome to SetSail",
             subtitle:    "Set your wake window, sleep with Apple Watch, and wake at the right moment.",
             accentColor: UIColor(hex: "#5E9BF0")
         ),
         OnboardingPage(
             sfSymbol:    "waveform.path.ecg",
             title:       "Sleep Signals",
-            subtitle:    "WakeWell reads heart rate and movement only during your alarm window.",
+            subtitle:    "SetSail reads heart rate and movement only during your alarm window.",
             accentColor: WakeWellTheme.accentGold
         ),
         OnboardingPage(

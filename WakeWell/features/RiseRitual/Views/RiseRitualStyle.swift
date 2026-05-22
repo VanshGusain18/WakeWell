@@ -11,6 +11,22 @@ enum RiseRitualStyle {
     static let border = Color(riseHex: "#E2E0FC")
     static let shadow = Color(riseHex: "#0A0820")
 
+    static func titleFont(size: CGFloat = 34) -> Font {
+        .system(size: size, weight: .bold)
+    }
+
+    static func headlineFont(size: CGFloat = 20) -> Font {
+        .system(size: size, weight: .bold)
+    }
+
+    static func bodyFont(size: CGFloat = 15, weight: Font.Weight = .medium) -> Font {
+        .system(size: size, weight: weight)
+    }
+
+    static func buttonFont(size: CGFloat = 16) -> Font {
+        .system(size: size, weight: .bold)
+    }
+
     static var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [background, Color(riseHex: "#EAE8FF"), gold.opacity(0.08)],
@@ -48,7 +64,7 @@ extension Color {
 struct RiseRitualPrimaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .bold, design: .rounded))
+            .font(RiseRitualStyle.buttonFont(size: 16))
             .foregroundStyle(RiseRitualStyle.text)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 15)
@@ -61,7 +77,7 @@ struct RiseRitualPrimaryButton: ButtonStyle {
 struct RiseRitualSecondaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 14, weight: .bold, design: .rounded))
+            .font(RiseRitualStyle.buttonFont(size: 14))
             .foregroundStyle(RiseRitualStyle.purple)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
@@ -86,7 +102,7 @@ struct RiseRitualTopBar: View {
             if let leadingSystemImage, let onLeadingTap {
                 Button(action: onLeadingTap) {
                     Image(systemName: leadingSystemImage)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(RiseRitualStyle.buttonFont(size: 16))
                         .foregroundStyle(RiseRitualStyle.purple)
                         .frame(width: 44, height: 44)
                 }
@@ -96,11 +112,11 @@ struct RiseRitualTopBar: View {
 
             VStack(spacing: 2) {
                 Text(title)
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(RiseRitualStyle.headlineFont(size: 17))
                     .foregroundStyle(RiseRitualStyle.text)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.caption.weight(.semibold))
+                        .font(RiseRitualStyle.bodyFont(size: 12, weight: .semibold))
                         .foregroundStyle(RiseRitualStyle.secondaryText)
                 }
             }
@@ -108,7 +124,7 @@ struct RiseRitualTopBar: View {
 
             if let trailingText {
                 Text(trailingText)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(RiseRitualStyle.buttonFont(size: 14))
                     .foregroundStyle(RiseRitualStyle.gold)
                     .frame(width: 44, alignment: .trailing)
             } else {

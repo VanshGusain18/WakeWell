@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>WakeWell Watch App</string>
+	<string>SetSail Watch App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,11 +21,11 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.</string>
+	<string>SetSail reads Apple Watch heart rate and HRV to detect wake readiness.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>WakeWell starts a workout session to stream live heart rate during sleep monitoring.</string>
+	<string>SetSail starts a workout session to stream live heart rate during sleep monitoring.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.</string>
+	<string>SetSail reads Apple Watch motion to detect movement intensity during sleep monitoring.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

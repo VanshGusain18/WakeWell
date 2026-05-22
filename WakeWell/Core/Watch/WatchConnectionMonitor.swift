@@ -31,7 +31,7 @@ final class WatchConnectionMonitor {
         guard WCSession.isSupported() else { return "Watch Connectivity Unavailable" }
 
         #if os(iOS)
-        guard WCSession.default.isWatchAppInstalled else { return "Install WakeWell on Apple Watch" }
+        guard WCSession.default.isWatchAppInstalled else { return "Install SetSail on Apple Watch" }
         #endif
 
         if state == .connected && !isStaleData {

@@ -26,7 +26,7 @@ struct WatchRiseRitual: Identifiable {
         case "short_walk":
             return "Gentle movement to lift alertness."
         default:
-            return "A guided WakeWell morning ritual."
+            return "A guided SetSail morning ritual."
         }
     }
 

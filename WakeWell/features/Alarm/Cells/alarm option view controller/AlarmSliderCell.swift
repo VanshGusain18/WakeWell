@@ -1,6 +1,6 @@
 //
 //  AlarmSliderCell.swift
-//  WakeWell
+//  SetSail
 
 import UIKit
 

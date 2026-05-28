@@ -1,6 +1,6 @@
 //
 //  continuityModels.swift
-//  WakeWell
+//  SetSail
 //
 //  Created by geu on 10/03/26.
 //

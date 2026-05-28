@@ -1,6 +1,6 @@
 //
 //  AlarmPickerCell.swift
-//  WakeWell
+//  SetSail
 
 import UIKit
 

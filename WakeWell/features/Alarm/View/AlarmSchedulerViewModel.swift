@@ -1,6 +1,6 @@
 //
 //  AlarmSchedulerViewModel.swift   ← renamed from AlarmViewModel to avoid
-//  WakeWell                           conflict with Home/ViewModel/AlarmViewModel.swift
+//  SetSail                           conflict with Home/ViewModel/AlarmViewModel.swift
 //
 //  Owns all alarm business logic: HealthKit queries, notification scheduling, persistence.
 //

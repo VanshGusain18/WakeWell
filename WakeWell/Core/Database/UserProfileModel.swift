@@ -1,5 +1,5 @@
 // UserProfileModel.swift
-// WakeWell
+// SetSail
 //
 // Stores user profile info collected during onboarding / login.
 

@@ -1,5 +1,5 @@
 // DatabaseManager+UserProfile.swift
-// WakeWell
+// SetSail
 //
 // Extends DatabaseManager with user_profile table operations.
 // Call `DatabaseManager.shared.createUserProfileTable()` once at app start.

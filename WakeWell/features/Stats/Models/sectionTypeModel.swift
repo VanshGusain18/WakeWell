@@ -1,6 +1,6 @@
 //
 //  sectionTypeModel.swift
-//  WakeWell
+//  SetSail
 //
 //  Created by geu on 24/03/26.
 //

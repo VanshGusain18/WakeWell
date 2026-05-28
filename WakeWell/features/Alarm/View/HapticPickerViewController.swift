@@ -1,6 +1,6 @@
 //
 //  HapticPickerViewController.swift
-//  WakeWell
+//  SetSail
 //
 //  Fully programmatic — no XIB, no Storyboard.
 //

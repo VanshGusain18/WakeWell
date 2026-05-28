@@ -1,6 +1,6 @@
 //
-//  WakeWell_Watch_AppApp.swift
-//  WakeWell Watch App Watch App
+//  SetSail_Watch_AppApp.swift
+//  SetSail Watch App Watch App
 //
 //  Created by geu on 29/04/26.
 //

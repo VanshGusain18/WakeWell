@@ -1,6 +1,6 @@
 //
 //  DurationAnalyzers.swift
-//  WakeWell
+//  SetSail
 //
 //  getData() pulls from HealthKitSleepRepository.
 //

@@ -1,6 +1,6 @@
 //
 //  AlarmModel.swift
-//  WakeWell
+//  SetSail
 //
 //  Pure data model for a single alarm configuration.
 //  No UIKit imports — safe to use in extensions / tests.

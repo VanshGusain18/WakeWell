@@ -1,6 +1,6 @@
 //
 //  AlarmOptionViewController.swift
-//  WakeWell
+//  SetSail
 //
 //  UITableViewController that registers and dequeues 5 custom XIB-backed cells.
 //  All outlets live inside the cell classes — the VC only holds references

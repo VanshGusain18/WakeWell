@@ -1,6 +1,6 @@
 //
 //  SoundPickerViewController.swift
-//  WakeWell
+//  SetSail
 //
 //  Fully programmatic — no XIB, no Storyboard.
 //  Push via navigationController?.pushViewController(SoundPickerViewController(), animated: true)

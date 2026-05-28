@@ -1,6 +1,6 @@
 //
 //  CalmnessAnalyzers.swift
-//  WakeWell
+//  SetSail
 //
 
 import Foundation

@@ -1,5 +1,5 @@
 // OnboardingPageTableViewController.swift
-// WakeWell
+// SetSail
 //
 // A single onboarding slide. No XIBs - fully code-driven.
 

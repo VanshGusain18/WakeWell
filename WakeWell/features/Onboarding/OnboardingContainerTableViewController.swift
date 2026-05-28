@@ -30,7 +30,7 @@ final class OnboardingContainerTableViewController: UITableViewController {
         OnboardingPage(
             eyebrow:     "Better sleep awareness",
             title:       "Wake up at the right moment.",
-            subtitle:    "WakeWell helps you see your sleep rhythm clearly so mornings feel calmer, not rushed.",
+            subtitle:    "SetSail helps you see your sleep rhythm clearly so mornings feel calmer, not rushed.",
             accentColor: WakeWellTheme.accentPurple,
             hero:        .init(kind: .logo, accentColor: WakeWellTheme.accentPurple),
             highlights:  ["Sleep rhythm", "Gentle wake timing"]
@@ -46,7 +46,7 @@ final class OnboardingContainerTableViewController: UITableViewController {
         OnboardingPage(
             eyebrow:     "Apple Watch + live tracking",
             title:       "Your watch becomes the sleep sensor.",
-            subtitle:    "During the alarm window, WakeWell reads the signals that matter for a gentler wake-up.",
+            subtitle:    "During the alarm window, SetSail reads the signals that matter for a gentler wake-up.",
             accentColor: WakeWellTheme.accentPurple,
             hero:        .init(kind: .symbol("applewatch"), accentColor: WakeWellTheme.accentPurple),
             highlights:  ["Live tracking", "Only when needed"]
@@ -134,7 +134,7 @@ final class OnboardingContainerTableViewController: UITableViewController {
         brandDot.layer.cornerRadius = 4.5
 
         brandLabel.translatesAutoresizingMaskIntoConstraints = false
-        brandLabel.text = "WakeWell"
+        brandLabel.text = "SetSail"
         brandLabel.font = .systemFont(ofSize: 12, weight: .semibold)
         brandLabel.textColor = WakeWellTheme.accentPurple
 

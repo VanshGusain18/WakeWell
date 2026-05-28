@@ -1,6 +1,6 @@
 //
 //  AlarmViewModel.swift
-//  WakeWell
+//  SetSail
 //
 //  Owns all alarm business logic: HealthKit queries, notification
 //  scheduling, persistence. The view controller only calls into this.

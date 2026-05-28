@@ -1,6 +1,6 @@
 //
 //  AlarmSmartWindowCell.swift
-//  WakeWell
+//  SetSail
 
 import UIKit
 

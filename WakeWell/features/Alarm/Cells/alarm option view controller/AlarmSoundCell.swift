@@ -1,6 +1,6 @@
 //
 //  AlarmSoundCell.swift
-//  WakeWell
+//  SetSail
 
 import UIKit
 

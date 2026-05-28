@@ -1,6 +1,6 @@
 //
 //  HealthKitSleepRepository.swift
-//  WakeWell
+//  SetSail
 //
 //  Central HealthKit data layer.
 //  All analyzers call this repository for HealthKit-backed records.

@@ -1,6 +1,6 @@
 //
 //  SceneDelegate.swift
-//  WakeWell
+//  SetSail
 //
 //  Created by geu on 30/01/26.
 //

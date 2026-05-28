@@ -1,6 +1,6 @@
 //
 //  ArchitectureModels.swift
-//  WakeWell
+//  SetSail
 //
 //  Created by geu on 12/03/26.
 //

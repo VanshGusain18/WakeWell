@@ -1,6 +1,6 @@
 //
 //  AlarmToggleCell.swift
-//  WakeWell
+//  SetSail
 
 import UIKit
 

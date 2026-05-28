@@ -12,6 +12,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         applyTheme()
+        collectionView.contentInsetAdjustmentBehavior = .automatic
         collectionView.delegate        = self
         collectionView.dataSource      = self
         collectionView.allowsSelection = true
@@ -295,26 +296,11 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.onBeginEditing = { [weak self] in
                 self?.focusGroggyNotesCard()
             }
-            cell.onGroggyChange = { [weak self] value in
-                self?.viewModel.saveGroggyValue(value)
-            }
-            cell.onTextChange = { [weak self] text in
-                self?.viewModel.saveMorningNote(text)
-            }
-            cell.onPrimaryActionTapped = { [weak self] groggyValue, text, action in
+            cell.onPrimaryActionTapped = { [weak self] groggyValue, text in
                 guard let self else { return }
                 self.viewModel.finalizeTodayJournal(groggyValue: groggyValue, morningNote: text)
                 self.viewModel.refreshDynamicContent()
                 self.collectionView.reloadItems(at: [indexPath])
-                let alert = UIAlertController(
-                    title: "Noted",
-                    message: action == .set
-                        ? "Your grogginess score has been set."
-                        : "Your grogginess score has been updated.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.present(alert, animated: true)
             }
             cell.configure(
                 groggy: GroggySliderViewModel(model: groggyModel),
@@ -345,7 +331,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         let halfWidth = (fullWidth - 8) / 2
 
         switch viewModel.cards[indexPath.item] {
-        case .sleepDebt:    return CGSize(width: fullWidth, height: 60)
+        case .sleepDebt:    return CGSize(width: fullWidth, height: 96)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .liveVitals:   return CGSize(width: fullWidth, height: 190)

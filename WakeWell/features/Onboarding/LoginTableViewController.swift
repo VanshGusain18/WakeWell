@@ -431,7 +431,14 @@ final class LoginTableViewController: UITableViewController {
         if DatabaseManager.shared.validateLogin(
             email: emailText.trimmingCharacters(in: .whitespaces),
             password: passwordText) {
-            UserDefaults.standard.set(true, forKey: "ww_logged_in")
+            if let profile = DatabaseManager.shared.authenticateUser(
+                email: emailText.trimmingCharacters(in: .whitespaces),
+                password: passwordText
+            ) {
+                ProfileRepository.shared.signIn(model: profile)
+            } else {
+                UserDefaults.standard.set(true, forKey: "ww_logged_in")
+            }
             navigateToMainApp()
         } else {
             showError("Invalid email or password.", button: button)
@@ -458,9 +465,11 @@ final class LoginTableViewController: UITableViewController {
                 let wakeTimeDate = self.normalizedWakeTime(from: self.wakeTimeGoal)
 
                 let input = UserProfileInput(
+                    authProvider: .email,
                     firstName: firstName,
                     email: email,
                     password: self.passwordText,
+                    profilePhotoURL: nil,
                     wakeUpGoalTime: wakeUpDate,
                     sleepGoalHours: self.sleepGoal,
                     biologicalSex: self.biologicalSex,
@@ -474,14 +483,15 @@ final class LoginTableViewController: UITableViewController {
                 )
 
                 switch DatabaseManager.shared.insertUserProfile(input) {
-                case .success:
-                    break
+                case .success(let userID):
+                    if let profile = DatabaseManager.shared.fetchUserProfile(id: userID) {
+                        ProfileRepository.shared.signIn(model: profile)
+                    }
                 case .failure(let error):
                     self.showError(error.localizedDescription, button: button)
                     return
                 }
 
-                UserDefaults.standard.set(true, forKey: "ww_logged_in")
                 UserDefaults.standard.set(wakeUpDate, forKey: "wakewell.savedAlarmTime")
                 AlarmManager.shared.setAlarm(AlarmModel(time: wakeUpDate))
                 self.navigateToMainApp()

@@ -41,10 +41,10 @@
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="FR1-Hr-aTD" secondAttribute="bottom" id="CPX-UP-xdJ"/>
-                            <constraint firstItem="FR1-Hr-aTD" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="Lql-X7-6vD"/>
-                            <constraint firstItem="FR1-Hr-aTD" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="jiJ-DH-dqM"/>
-                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="FR1-Hr-aTD" secondAttribute="trailing" id="jwR-sR-Tbu"/>
+                            <constraint firstItem="5EZ-qb-Rvc" firstAttribute="bottom" secondItem="FR1-Hr-aTD" secondAttribute="bottom" id="CPX-UP-xdJ"/>
+                            <constraint firstItem="FR1-Hr-aTD" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="Lql-X7-6vD"/>
+                            <constraint firstItem="FR1-Hr-aTD" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" id="jiJ-DH-dqM"/>
+                            <constraint firstItem="5EZ-qb-Rvc" firstAttribute="trailing" secondItem="FR1-Hr-aTD" secondAttribute="trailing" id="jwR-sR-Tbu"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="evb-e1-h2V"/>

@@ -7,6 +7,7 @@ struct GroggySliderViewModel {
     let rightLabel: String
     let value: Float
     let isLocked: Bool
+    let hasEntry: Bool
 
     init(model: GroggyModel) {
         title = "How groggy do you feel?"
@@ -14,5 +15,6 @@ struct GroggySliderViewModel {
         rightLabel = "Very Groggy"
         value = model.value
         isLocked = model.isLocked
+        hasEntry = model.hasEntry
     }
 }

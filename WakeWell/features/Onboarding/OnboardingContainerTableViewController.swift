@@ -21,31 +21,51 @@ final class OnboardingContainerTableViewController: UITableViewController {
 
     private var pageVC: UIPageViewController!
     private var currentIndex = 0
+    private let brandHeaderView = UIView()
+    private let brandPill = UIView()
+    private let brandDot = UIView()
+    private let brandLabel = UILabel()
 
     private let pages: [OnboardingPage] = [
         OnboardingPage(
-            sfSymbol:    "sailboat.fill",
-            title:       "Welcome to SetSail",
-            subtitle:    "Set your wake window, sleep with Apple Watch, and wake at the right moment.",
-            accentColor: UIColor(hex: "#5E9BF0")
+            eyebrow:     "Better sleep awareness",
+            title:       "Wake up at the right moment.",
+            subtitle:    "WakeWell helps you see your sleep rhythm clearly so mornings feel calmer, not rushed.",
+            accentColor: WakeWellTheme.accentPurple,
+            hero:        .init(kind: .logo, accentColor: WakeWellTheme.accentPurple),
+            highlights:  ["Sleep rhythm", "Gentle wake timing"]
         ),
         OnboardingPage(
-            sfSymbol:    "waveform.path.ecg",
-            title:       "Sleep Signals",
-            subtitle:    "SetSail reads heart rate and movement only during your alarm window.",
-            accentColor: WakeWellTheme.accentGold
+            eyebrow:     "Smart wake window",
+            title:       "Understand when your body is ready.",
+            subtitle:    "We learn your ideal wake window so the alarm feels less abrupt and more human.",
+            accentColor: WakeWellTheme.accentGold,
+            hero:        .init(kind: .symbol("alarm.waves.left.and.right.fill"), accentColor: WakeWellTheme.accentGold),
+            highlights:  ["Wake window", "Calm alarm"]
         ),
         OnboardingPage(
-            sfSymbol:    "alarm.waves.left.and.right.fill",
-            title:       "Smart Wake Alarm",
-            subtitle:    "When your body is ready, iPhone alarms and Apple Watch haptics wake you gently.",
-            accentColor: UIColor(hex: "#5E9BF0")
+            eyebrow:     "Apple Watch + live tracking",
+            title:       "Your watch becomes the sleep sensor.",
+            subtitle:    "During the alarm window, WakeWell reads the signals that matter for a gentler wake-up.",
+            accentColor: WakeWellTheme.accentPurple,
+            hero:        .init(kind: .symbol("applewatch"), accentColor: WakeWellTheme.accentPurple),
+            highlights:  ["Live tracking", "Only when needed"]
         ),
         OnboardingPage(
-            sfSymbol:    "sunrise.fill",
-            title:       "Rise Ritual",
-            subtitle:    "Start a short Watch-guided routine to move into the day with intention.",
-            accentColor: WakeWellTheme.accentGold
+            eyebrow:     "Recovery insights",
+            title:       "Turn sleep into useful guidance.",
+            subtitle:    "See grogginess, sleep debt, and morning notes turn into calm, trend-aware coaching.",
+            accentColor: WakeWellTheme.accentGold,
+            hero:        .init(kind: .symbol("chart.line.uptrend.xyaxis"), accentColor: WakeWellTheme.accentGold),
+            highlights:  ["Recovery insights", "Morning notes"]
+        ),
+        OnboardingPage(
+            eyebrow:     "Final step",
+            title:       "Let’s improve your mornings.",
+            subtitle:    "We’ll ask for HealthKit and notifications only when they unlock the experience you just saw.",
+            accentColor: WakeWellTheme.accentPurple,
+            hero:        .init(kind: .symbol("sparkles"), accentColor: WakeWellTheme.accentPurple),
+            highlights:  ["HealthKit permissions", "Trustworthy setup"]
         )
     ]
 
@@ -58,6 +78,7 @@ final class OnboardingContainerTableViewController: UITableViewController {
         super.viewDidLoad()
         applyGradientBackground()
         setupTableView()
+        setupBrandHeader()
         buildPageViewController()
         showPage(at: 0, animated: false)
     }
@@ -76,15 +97,16 @@ final class OnboardingContainerTableViewController: UITableViewController {
         let grad = CAGradientLayer()
         grad.frame  = view.bounds
         grad.colors = [
-            UIColor(hex: "#F2F1FF").cgColor,   // WakeWellTheme.background (light)
-            UIColor(hex: "#EAE8FF").cgColor,   // slightly deeper lavender mid
-            UIColor(hex: "#E0DEFF").cgColor    // soft purple base
+            UIColor(hex: "#F7F6FF").cgColor,
+            UIColor(hex: "#F1EEFF").cgColor,
+            UIColor(hex: "#E8E4FF").cgColor
         ]
         grad.locations = [0.0, 0.5, 1.0]
         grad.startPoint = CGPoint(x: 0.5, y: 0)
         grad.endPoint   = CGPoint(x: 0.5, y: 1)
         view.layer.insertSublayer(grad, at: 0)
-        tableView.backgroundColor = WakeWellTheme.background 
+        tableView.backgroundColor = .clear
+        view.backgroundColor = WakeWellTheme.background
     }
 
     private func setupTableView() {
@@ -95,6 +117,51 @@ final class OnboardingContainerTableViewController: UITableViewController {
         tableView.allowsSelection = false
         tableView.contentInset    = .zero
         tableView.showsVerticalScrollIndicator = false
+    }
+
+    private func setupBrandHeader() {
+        brandHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        brandHeaderView.backgroundColor = .clear
+
+        brandPill.translatesAutoresizingMaskIntoConstraints = false
+        brandPill.backgroundColor = WakeWellTheme.cardBackground.withAlphaComponent(0.52)
+        brandPill.layer.cornerRadius = 17
+        brandPill.layer.borderWidth = 1
+        brandPill.layer.borderColor = WakeWellTheme.border.cgColor
+
+        brandDot.translatesAutoresizingMaskIntoConstraints = false
+        brandDot.backgroundColor = WakeWellTheme.accentPurple
+        brandDot.layer.cornerRadius = 4.5
+
+        brandLabel.translatesAutoresizingMaskIntoConstraints = false
+        brandLabel.text = "WakeWell"
+        brandLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        brandLabel.textColor = WakeWellTheme.accentPurple
+
+        view.addSubview(brandHeaderView)
+        brandHeaderView.addSubview(brandPill)
+        brandPill.addSubview(brandDot)
+        brandPill.addSubview(brandLabel)
+
+        NSLayoutConstraint.activate([
+            brandHeaderView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            brandHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 26),
+            brandHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -26),
+            brandHeaderView.heightAnchor.constraint(equalToConstant: 34),
+
+            brandPill.leadingAnchor.constraint(equalTo: brandHeaderView.leadingAnchor),
+            brandPill.topAnchor.constraint(equalTo: brandHeaderView.topAnchor),
+            brandPill.heightAnchor.constraint(equalToConstant: 34),
+
+            brandDot.leadingAnchor.constraint(equalTo: brandPill.leadingAnchor, constant: 14),
+            brandDot.centerYAnchor.constraint(equalTo: brandPill.centerYAnchor),
+            brandDot.widthAnchor.constraint(equalToConstant: 9),
+            brandDot.heightAnchor.constraint(equalToConstant: 9),
+
+            brandLabel.leadingAnchor.constraint(equalTo: brandDot.trailingAnchor, constant: 8),
+            brandLabel.trailingAnchor.constraint(equalTo: brandPill.trailingAnchor, constant: -14),
+            brandLabel.centerYAnchor.constraint(equalTo: brandPill.centerYAnchor)
+        ])
     }
 
     private func buildPageViewController() {
@@ -142,8 +209,8 @@ final class OnboardingContainerTableViewController: UITableViewController {
                             heightForRowAt indexPath: IndexPath) -> CGFloat {
         let total = tableView.bounds.height
         switch OnboardingSection(rawValue: indexPath.section)! {
-        case .carousel: return total * 0.80
-        case .controls: return total * 0.20
+        case .carousel: return total * 0.78
+        case .controls: return total * 0.22
         }
     }
 
@@ -262,9 +329,10 @@ private final class ControlsCell: UITableViewCell {
     var onNext: (() -> Void)?
     var onSkip: (() -> Void)?
 
+    private let progressLabel = UILabel()
     private let pageControl = UIPageControl()
-    private let nextButton  = UIButton(type: .system)
-    private let skipButton  = UIButton(type: .system)
+    private let nextButton = UIButton(type: .system)
+    private let skipButton = UIButton(type: .system)
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -277,9 +345,18 @@ private final class ControlsCell: UITableViewCell {
         contentView.backgroundColor = .clear
         selectionStyle              = .none
 
+        progressLabel.translatesAutoresizingMaskIntoConstraints = false
+        progressLabel.textAlignment = .center
+        progressLabel.textColor = WakeWellTheme.labelTertiary
+        progressLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        progressLabel.text = "Ready to begin"
+
         // Page dots — visible on light background
-        pageControl.pageIndicatorTintColor        = WakeWellTheme.accentPurple.withAlphaComponent(0.30)
+        pageControl.pageIndicatorTintColor        = WakeWellTheme.accentPurple.withAlphaComponent(0.28)
         pageControl.currentPageIndicatorTintColor = WakeWellTheme.accentPurple
+        if #available(iOS 14.0, *) {
+            pageControl.backgroundStyle = .minimal
+        }
         pageControl.translatesAutoresizingMaskIntoConstraints = false
 
         // Next button — purple fill
@@ -291,40 +368,51 @@ private final class ControlsCell: UITableViewCell {
         nextButton.setTitle("Next", for: .normal)
         nextButton.translatesAutoresizingMaskIntoConstraints = false
         nextButton.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
+        nextButton.layer.shadowColor = WakeWellTheme.shadowColor.cgColor
+        nextButton.layer.shadowOpacity = 0.16
+        nextButton.layer.shadowRadius = 12
+        nextButton.layer.shadowOffset = CGSize(width: 0, height: 8)
 
         // Skip button
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(WakeWellTheme.labelSecondary, for: .normal)
-        skipButton.titleLabel?.font     = .systemFont(ofSize: 14, weight: .regular)
+        skipButton.titleLabel?.font     = .systemFont(ofSize: 14, weight: .medium)
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
 
+        contentView.addSubview(progressLabel)
         contentView.addSubview(pageControl)
         contentView.addSubview(nextButton)
         contentView.addSubview(skipButton)
 
         NSLayoutConstraint.activate([
-            pageControl.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            progressLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
+            progressLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+
+            pageControl.topAnchor.constraint(equalTo: progressLabel.bottomAnchor, constant: 6),
             pageControl.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
 
             nextButton.topAnchor.constraint(equalTo: pageControl.bottomAnchor, constant: 14),
-            nextButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            nextButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.72),
-            nextButton.heightAnchor.constraint(equalToConstant: 52),
+            nextButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
+            nextButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -28),
+            nextButton.heightAnchor.constraint(equalToConstant: 54),
 
-            skipButton.topAnchor.constraint(equalTo: nextButton.bottomAnchor, constant: 8),
-            skipButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
+            skipButton.topAnchor.constraint(equalTo: nextButton.bottomAnchor, constant: 10),
+            skipButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            skipButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
     }
 
     func configure(pageCount: Int, currentPage: Int) {
         pageControl.numberOfPages = pageCount
         pageControl.currentPage   = currentPage
+        progressLabel.text = "Step \(currentPage + 1) of \(pageCount)"
     }
 
     func update(currentPage: Int, isLast: Bool) {
         pageControl.currentPage = currentPage
-        let title = isLast ? "Set Sail  ⛵" : "Next"
+        progressLabel.text = isLast ? "Final step" : "Step \(currentPage + 1) of \(pageControl.numberOfPages)"
+        let title = isLast ? "Start Sleeping Better" : "Next"
         nextButton.setTitle(title, for: .normal)
         nextButton.backgroundColor = isLast ? WakeWellTheme.accentGold : WakeWellTheme.accentPurple
         UIView.animate(withDuration: 0.2) {

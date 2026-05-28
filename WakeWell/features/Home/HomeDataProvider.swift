@@ -119,6 +119,8 @@ final class HomeDataProvider {
     // MARK: - Sleep Debt
     func getSleepDebt() -> SleepDebtModel {
         let records = HealthKitSleepRepository.shared.records(for: .week)
+        let todayRecord = records.first(where: { Calendar.current.isDateInToday($0.date) })
+        let yesterdayRecord = records.first(where: { Calendar.current.isDateInYesterday($0.date) })
         let history = records
             .filter { $0.hoursSlept > 0 }
             .sorted { $0.date > $1.date }
@@ -129,7 +131,11 @@ final class HomeDataProvider {
                 )
             }
 
-        return SleepDebtModel(sleepHistory: history)
+        return SleepDebtModel(
+            todaySleepDuration: todayRecord?.hoursSlept,
+            yesterdaySleepDuration: yesterdayRecord?.hoursSlept,
+            sleepHistory: history
+        )
     }
 
     // MARK: - Groggy / Notes
@@ -137,7 +143,8 @@ final class HomeDataProvider {
         let journal = DatabaseManager.shared.fetchDailyJournalEntry()
         return GroggyModel(
             value: journal.map { max(0, min(10, $0.groggyValue)) } ?? 0,
-            isLocked: journal?.isLocked ?? false
+            isLocked: journal?.isLocked ?? false,
+            hasEntry: journal != nil
         )
     }
 
@@ -146,7 +153,8 @@ final class HomeDataProvider {
         return MorningNoteModel(
             text: journal?.morningNote ?? "",
             date: journal?.date ?? Date(),
-            isLocked: journal?.isLocked ?? false
+            isLocked: journal?.isLocked ?? false,
+            hasEntry: journal != nil
         )
     }
 

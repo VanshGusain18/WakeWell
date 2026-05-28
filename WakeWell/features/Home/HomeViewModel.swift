@@ -82,10 +82,6 @@ final class HomeViewModel {
 
     private func updateSleepDebtCard(with model: SleepDebtModel) {
         removeSleepDebtCard()
-
-        let sleepDebtViewModel = SleepDebtViewModel(model: model)
-        guard sleepDebtViewModel.shouldShowCard() else { return }
-
         allCards.insert(.sleepDebt(model), at: 0)
     }
 

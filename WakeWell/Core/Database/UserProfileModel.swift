@@ -6,9 +6,11 @@
 import Foundation
 
 struct UserProfileInput {
+    let authProvider: AuthProvider
     let firstName: String
     let email: String
     let password: String
+    let profilePhotoURL: String?
     let wakeUpGoalTime: Date
     let sleepGoalHours: Double
     let biologicalSex: String
@@ -23,9 +25,11 @@ struct UserProfileInput {
 
 struct UserProfileModel {
     let id: Int
+    let authProvider: AuthProvider
     let firstName: String
     let email: String
     let passwordHash: String   // SHA-256 hex of password
+    let profilePhotoURL: String?
     let wakeUpGoalTime: Date
     let sleepGoalHours: Double
     let biologicalSex: String
@@ -39,4 +43,5 @@ struct UserProfileModel {
     let createdAt: Date
 
     var name: String { firstName }
+    var displayName: String { firstName }
 }

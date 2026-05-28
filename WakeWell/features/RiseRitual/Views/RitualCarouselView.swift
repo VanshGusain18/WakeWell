@@ -72,7 +72,7 @@ private struct ActivityCard: View {
             Spacer()
 
             Image(systemName: block.sfSymbol)
-                .font(.system(size: 76, weight: .semibold))
+                .font(RiseRitualStyle.bodyFont(size: 76, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 146, height: 146)
                 .background(
@@ -83,19 +83,19 @@ private struct ActivityCard: View {
 
             VStack(spacing: 10) {
                 Text(block.title)
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(RiseRitualStyle.titleFont(size: 34))
                     .foregroundStyle(RiseRitualStyle.text)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.75)
                 Text(block.subtitle)
-                    .font(.system(size: 18, weight: .medium))
+                    .font(RiseRitualStyle.bodyFont(size: 18))
                     .foregroundStyle(RiseRitualStyle.secondaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(3)
             }
 
             Text("\(block.duration) min")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(RiseRitualStyle.bodyFont(size: 15, weight: .bold))
                 .foregroundStyle(RiseRitualStyle.gold)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)

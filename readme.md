@@ -1,18 +1,18 @@
-# 🌙 WakeWell
+# 🌙 SetSail
 ## Smart Sleep & Wake Optimization App (iOS + watchOS)
 
 ---
 
 ## 📌 Project Overview
 
-WakeWell is an **iOS + watchOS application** designed to help **working professionals wake up refreshed** by intelligently detecting **optimal wake moments** within a user-defined time window.
+SetSail is an **iOS + watchOS application** designed to help **working professionals wake up refreshed** by intelligently detecting **optimal wake moments** within a user-defined time window.
 
 The app combines:
 - Real-time physiological signals (during a short wake window)
 - Post-sleep insights from Apple Health
 - Minimal, focused features that support better wake quality (not generic sleep tracking)
 
-> ⚠️ WakeWell is **not a medical or clinical sleep diagnosis tool**.
+> ⚠️ SetSail is **not a medical or clinical sleep diagnosis tool**.
 
 ---
 
@@ -22,7 +22,7 @@ The app combines:
 We use Apple’s ecosystem **as intended**:
 
 - **Apple** → Sleep insights (after sleep ends)
-- **WakeWell** → Real-time wake decision (during wake window)
+- **SetSail** → Real-time wake decision (during wake window)
 
 This repository exists to build a **reliable, battery-aware, iOS-native experience**.
 
@@ -128,6 +128,6 @@ fix/battery-drain
 
 ## ⚠️ Disclaimer
 
-WakeWell is a wellness-focused educational project and **not a medical device**.
+SetSail is a wellness-focused educational project and **not a medical device**.
 
 commit1

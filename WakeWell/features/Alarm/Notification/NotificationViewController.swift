@@ -1,10 +1,10 @@
 //
 //  NotificationViewController.swift
-//  WakeWellAlarmUI  ← Notification Content Extension target
+//  SetSailAlarmUI  ← Notification Content Extension target
 //
 //  HOW TO ADD THIS TARGET:
 //  1. Xcode → File → New → Target → Notification Content Extension
-//  2. Name it "WakeWellAlarmUI"
+//  2. Name it "SetSailAlarmUI"
 //  3. In its Info.plist set:
 //       NSExtension → NSExtensionAttributes
 //         UNNotificationExtensionCategory           → "WAKEWELL_ALARM"

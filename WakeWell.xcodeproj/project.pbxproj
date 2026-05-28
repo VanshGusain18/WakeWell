@@ -282,10 +282,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
-				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
+				INFOPLIST_KEY_CFBundleDisplayName = "SetSail Watch App";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "SetSail reads Apple Watch heart rate and HRV to detect wake readiness.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "SetSail starts a workout session to stream live heart rate during sleep monitoring.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "SetSail reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
@@ -321,10 +321,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "WakeWell Watch App";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "WakeWell reads Apple Watch heart rate and HRV to detect wake readiness.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WakeWell starts a workout session to stream live heart rate during sleep monitoring.";
-				INFOPLIST_KEY_NSMotionUsageDescription = "WakeWell reads Apple Watch motion to detect movement intensity during sleep monitoring.";
+				INFOPLIST_KEY_CFBundleDisplayName = "SetSail Watch App";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "SetSail reads Apple Watch heart rate and HRV to detect wake readiness.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "SetSail starts a workout session to stream live heart rate during sleep monitoring.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "SetSail reads Apple Watch motion to detect movement intensity during sleep monitoring.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.priyanshupanwar.wakewell;
@@ -359,7 +359,7 @@
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = SetSail;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app needs to access health data";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs to share the heath data";
@@ -399,7 +399,7 @@
 				DEVELOPMENT_TEAM = JG2ATY92J8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = SetSail;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app needs to access health data";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs to share the heath data";

@@ -1,5 +1,15 @@
 import Foundation
 
+enum RitualInteractionType: String, Equatable {
+    case instruction
+    case tapCounter
+    case breathingPacer
+    case focusPrompt
+    case mentalActivation
+    case bodyActivation
+    case grounding
+}
+
 struct RitualBlock: Identifiable, Equatable {
     let id: UUID
     let title: String
@@ -8,6 +18,10 @@ struct RitualBlock: Identifiable, Equatable {
     let sfSymbol: String
     let category: String
     let moodTags: [String]
+    let detailedInstructions: [String]
+    let interactionType: RitualInteractionType
+    let interactionTarget: Int
+    let interactionPrompts: [String]
 
     init(
         id: UUID = UUID(),
@@ -16,7 +30,11 @@ struct RitualBlock: Identifiable, Equatable {
         duration: Int,
         sfSymbol: String,
         category: String,
-        moodTags: [String] = []
+        moodTags: [String] = [],
+        detailedInstructions: [String] = [],
+        interactionType: RitualInteractionType = .instruction,
+        interactionTarget: Int = 0,
+        interactionPrompts: [String] = []
     ) {
         self.id = id
         self.title = title
@@ -25,5 +43,15 @@ struct RitualBlock: Identifiable, Equatable {
         self.sfSymbol = sfSymbol
         self.category = category
         self.moodTags = moodTags
+        self.detailedInstructions = detailedInstructions.isEmpty
+            ? [
+                subtitle,
+                "Move slowly enough that it feels easy to finish.",
+                "Press Done when you feel complete."
+            ]
+            : detailedInstructions
+        self.interactionType = interactionType
+        self.interactionTarget = interactionTarget
+        self.interactionPrompts = interactionPrompts
     }
 }

@@ -297,8 +297,10 @@ final class AlarmRingViewController: UIViewController {
     private let reasonLabel = UILabel()
     private let sourceLabel = UILabel()
     private let ringContainer = UIView()
+    private let readinessTrackRing = CAShapeLayer()
     private let readinessRing = CAShapeLayer()
     private var timeTimer: Timer?
+    private var lastRingBounds: CGRect = .zero
 
     init(reason: String, confidence: Double, wakeDate: Date, source: AlarmWakeSource) {
         self.reason = reason
@@ -392,7 +394,12 @@ final class AlarmRingViewController: UIViewController {
         sourceLabel.textAlignment = .center
 
         ringContainer.translatesAutoresizingMaskIntoConstraints = false
+        ringContainer.isUserInteractionEnabled = false
+        ringContainer.layer.addSublayer(readinessTrackRing)
         ringContainer.layer.addSublayer(readinessRing)
+
+        readinessLabel.translatesAutoresizingMaskIntoConstraints = false
+        ringContainer.addSubview(readinessLabel)
 
         let stopButton = UIButton(type: .system)
         stopButton.setTitle("Dismiss & Start Ritual", for: .normal)
@@ -402,17 +409,7 @@ final class AlarmRingViewController: UIViewController {
         stopButton.layer.cornerRadius = 18
         stopButton.addTarget(self, action: #selector(stopAlarm), for: .touchUpInside)
 
-        let snoozeButton = UIButton(type: .system)
-        snoozeButton.setTitle("Snooze 9 min", for: .normal)
-        snoozeButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        snoozeButton.tintColor = .white
-        snoozeButton.backgroundColor = UIColor.white.withAlphaComponent(0.18)
-        snoozeButton.layer.cornerRadius = 18
-        snoozeButton.layer.borderWidth = 1
-        snoozeButton.layer.borderColor = UIColor.white.withAlphaComponent(0.24).cgColor
-        snoozeButton.addTarget(self, action: #selector(snoozeAlarm), for: .touchUpInside)
-
-        let buttonStack = UIStackView(arrangedSubviews: [stopButton, snoozeButton])
+        let buttonStack = UIStackView(arrangedSubviews: [stopButton])
         buttonStack.axis = .vertical
         buttonStack.spacing = 12
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
@@ -422,7 +419,6 @@ final class AlarmRingViewController: UIViewController {
             greetingLabel,
             timeLabel,
             ringContainer,
-            readinessLabel,
             reasonLabel,
             sourceLabel
         ])
@@ -445,7 +441,9 @@ final class AlarmRingViewController: UIViewController {
             buttonStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -18),
             stopButton.heightAnchor.constraint(equalToConstant: 58),
-            snoozeButton.heightAnchor.constraint(equalToConstant: 54)
+
+            readinessLabel.centerXAnchor.constraint(equalTo: ringContainer.centerXAnchor),
+            readinessLabel.centerYAnchor.constraint(equalTo: ringContainer.centerYAnchor)
         ])
     }
 
@@ -479,37 +477,52 @@ final class AlarmRingViewController: UIViewController {
 
     private func updateReadinessRingPath() {
         let bounds = ringContainer.bounds
+        guard bounds.width > 0, bounds.height > 0 else { return }
+
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
-        let radius: CGFloat = 48
-        readinessRing.frame = bounds
-        let track = CAShapeLayer()
-        track.path = UIBezierPath(
+        let radius = min(bounds.width, bounds.height) / 2 - 11
+        let path = UIBezierPath(
             arcCenter: center,
             radius: radius,
             startAngle: -.pi / 2,
             endAngle: .pi * 1.5,
             clockwise: true
         ).cgPath
-        track.strokeColor = UIColor.white.withAlphaComponent(0.18).cgColor
-        track.fillColor = UIColor.clear.cgColor
-        track.lineWidth = 9
 
-        readinessRing.sublayers?.forEach { $0.removeFromSuperlayer() }
-        readinessRing.addSublayer(track)
-        readinessRing.path = track.path
-        readinessRing.strokeColor = WakeWellTheme.accentGold.cgColor
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        readinessTrackRing.frame = bounds
+        readinessTrackRing.path = path
+        readinessTrackRing.strokeColor = UIColor.white.withAlphaComponent(0.16).cgColor
+        readinessTrackRing.fillColor = UIColor.clear.cgColor
+        readinessTrackRing.lineCap = .round
+        readinessTrackRing.lineWidth = 8
+
+        readinessRing.frame = bounds
+        readinessRing.path = path
+        readinessRing.strokeColor = UIColor.white.withAlphaComponent(0.92).cgColor
         readinessRing.fillColor = UIColor.clear.cgColor
         readinessRing.lineCap = .round
-        readinessRing.lineWidth = 9
+        readinessRing.lineWidth = 8
         readinessRing.strokeEnd = max(0.08, min(1, confidence))
+        CATransaction.commit()
+
+        if lastRingBounds != bounds {
+            lastRingBounds = bounds
+            animateReadinessRing(fromCurrentValue: false)
+        }
     }
 
-    private func animateReadinessRing() {
+    private func animateReadinessRing(fromCurrentValue: Bool = true) {
+        let targetValue = max(0.08, min(1, confidence))
         let animation = CABasicAnimation(keyPath: "strokeEnd")
-        animation.fromValue = 0
-        animation.toValue = max(0.08, min(1, confidence))
-        animation.duration = 0.8
+        animation.fromValue = fromCurrentValue
+            ? readinessRing.presentation()?.strokeEnd ?? readinessRing.strokeEnd
+            : 0
+        animation.toValue = targetValue
+        animation.duration = fromCurrentValue ? 0.35 : 0.65
         animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        readinessRing.strokeEnd = targetValue
         readinessRing.add(animation, forKey: "readiness")
     }
 
@@ -528,10 +541,6 @@ final class AlarmRingViewController: UIViewController {
 
     @objc private func stopAlarm() {
         AlarmPresentationManager.shared.dismissWakeAlarm(startRiseRitual: true)
-    }
-
-    @objc private func snoozeAlarm() {
-        AlarmPresentationManager.shared.snoozeWakeAlarm()
     }
 }
 final class NotificationManager: NSObject {
@@ -611,7 +620,7 @@ final class NotificationManager: NSObject {
                     let content = self.makeAlarmContent(
                         title: index == 0 ? "Rise & Shine" : "Still time to wake up",
                         subtitle: index == 0 ? "Your SetSail alarm" : "Alarm follow-up",
-                        body: index == 0 ? "SetSail is ready to wake you." : "Open SetSail to stop or snooze your alarm.",
+                        body: index == 0 ? "SetSail is ready to wake you." : "Open SetSail to stop your alarm.",
                         fireDate: fireDate,
                         source: source,
                         confidence: 0.86
@@ -785,12 +794,6 @@ final class NotificationManager: NSObject {
             options: [.destructive]
         )
 
-        let snoozeAction = UNNotificationAction(
-            identifier: snoozeActionIdentifier,
-            title: "Snooze",
-            options: []
-        )
-
         let openAction = UNNotificationAction(
             identifier: openActionIdentifier,
             title: "Open SetSail",
@@ -799,7 +802,7 @@ final class NotificationManager: NSObject {
 
         let category = UNNotificationCategory(
             identifier: notificationCategory,
-            actions: [snoozeAction, openAction, stopAction],
+            actions: [openAction, stopAction],
             intentIdentifiers: [],
             hiddenPreviewsBodyPlaceholder: "Alarm",
             options: [.customDismissAction]

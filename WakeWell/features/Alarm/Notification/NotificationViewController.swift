@@ -82,8 +82,15 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
     private var clockTimer: Timer?
 
     // Pulse layers
-    private var pulseLayer1: CALayer?
-    private var pulseLayer2: CALayer?
+    private let pulseContainer: UIView = {
+        let v = UIView()
+        v.isUserInteractionEnabled = false
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let pulseLayer1 = CAShapeLayer()
+    private let pulseLayer2 = CAShapeLayer()
+    private var hasStartedPulse = false
 
     // MARK: - Lifecycle
 
@@ -92,10 +99,18 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
         view.backgroundColor = WakeWellTheme.background
         buildLayout()
         setupSlideGesture()
-        startPulse()
         updateClock()
         clockTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.updateClock()
+        }
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updatePulseLayers()
+        if !hasStartedPulse {
+            hasStartedPulse = true
+            startPulse()
         }
     }
 
@@ -117,7 +132,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
         switch response.actionIdentifier {
         case "STOP_ALARM":
             animateSlideComplete { done(.dismissAndForwardAction) }
-        case "OPEN_SETSAIL_ALARM", "SNOOZE_ALARM":
+        case "OPEN_SETSAIL_ALARM":
             done(.dismissAndForwardAction)
         default:
             done(.doNotDismiss)
@@ -127,16 +142,24 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
     // MARK: - Layout
 
     private func buildLayout() {
+        view.addSubview(pulseContainer)
         [timeLabel, subtitleLabel, smartBadge, slideTrack, slideHint].forEach {
             view.addSubview($0)
         }
         slideTrack.addSubview(slideThumb)
         slideThumb.addSubview(slideArrow)
+        pulseContainer.layer.addSublayer(pulseLayer1)
+        pulseContainer.layer.addSublayer(pulseLayer2)
 
         thumbLeadingConstraint = slideThumb.leadingAnchor.constraint(
             equalTo: slideTrack.leadingAnchor, constant: 8)
 
         NSLayoutConstraint.activate([
+            pulseContainer.centerXAnchor.constraint(equalTo: timeLabel.centerXAnchor),
+            pulseContainer.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor),
+            pulseContainer.widthAnchor.constraint(equalToConstant: 188),
+            pulseContainer.heightAnchor.constraint(equalToConstant: 188),
+
             timeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             timeLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -60),
 
@@ -210,33 +233,41 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
 
     // MARK: - Pulse animation
 
-    private func startPulse() {
-        func makePulse(scale: Float, delay: Double) -> CALayer {
-            let size: CGFloat = 140
-            let layer = CALayer()
-            layer.frame = CGRect(
-                x: view.center.x - size / 2,
-                y: view.frame.height / 2 - 60 - size / 2,
-                width: size, height: size
-            )
-            layer.cornerRadius    = size / 2
-            layer.borderWidth     = 1
-            layer.borderColor     = UIColor.white.withAlphaComponent(0.15).cgColor
-            layer.backgroundColor = UIColor.clear.cgColor
-            view.layer.insertSublayer(layer, at: 0)
+    private func updatePulseLayers() {
+        let bounds = pulseContainer.bounds
+        guard bounds.width > 0, bounds.height > 0 else { return }
 
-            let anim           = CABasicAnimation(keyPath: "transform.scale")
-            anim.toValue       = scale
-            anim.duration      = 2.5
-            anim.beginTime     = CACurrentMediaTime() + delay
-            anim.repeatCount   = .infinity
-            anim.autoreverses  = true
-            anim.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            layer.add(anim, forKey: "pulse")
-            return layer
+        let path = UIBezierPath(ovalIn: bounds.insetBy(dx: 14, dy: 14)).cgPath
+        [pulseLayer1, pulseLayer2].forEach { layer in
+            layer.frame = bounds
+            layer.path = path
+            layer.fillColor = UIColor.clear.cgColor
+            layer.strokeColor = UIColor.white.withAlphaComponent(0.14).cgColor
+            layer.lineWidth = 1.2
         }
-        pulseLayer1 = makePulse(scale: 1.4, delay: 0)
-        pulseLayer2 = makePulse(scale: 1.7, delay: 0.8)
+    }
+
+    private func startPulse() {
+        func animate(_ layer: CAShapeLayer, delay: Double) {
+            let scale = CABasicAnimation(keyPath: "transform.scale")
+            scale.fromValue = 0.92
+            scale.toValue = 1.18
+
+            let opacity = CABasicAnimation(keyPath: "opacity")
+            opacity.fromValue = 0.75
+            opacity.toValue = 0.0
+
+            let group = CAAnimationGroup()
+            group.animations = [scale, opacity]
+            group.duration = 2.4
+            group.beginTime = CACurrentMediaTime() + delay
+            group.repeatCount = .infinity
+            group.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            layer.opacity = 0
+            layer.add(group, forKey: "pulse")
+        }
+        animate(pulseLayer1, delay: 0)
+        animate(pulseLayer2, delay: 1.2)
     }
 
     // MARK: - Clock

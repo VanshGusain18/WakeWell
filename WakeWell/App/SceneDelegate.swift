@@ -15,6 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let tabBarItemWidth: CGFloat = 84
     private let tabBarItemSpacing: CGFloat = 8
     private var authObserver: NSObjectProtocol?
+    private var alarmObserver: NSObjectProtocol?
+    private var riseRitualObserver: NSObjectProtocol?
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -28,11 +30,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self?.updateRootController(animated: true)
         }
 
+        alarmObserver = NotificationCenter.default.addObserver(
+            forName: .setSailOpenAlarmScreen,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.presentPendingAlarm()
+        }
+
+        riseRitualObserver = NotificationCenter.default.addObserver(
+            forName: .setSailOpenRiseRitual,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.openRiseRitual()
+        }
+
         if window == nil {
             window = UIWindow(windowScene: windowScene)
         }
 
         updateRootController(animated: false)
+
+        if let notificationResponse = connectionOptions.notificationResponse {
+            NotificationManager.shared.handleNotificationResponse(notificationResponse)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -46,6 +68,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         configureTabsAfterLayout()
+        presentPendingAlarm()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -68,6 +91,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     deinit {
         if let authObserver {
             NotificationCenter.default.removeObserver(authObserver)
+        }
+        if let alarmObserver {
+            NotificationCenter.default.removeObserver(alarmObserver)
+        }
+        if let riseRitualObserver {
+            NotificationCenter.default.removeObserver(riseRitualObserver)
         }
     }
 
@@ -106,6 +135,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.insertRiseRitualTabIfNeeded()
             self?.alignTabBarItems()
+        }
+    }
+
+    private func presentPendingAlarm() {
+        guard window?.rootViewController != nil else { return }
+        DispatchQueue.main.async {
+            AlarmDeepLinkCoordinator.shared.processPendingAlarmIfNeeded()
+        }
+    }
+
+    private func openRiseRitual() {
+        guard AuthStateManager.shared.isAuthenticated else {
+            updateRootController(animated: true)
+            return
+        }
+
+        configureTabsAfterLayout()
+        DispatchQueue.main.async { [weak self] in
+            guard let tabBarController = self?.window?.rootViewController as? UITabBarController else { return }
+            self?.insertRiseRitualTabIfNeeded()
+            tabBarController.selectedIndex = min(1, (tabBarController.viewControllers?.count ?? 1) - 1)
         }
     }
 

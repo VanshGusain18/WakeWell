@@ -90,6 +90,7 @@ final class SmartAlarmEngine {
     private(set) var alarmState: AlarmState = .idle
     private(set) var debugSnapshot = SmartAlarmDebugSnapshot.empty
     private(set) var lastTriggerResult: TriggerResult?
+    var currentWakeConfidence: Double { wakeConfidence }
 
     // MARK: - Public
 

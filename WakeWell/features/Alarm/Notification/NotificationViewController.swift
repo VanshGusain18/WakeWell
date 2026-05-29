@@ -111,7 +111,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
 
     func didReceive(_ notification: UNNotification) {
         let info   = notification.request.content.userInfo
-        let isSmart = (info["isSmart"] as? Bool) ?? false
+        let isSmart = (info["source"] as? String) == "smartAlarm"
         smartBadge.isHidden  = !isSmart
         subtitleLabel.text   = "Rise & Shine"
     }
@@ -121,7 +121,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
         switch response.actionIdentifier {
         case "STOP_ALARM":
             animateSlideComplete { done(.dismissAndForwardAction) }
-        case "START_RITUAL":
+        case "OPEN_SETSAIL_ALARM", "SNOOZE_ALARM":
             done(.dismissAndForwardAction)
         default:
             done(.doNotDismiss)

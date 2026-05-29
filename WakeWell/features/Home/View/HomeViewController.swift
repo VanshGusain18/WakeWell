@@ -126,7 +126,7 @@ class HomeViewController: UIViewController {
 
     private func updateKeyboardInsets(bottom: CGFloat) {
         collectionView.contentInset.bottom        = bottom
-        collectionView.scrollIndicatorInsets.bottom = bottom
+        collectionView.verticalScrollIndicatorInsets.bottom = bottom
     }
 
     @objc private func keyboardWillShow(_ notification: Notification) {

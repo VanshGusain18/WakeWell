@@ -344,7 +344,7 @@ final class LoginTableViewController: UITableViewController {
         case .watchConnectivity:
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: StatusActionCell.reuseID, for: indexPath) as! StatusActionCell
-            cell.configure(title: "Watch Connectivity Status",
+            cell.configure(title: "Apple Watch Setup",
                            detail: watchStatusText,
                            actionTitle: "Refresh")
             cell.onAction = { [weak self, weak cell] in
@@ -604,7 +604,7 @@ final class LoginTableViewController: UITableViewController {
 
     private func refreshWatchStatus(_ cell: StatusActionCell) {
         watchStatusText = WatchConnectionMonitor.shared.displayStatus
-        cell.configure(title: "Watch Connectivity Status",
+        cell.configure(title: "Apple Watch Setup",
                        detail: watchStatusText,
                        actionTitle: "Refresh")
     }

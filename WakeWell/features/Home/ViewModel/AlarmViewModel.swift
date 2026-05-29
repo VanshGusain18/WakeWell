@@ -7,17 +7,24 @@ struct HomeAlarmViewModel {
     let title: String
     let timeText: String
     let subtitleText: String
+    let wakeWindowText: String
+    let hasAlarm: Bool
 
     init(model: AlarmModel) {
 
         if let time = model.time {
-            title = "Your alarm will ring at"
+            hasAlarm = true
+            title = "Next wake session"
             timeText = Self.format(time: time)
-            subtitleText = "Tap to edit"
+            let windowStart = AlarmManager.shared.alarmWindowStart(for: time)
+            wakeWindowText = "\(Self.format(time: windowStart)) - \(Self.format(time: time))"
+            subtitleText = "Smart wake window enabled"
         } else {
-            title = "No alarm set"
-            timeText = "--:--"
-            subtitleText = "Tap to set alarm"
+            hasAlarm = false
+            title = "No alarm configured"
+            timeText = "Tap to set your alarm"
+            wakeWindowText = "Smart wake begins after setup"
+            subtitleText = "Choose a wake time when you are ready."
         }
     }
 

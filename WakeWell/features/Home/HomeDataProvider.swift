@@ -10,12 +10,7 @@ final class HomeDataProvider {
     // MARK: - Alarm
     func getAlarm() -> AlarmModel {
         let savedTime = UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date
-        if let savedTime {
-            return AlarmModel(time: savedTime)
-        }
-
-        let profileGoal = DatabaseManager.shared.fetchUserProfile()?.wakeUpGoalTime
-        return AlarmModel(time: profileGoal)
+        return AlarmModel(time: savedTime)
     }
 
     // MARK: - Sleep Ring
@@ -24,7 +19,7 @@ final class HomeDataProvider {
         guard !records.isEmpty else {
             return SleepRingModel(
                 score: nil,
-                subtitle: "Start tonight"
+                subtitle: "Track your first night"
             )
         }
 

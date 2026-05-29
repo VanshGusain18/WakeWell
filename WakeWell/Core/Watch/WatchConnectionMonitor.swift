@@ -28,21 +28,21 @@ final class WatchConnectionMonitor {
     }
 
     var displayStatus: String {
-        guard WCSession.isSupported() else { return "Watch Connectivity Unavailable" }
+        guard WCSession.isSupported() else { return "Apple Watch tracking is not available on this device." }
 
         #if os(iOS)
         guard WCSession.default.isWatchAppInstalled else { return "Install SetSail on Apple Watch" }
         #endif
 
         if state == .connected && !isStaleData {
-            return "Receiving Data"
+            return "Apple Watch is sending overnight signals."
         }
 
         if state == .disconnected {
-            return "Disconnected"
+            return "Open SetSail on Apple Watch to reconnect sleep tracking."
         }
 
-        return isReachable ? "Waiting for Live Data" : "Connecting to Apple Watch"
+        return isReachable ? "Waiting for your first overnight signal." : "Keep Apple Watch nearby to unlock sleep tracking."
     }
 
     func markPayloadReceived(at date: Date = Date()) {

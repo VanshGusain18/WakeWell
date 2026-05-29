@@ -183,6 +183,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         riseHost.title = "Rise Ritual"
 
         let riseController = UINavigationController(rootViewController: riseHost)
+        riseController.setNavigationBarHidden(true, animated: false)
         riseController.navigationBar.prefersLargeTitles = false
         riseController.tabBarItem = UITabBarItem(
             title: "Rise Ritual",

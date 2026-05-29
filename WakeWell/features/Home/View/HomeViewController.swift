@@ -164,10 +164,6 @@ class HomeViewController: UIViewController {
             forCellWithReuseIdentifier: "sleep_metrics_cell"
         )
         collectionView.register(
-            LiveVitalsCollectionViewCell.self,
-            forCellWithReuseIdentifier: LiveVitalsCollectionViewCell.identifier
-        )
-        collectionView.register(
             UINib(nibName: GroggyNotesCollectionViewCell.identifier, bundle: nil),
             forCellWithReuseIdentifier: GroggyNotesCollectionViewCell.identifier
         )
@@ -280,14 +276,6 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.configure(with: SleepMetricsViewModel(model: model))
             return cell
 
-        case .liveVitals:
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: LiveVitalsCollectionViewCell.identifier,
-                for: indexPath
-            ) as! LiveVitalsCollectionViewCell
-            cell.configure()
-            return cell
-
         case .groggyNotes(let groggyModel, let notesModel):
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: GroggyNotesCollectionViewCell.identifier,
@@ -334,7 +322,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         case .sleepDebt:    return CGSize(width: fullWidth, height: 96)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
-        case .liveVitals:   return CGSize(width: fullWidth, height: 190)
         case .metrics:      return CGSize(width: fullWidth, height: 200)
         case .groggyNotes:  return CGSize(width: fullWidth, height: 250)
         case .sounds:       return CGSize(width: fullWidth, height: 60)

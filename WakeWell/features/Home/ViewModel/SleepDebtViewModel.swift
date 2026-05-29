@@ -28,7 +28,7 @@ final class SleepDebtViewModel {
             return CardState(
                 valueText: "No sleep data yet",
                 trendText: nil,
-                insightText: "Track sleep regularly to unlock trend insights.",
+                insightText: "Wear your Apple Watch tonight and SetSail will start building your sleep debt trend.",
                 tone: .empty
             )
         }
@@ -41,8 +41,8 @@ final class SleepDebtViewModel {
                 valueText: todayValueText,
                 trendText: nil,
                 insightText: todayDebt == 0
-                    ? "You reached your ideal sleep target tonight."
-                    : "Track sleep regularly to unlock trend insights.",
+                    ? "Your sleep duration met your target last night."
+                    : "A few more tracked nights will help SetSail understand your normal rhythm.",
                 tone: todayDebt == 0 ? .positive : .neutral
             )
         }
@@ -57,8 +57,8 @@ final class SleepDebtViewModel {
                 valueText: todayValueText,
                 trendText: nil,
                 insightText: todayDebt == 0
-                    ? "You reached your ideal sleep target tonight."
-                    : "Track sleep regularly to unlock trend insights.",
+                    ? "Your sleep duration met your target last night."
+                    : "A few more tracked nights will help SetSail understand your normal rhythm.",
                 tone: todayDebt == 0 ? .positive : .neutral
             )
         }
@@ -119,9 +119,9 @@ final class SleepDebtViewModel {
 
     private func positiveZeroDebtInsight(seed: Int) -> String {
         let options = [
-            "You reached your ideal sleep target tonight.",
-            "No sleep debt detected.",
-            "Your recovery sleep was excellent."
+            "Your recent sleep met your target, which may help the morning feel steadier.",
+            "No sleep debt detected from your latest tracked night.",
+            "Your sleep duration supported recovery last night."
         ]
         return pick(options, seed: Double(seed))
     }
@@ -129,29 +129,29 @@ final class SleepDebtViewModel {
     private func positiveInsight(seed: Double) -> String {
         let options = [
             "You slept closer to your ideal range.",
-            "Your sleep debt decreased from yesterday.",
-            "You recovered more sleep tonight.",
-            "Your sleep duration improved overnight.",
-            "You are moving toward healthier sleep duration."
+            "Your recent sleep debt eased compared with yesterday.",
+            "You recovered more sleep overnight.",
+            "Your sleep duration improved gently.",
+            "Your rhythm is moving in a better direction."
         ]
         return pick(options, seed: seed)
     }
 
     private func negativeInsight(seed: Int) -> String {
         let options = [
-            "Your sleep debt increased tonight.",
-            "You slept below your ideal range.",
-            "You may need more recovery sleep.",
-            "Your sleep duration dropped compared to yesterday."
+            "You may feel more drained today because sleep was shorter than usual.",
+            "Last night landed below your ideal range.",
+            "A calmer wind-down tonight may help you recover.",
+            "Your sleep duration dipped compared with yesterday."
         ]
         return pick(options, seed: Double(seed))
     }
 
     private func neutralInsight(seed: Int) -> String {
         let options = [
-            "Your sleep debt stayed similar to yesterday.",
-            "Your sleep duration remained stable.",
-            "No major change from your previous night."
+            "Your sleep rhythm stayed close to yesterday.",
+            "Your sleep duration remained steady.",
+            "No major shift from your previous tracked night."
         ]
         return pick(options, seed: Double(seed))
     }

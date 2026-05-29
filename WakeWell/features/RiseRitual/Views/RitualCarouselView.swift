@@ -15,12 +15,12 @@ struct RitualCarouselView: View {
                     onLeadingTap: viewModel.backToMoodSelection
                 )
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 8)
 
                 TabView(selection: $viewModel.currentCardIndex) {
                     ForEach(Array((viewModel.currentRitual?.blocks ?? []).enumerated()), id: \.element.id) { index, block in
                         ActivityCard(block: block, index: index)
-                            .padding(.horizontal, 28)
+                            .padding(.horizontal, 16)
                             .tag(index)
                     }
                 }
@@ -55,7 +55,7 @@ struct RitualCarouselView: View {
                     .buttonStyle(RiseRitualSecondaryButton())
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.top, 10)
             .padding(.bottom, 12)
             .background(.ultraThinMaterial.opacity(0.4))
@@ -78,7 +78,7 @@ private struct ActivityCard: View {
                 .background(
                     LinearGradient(colors: RiseRitualStyle.gradient(for: index), startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 42, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .shadow(color: RiseRitualStyle.shadow.opacity(0.16), radius: 18, x: 0, y: 12)
 
             VStack(spacing: 10) {
@@ -104,12 +104,12 @@ private struct ActivityCard: View {
 
             Spacer()
         }
-        .padding(26)
+        .padding(22)
         .frame(maxWidth: .infinity, minHeight: 390)
         .background(RiseRitualStyle.card)
-        .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(RiseRitualStyle.border, lineWidth: 1)
         )
         .shadow(color: RiseRitualStyle.shadow.opacity(0.1), radius: 22, x: 0, y: 14)

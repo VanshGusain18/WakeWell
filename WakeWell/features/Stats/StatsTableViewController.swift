@@ -112,6 +112,10 @@ class StatsTableViewController: UITableViewController {
         let lm = metrics[li]
         let rm = ri < metrics.count ? metrics[ri] : nil
 
+        let rightAction: (() -> Void)? = rm.map { metric in
+            { [weak self] in self?.openMetricScreen(metric.type) }
+        }
+
         cell.configure(
             leftTitle:  lm.type.title,
             leftValue:  lm.displayValue,
@@ -120,7 +124,7 @@ class StatsTableViewController: UITableViewController {
             rightValue: rm?.displayValue,
             rightTrend: rm?.trendPercent ?? 0,
             leftAction:  { [weak self] in self?.openMetricScreen(lm.type) },
-            rightAction: rm != nil ? { [weak self] in self?.openMetricScreen(rm!.type) } : nil
+            rightAction: rightAction
         )
         return cell
     }

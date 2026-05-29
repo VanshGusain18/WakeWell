@@ -49,9 +49,6 @@ final class HomeViewModel {
 
             case .sounds:
                 return .sounds
-
-            case .liveVitals:
-                return .liveVitals
             }
         }
     }
@@ -89,7 +86,6 @@ final class HomeViewModel {
         allCards = [
             .sleepRing(provider.getSleepRing()),
             .alarm(provider.getAlarm()),
-            .liveVitals,
             .metrics(provider.getMetrics()),
             .groggyNotes(groggy: provider.getGroggy(), notes: provider.getNote()),
             .sounds

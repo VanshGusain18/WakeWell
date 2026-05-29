@@ -125,13 +125,20 @@ class SleepRingCollectionViewCell: UICollectionViewCell {
         titleLabel?.text    = "YOUR SLEEP SCORE"
         scoreLabel?.text    = viewModel.scoreText
         subtitleLabel?.text = viewModel.subtitleText
+        ctaLabel?.text = viewModel.hasData
+            ? "Tap for detailed sleep score"
+            : "Wear your Apple Watch during sleep to unlock insights."
+        ctaLabel?.textColor = viewModel.hasData ? WakeWellTheme.labelSecondary : WakeWellTheme.labelTertiary
+        containerView.alpha = viewModel.hasData ? 1.0 : 0.84
 
         progressRingLayer.strokeEnd = 0
         if !viewModel.hasData {
             progressRingLayer.removeAllAnimations()
-            progressRingLayer.strokeEnd = 0
+            progressRingLayer.opacity = 0.22
+            progressRingLayer.strokeEnd = 0.18
             return
         }
+        progressRingLayer.opacity = 1.0
         let anim                    = CABasicAnimation(keyPath: "strokeEnd")
         anim.toValue                = viewModel.progress
         anim.duration               = 0.9

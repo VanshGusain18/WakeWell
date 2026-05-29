@@ -11,9 +11,9 @@ struct MoodSelectionView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Rise Ritual")
-                            .font(RiseRitualStyle.titleFont(size: 38))
+                            .font(RiseRitualStyle.titleFont(size: 34))
                             .foregroundStyle(RiseRitualStyle.text)
-                        Text("Choose how your morning feels. SetSail will build one focused ritual.")
+                        Text("Choose how you want to meet the morning. SetSail will build one calm, focused ritual.")
                             .font(RiseRitualStyle.bodyFont(size: 17))
                             .foregroundStyle(RiseRitualStyle.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
@@ -31,8 +31,8 @@ struct MoodSelectionView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
                 .padding(.bottom, 36)
             }
             .scrollIndicators(.hidden)
@@ -53,7 +53,7 @@ private struct MoodCard: View {
                 .background(
                     LinearGradient(colors: RiseRitualStyle.gradient(for: index), startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(mood.title)
@@ -67,12 +67,12 @@ private struct MoodCard: View {
 
             Spacer()
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, minHeight: 140)
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 132)
         .background(RiseRitualStyle.card.opacity(0.96))
-        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(RiseRitualStyle.border, lineWidth: 1)
         )
         .shadow(color: RiseRitualStyle.shadow.opacity(0.08), radius: 14, x: 0, y: 8)

@@ -2,16 +2,7 @@
 //  NotificationViewController.swift
 //  SetSailAlarmUI  ← Notification Content Extension target
 //
-//  HOW TO ADD THIS TARGET:
-//  1. Xcode → File → New → Target → Notification Content Extension
-//  2. Name it "SetSailAlarmUI"
-//  3. In its Info.plist set:
-//       NSExtension → NSExtensionAttributes
-//         UNNotificationExtensionCategory           → "WAKEWELL_ALARM"
-//         UNNotificationExtensionDefaultContentHidden → YES
-//         UNNotificationExtensionInitialContentSizeRatio → 1
-//  4. Replace generated NotificationViewController.swift with this file.
-//  5. Delete MainInterface.storyboard — all UI is built here.
+//  Notification content extension for SetSail alarm alerts.
 //
 
 import UIKit

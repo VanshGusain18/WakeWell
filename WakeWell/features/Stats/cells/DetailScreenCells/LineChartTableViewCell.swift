@@ -68,13 +68,15 @@ class LineChartTableViewCell: UITableViewCell {
     func configure(title: String, dataSets: [LineChartDataSetModel], xAxisLabels: [String]) {
         titleLabel.text = title
         guard !dataSets.isEmpty else {
-            lineChartView.data = nil
-            lineChartView.isHidden = true
+            lineChartView.isHidden = false
+            lineChartView.alpha = 0.28
+            lineChartView.data = placeholderChartData()
             emptyStateLabel.isHidden = false
             return
         }
 
         lineChartView.isHidden = false
+        lineChartView.alpha = 1.0
         emptyStateLabel.isHidden = true
 
         let chartDataSets: [LineChartDataSet] = dataSets.map { model in
@@ -106,10 +108,29 @@ class LineChartTableViewCell: UITableViewCell {
         lineChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
+    private func placeholderChartData() -> LineChartData {
+        let entries = [
+            ChartDataEntry(x: 0, y: 35),
+            ChartDataEntry(x: 1, y: 42),
+            ChartDataEntry(x: 2, y: 39),
+            ChartDataEntry(x: 3, y: 48),
+            ChartDataEntry(x: 4, y: 44)
+        ]
+        let set = LineChartDataSet(entries: entries, label: "")
+        set.setColor(WakeWellTheme.labelTertiary)
+        set.lineWidth = 3
+        set.mode = .cubicBezier
+        set.drawValuesEnabled = false
+        set.drawCirclesEnabled = false
+        lineChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: ["", "", "", "", ""])
+        return LineChartData(dataSet: set)
+    }
+
     override func prepareForReuse() {
         super.prepareForReuse()
         lineChartView.data = nil
         lineChartView.isHidden = false
+        lineChartView.alpha = 1.0
         emptyStateLabel.isHidden = true
     }
 }

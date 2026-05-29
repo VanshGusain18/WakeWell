@@ -145,6 +145,10 @@ final class RiseRitualFeatureViewModel: ObservableObject {
     }
 
     func finishCompletion() {
+        let trimmedNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedNotes.isEmpty {
+            HomeDataProvider.shared.saveMorningNote(trimmedNotes)
+        }
         stopTimer()
         selectedMood = nil
         currentRitual = nil

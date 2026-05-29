@@ -71,13 +71,15 @@ class BarChartTableViewCell: UITableViewCell {
     func configure(title: String, dataSets: [BarChartDataSetModel], xAxisLabels: [String]) {
         titleLabel.text = title
         guard !dataSets.isEmpty else {
-            barChartView.data = nil
-            barChartView.isHidden = true
+            barChartView.isHidden = false
+            barChartView.alpha = 0.25
+            barChartView.data = placeholderChartData()
             emptyStateLabel.isHidden = false
             return
         }
 
         barChartView.isHidden = false
+        barChartView.alpha = 1.0
         emptyStateLabel.isHidden = true
 
         let palette: [UIColor] = [
@@ -121,10 +123,26 @@ class BarChartTableViewCell: UITableViewCell {
         barChartView.animate(yAxisDuration: 1.0, easingOption: .easeOutCubic)
     }
 
+    private func placeholderChartData() -> BarChartData {
+        let entries = [
+            BarChartDataEntry(x: 0, y: 28),
+            BarChartDataEntry(x: 1, y: 42),
+            BarChartDataEntry(x: 2, y: 36),
+            BarChartDataEntry(x: 3, y: 50)
+        ]
+        let set = BarChartDataSet(entries: entries, label: "")
+        set.setColor(WakeWellTheme.labelTertiary)
+        set.drawValuesEnabled = false
+        barChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: ["", "", "", ""])
+        barChartView.xAxis.labelCount = 4
+        return BarChartData(dataSet: set)
+    }
+
     override func prepareForReuse() {
         super.prepareForReuse()
         barChartView.data = nil
         barChartView.isHidden = false
+        barChartView.alpha = 1.0
         emptyStateLabel.isHidden = true
     }
 }

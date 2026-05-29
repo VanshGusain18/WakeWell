@@ -51,9 +51,18 @@ class AlarmCollectionViewCell: UICollectionViewCell {
     func configure(with viewModel: HomeAlarmViewModel) {
         titleLabel.text    = viewModel.title
         timeLabel.text     = viewModel.timeText
-        subtitleLabel.text = viewModel.subtitleText
-        timeLabel.textColor = viewModel.timeText == "--:--"
-            ? WakeWellTheme.labelTertiary
-            : WakeWellTheme.accentGold
+        subtitleLabel.text = viewModel.hasAlarm
+            ? "\(viewModel.subtitleText)\n\(viewModel.wakeWindowText)"
+            : "\(viewModel.subtitleText)\n\(viewModel.wakeWindowText)"
+        titleLabel.textColor = viewModel.hasAlarm ? WakeWellTheme.labelPrimary : WakeWellTheme.labelSecondary
+        timeLabel.font = viewModel.hasAlarm
+            ? .systemFont(ofSize: 28, weight: .bold)
+            : .systemFont(ofSize: 18, weight: .semibold)
+        timeLabel.numberOfLines = 2
+        timeLabel.textColor = viewModel.hasAlarm ? WakeWellTheme.accentGold : WakeWellTheme.labelSecondary
+        subtitleLabel.numberOfLines = 3
+        subtitleLabel.textColor = viewModel.hasAlarm ? WakeWellTheme.labelSecondary : WakeWellTheme.labelTertiary
+        alarmIcon.tintColor = viewModel.hasAlarm ? WakeWellTheme.accentPurple : WakeWellTheme.labelTertiary
+        contentView.alpha = viewModel.hasAlarm ? 1.0 : 0.78
     }
 }

@@ -61,13 +61,15 @@ class SleepScoreChartCell: UITableViewCell {
     func configure(for range: StatsTimeRange) {
         let dataPoints = MetricDataProvider.overallScores(for: range)
         guard !dataPoints.isEmpty else {
-            chartView.data = nil
-            chartView.isHidden = true
+            chartView.isHidden = false
+            chartView.alpha = 0.28
+            chartView.data = placeholderChartData()
             emptyStateLabel.isHidden = false
             return
         }
 
         chartView.isHidden = false
+        chartView.alpha = 1.0
         emptyStateLabel.isHidden = true
         let labels     = dataPoints.map { $0.day }
         let entries    = dataPoints.enumerated().map {
@@ -99,10 +101,31 @@ class SleepScoreChartCell: UITableViewCell {
         chartView.animate(xAxisDuration: 0.8, yAxisDuration: 1.2)
     }
 
+    private func placeholderChartData() -> LineChartData {
+        let entries = [
+            ChartDataEntry(x: 0, y: 42),
+            ChartDataEntry(x: 1, y: 48),
+            ChartDataEntry(x: 2, y: 45),
+            ChartDataEntry(x: 3, y: 54),
+            ChartDataEntry(x: 4, y: 50),
+            ChartDataEntry(x: 5, y: 58),
+            ChartDataEntry(x: 6, y: 55)
+        ]
+        let dataSet = LineChartDataSet(entries: entries, label: "")
+        dataSet.mode = .cubicBezier
+        dataSet.lineWidth = 3
+        dataSet.setColor(WakeWellTheme.labelTertiary)
+        dataSet.drawCirclesEnabled = false
+        dataSet.drawValuesEnabled = false
+        chartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: ["", "", "", "", "", "", ""])
+        return LineChartData(dataSet: dataSet)
+    }
+
     override func prepareForReuse() {
         super.prepareForReuse()
         chartView.data = nil
         chartView.isHidden = false
+        chartView.alpha = 1.0
         emptyStateLabel.isHidden = true
     }
 }

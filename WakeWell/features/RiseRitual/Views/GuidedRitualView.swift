@@ -68,7 +68,7 @@ struct GuidedRitualView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
         }
-        .onChange(of: viewModel.currentBlock?.id) { _ in
+        .onChange(of: viewModel.currentBlock?.id) { _, _ in
             resetInteraction()
         }
         .safeAreaInset(edge: .bottom) {

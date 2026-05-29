@@ -46,27 +46,11 @@ final class HealthKitSleepRepository {
 
     private let store = HKHealthStore()
 
-    // Simple in-memory cache keyed by range raw value
     private var cache: [String: [NightRecord]] = [:]
     func records(for range: StatsTimeRange) -> [NightRecord] {
-#if DEBUG
-        if StatsSampleData.mode == .sampleOnly {
-            return StatsSampleData.records(for: range)
-        }
-#endif
-
         if let cached = cache[range.cacheKey] {
             return cached
         }
-
-#if DEBUG
-        if StatsSampleData.mode == .automatic {
-            let sampleRecords = StatsSampleData.records(for: range)
-            if !sampleRecords.isEmpty {
-                return sampleRecords
-            }
-        }
-#endif
 
         return []
     }

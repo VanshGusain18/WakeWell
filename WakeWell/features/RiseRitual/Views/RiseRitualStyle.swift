@@ -1,15 +1,15 @@
 import SwiftUI
 
 enum RiseRitualStyle {
-    static let background = Color(riseHex: "#F2F1FF")
-    static let card = Color.white
-    static let elevated = Color(riseHex: "#F8F7FF")
-    static let purple = Color(riseHex: "#6C63FF")
-    static let gold = Color(riseHex: "#F5A623")
-    static let text = Color(riseHex: "#1C1A3A")
-    static let secondaryText = Color(riseHex: "#6B6990")
-    static let border = Color(riseHex: "#E2E0FC")
-    static let shadow = Color(riseHex: "#0A0820")
+    static let background = Color(WakeWellTheme.background)
+    static let card = Color(WakeWellTheme.cardBackground)
+    static let elevated = Color(WakeWellTheme.cardElevated)
+    static let purple = Color(WakeWellTheme.accentPurple)
+    static let gold = Color(WakeWellTheme.accentGold)
+    static let text = Color(WakeWellTheme.labelPrimary)
+    static let secondaryText = Color(WakeWellTheme.labelSecondary)
+    static let border = Color(WakeWellTheme.border)
+    static let shadow = Color(WakeWellTheme.shadowColor)
 
     static func titleFont(size: CGFloat = 34) -> Font {
         .system(size: size, weight: .bold)
@@ -29,7 +29,7 @@ enum RiseRitualStyle {
 
     static var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [background, Color(riseHex: "#EAE8FF"), gold.opacity(0.08)],
+            colors: [background, Color(WakeWellTheme.cardElevated), purple.opacity(0.06)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -70,7 +70,7 @@ struct RiseRitualPrimaryButton: ButtonStyle {
             .padding(.vertical, 15)
             .background(RiseRitualStyle.gold.opacity(configuration.isPressed ? 0.78 : 1))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: RiseRitualStyle.gold.opacity(0.25), radius: 10, x: 0, y: 6)
+            .shadow(color: RiseRitualStyle.shadow.opacity(0.10), radius: 10, x: 0, y: 6)
     }
 }
 
@@ -132,7 +132,7 @@ struct RiseRitualTopBar: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.top, 12)
         .padding(.bottom, 6)
     }
 }

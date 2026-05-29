@@ -15,6 +15,12 @@ class CircularTimePicker: UIControl {
     var startAngle: CGFloat = CGFloat.pi
     var endAngle:   CGFloat = 0
 
+    func setTimes(bedtime: Date, wakeUp: Date) {
+        startAngle = angle(from: bedtime)
+        endAngle = angle(from: wakeUp)
+        setNeedsLayout()
+    }
+
     // MARK: - Layout
     private var ringCenter: CGPoint = .zero
     private var ringRadius: CGFloat = 0
@@ -344,6 +350,14 @@ class CircularTimePicker: UIControl {
         c.minute = Int(minutes)
 
         return Calendar.current.date(from: c) ?? Date()
+    }
+
+    private func angle(from date: Date) -> CGFloat {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: date)
+        let hour = components.hour ?? 0
+        let minute = components.minute ?? 0
+        let minutes = CGFloat(hour * 60 + minute)
+        return (minutes / CGFloat(24 * 60)) * (2 * .pi) - .pi / 2
     }
 
     private func formatTime(_ date: Date) -> String {

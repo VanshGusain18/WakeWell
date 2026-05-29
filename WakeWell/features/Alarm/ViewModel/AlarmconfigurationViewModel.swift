@@ -38,7 +38,7 @@ final class AlarmViewModel {
     // MARK: - Permissions
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .sound, .criticalAlert]
+            options: [.alert, .sound]
         ) { _, _ in }
     }
 

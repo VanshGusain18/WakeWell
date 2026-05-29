@@ -15,7 +15,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     @Published var isReachable = false
     @Published var hasSentPayload = false
     @Published var hasHealthDataAccess = true
-    @Published var statusText = "LIVE HEALTH DATA MODE"
+    @Published var statusText = "Ready to share overnight signals."
     @Published var alarmTime: Date?
     @Published var hasReceivedHeartRate = false
     @Published var hasReceivedMotion = false
@@ -44,7 +44,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
     private func activateSession() {
         guard WCSession.isSupported() else {
-            statusText = "WCSession not supported"
+            statusText = "Apple Watch sync is not available on this device."
             return
         }
 
@@ -73,7 +73,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
             self.hasHealthDataAccess = success
             guard success else {
-                self.statusText = "No Health Data Access"
+                self.statusText = "Allow Health access to share overnight signals."
                 MotionManager.shared.stop()
                 HealthKitWorkoutManager.shared.stop()
                 HRVManager.shared.stop()
@@ -83,7 +83,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
                 return
             }
 
-            self.statusText = "LIVE HEALTH DATA MODE"
+            self.statusText = "Sharing overnight signals with SetSail."
 
             self.aggregator.onVitalsReady = { [weak self] vitals in
                 self?.handleAggregatedVitals(vitals)
@@ -320,17 +320,17 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         do {
             try session.updateApplicationContext(payload)
             hasSentPayload = true
-            statusText = "LIVE HEALTH DATA MODE"
+            statusText = "Sharing overnight signals with SetSail."
             completeBackgroundTasks()
         } catch {
-            statusText = "Context failed: \(error.localizedDescription)"
+            statusText = "Keep your iPhone nearby so SetSail can sync."
             hasSentPayload = false
         }
 
         guard session.isReachable else { return }
         session.sendMessage(payload, replyHandler: nil) { [weak self] error in
             DispatchQueue.main.async {
-                self?.statusText = "Message failed: \(error.localizedDescription)"
+                self?.statusText = "Keep your iPhone nearby so SetSail can sync."
             }
         }
     }
@@ -358,8 +358,8 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 extension WatchConnectivityManager: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         DispatchQueue.main.async {
-            if let error {
-                self.statusText = "Activation error: \(error.localizedDescription)"
+            if error != nil {
+                self.statusText = "Open SetSail on iPhone to reconnect."
             } else {
                 self.isActivated = true
                 self.isReachable = session.isReachable

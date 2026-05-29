@@ -437,7 +437,8 @@ final class LoginTableViewController: UITableViewController {
             ) {
                 ProfileRepository.shared.signIn(model: profile)
             } else {
-                UserDefaults.standard.set(true, forKey: "ww_logged_in")
+                showError("We could not restore your account. Please create your account again.", button: button)
+                return
             }
             navigateToMainApp()
         } else {

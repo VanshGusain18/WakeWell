@@ -44,6 +44,7 @@ final class AlarmOptionViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.delegate = self
+        restoreSavedAlarmState()
         viewModel.requestNotificationPermission()
         setupNavBar()
         setupTableView()
@@ -90,6 +91,18 @@ final class AlarmOptionViewController: UITableViewController {
         navigationController?.navigationBar.tintColor = WakeWellTheme.accentPurple
     }
 
+    private func restoreSavedAlarmState() {
+        guard let wakeTime = AlarmManager.shared.getWakeTime()
+                ?? (UserDefaults.standard.object(forKey: "wakewell.savedAlarmTime") as? Date) else {
+            return
+        }
+
+        wakeUpOn = true
+        viewModel.config.wakeUpEnabled = true
+        viewModel.config.wakeUpTime = wakeTime
+        viewModel.config.smartWindowMinutes = AlarmManager.shared.smartWindowMinutes
+    }
+
     // MARK: - UITableViewDataSource
 
     override func numberOfSections(in tableView: UITableView) -> Int { 3 }
@@ -120,6 +133,10 @@ final class AlarmOptionViewController: UITableViewController {
         case (0, _):
             let cell = dequeue(AlarmPickerCell.self, id: AlarmPickerCell.reuseID, for: indexPath)
             pickerCell = cell
+            cell.timePicker.setTimes(
+                bedtime: viewModel.config.bedtime,
+                wakeUp: viewModel.config.wakeUpTime
+            )
             cell.timePicker.addTarget(self, action: #selector(timePickerChanged), for: .valueChanged)
             return cell
 
@@ -293,6 +310,20 @@ extension AlarmOptionViewController: AlarmSchedulerViewModelDelegate {
             : "Alarm set for \(f.string(from: wakeUpTime))."
         DispatchQueue.main.async {
             let alert = UIAlertController(title: "Alarm Set", message: msg, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+                self?.dismiss(animated: true)
+            })
+            self.present(alert, animated: true)
+        }
+    }
+
+    func alarmDidDisable() {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: "Alarm Off",
+                message: "SetSail will not wake you until you turn the alarm back on.",
+                preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
                 self?.dismiss(animated: true)
             })

@@ -155,6 +155,7 @@ final class WatchConnectivityReceiver: NSObject {
         do {
             try session.updateApplicationContext(payload)
         } catch {
+            WatchConnectionMonitor.shared.markDeliveryQueued()
         }
 
         guard session.isReachable else {
@@ -163,7 +164,8 @@ final class WatchConnectivityReceiver: NSObject {
             return
         }
 
-        session.sendMessage(payload, replyHandler: nil) { error in
+        session.sendMessage(payload, replyHandler: nil) { _ in
+            WatchConnectionMonitor.shared.markDeliveryQueued()
         }
 
         pendingStartPayload = nil
@@ -189,6 +191,7 @@ final class WatchConnectivityReceiver: NSObject {
         do {
             try session.updateApplicationContext(payload)
         } catch {
+            WatchConnectionMonitor.shared.markDeliveryQueued()
         }
 
         guard session.isReachable else {
@@ -197,7 +200,8 @@ final class WatchConnectivityReceiver: NSObject {
             return
         }
 
-        session.sendMessage(payload, replyHandler: nil) { error in
+        session.sendMessage(payload, replyHandler: nil) { _ in
+            WatchConnectionMonitor.shared.markDeliveryQueued()
         }
 
         pendingCommandPayload = nil

@@ -124,7 +124,7 @@ private struct LiveVitalsWatchView: View {
                     .frame(width: 8, height: 8)
             }
 
-            Text(connectivity.hasHealthDataAccess ? statusText(isReachable: isReachable) : "No Health Data Access")
+            Text(connectivity.hasHealthDataAccess ? statusText(isReachable: isReachable) : "Allow Health access to share overnight signals.")
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(connectivity.hasHealthDataAccess ? WatchTheme.secondaryText : .red)
 

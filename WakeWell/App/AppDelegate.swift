@@ -11,13 +11,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DatabaseManager.shared.createUserProfileTable()
         DatabaseManager.shared.createDailyJournalTable()
 
-        HealthKitManager.shared.requestAuthorization { success in
-            if success {
-                HealthKitVitalsFallbackManager.shared.start()
-            }
-        }
-
         AlarmManager.shared.loadSavedAlarm()
+        SleepSessionManager.shared.restoreActiveSessionIfNeeded()
         return true
     }
 

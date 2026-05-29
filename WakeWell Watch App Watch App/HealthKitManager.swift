@@ -13,16 +13,16 @@ final class HealthKitManager {
             return
         }
 
-        let types: Set<HKObjectType> = [
-            HKObjectType.quantityType(forIdentifier: .heartRate)!,
-            HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
-            HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
-        ]
+        guard let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
+              let hrv = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN),
+              let respiratoryRate = HKObjectType.quantityType(forIdentifier: .respiratoryRate) else {
+            completion?(false)
+            return
+        }
 
-        store.requestAuthorization(toShare: [], read: types) { success, error in
-            if success {
-            } else {
-            }
+        let types: Set<HKObjectType> = [heartRate, hrv, respiratoryRate]
+
+        store.requestAuthorization(toShare: [], read: types) { success, _ in
             DispatchQueue.main.async {
                 completion?(success)
             }

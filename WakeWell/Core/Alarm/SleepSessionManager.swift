@@ -10,7 +10,20 @@ final class SleepSessionManager {
     private(set) var startTime: Date?
     private(set) var alarmTime: Date?
 
+    func restoreActiveSessionIfNeeded() {
+        guard currentSessionId == nil,
+              let session = DatabaseManager.shared.fetchOpenSleepSession() else {
+            return
+        }
+
+        currentSessionId = session.id
+        startTime = session.startTime
+        alarmTime = session.alarmTime
+    }
+
     func startSession(alarmTime: Date) {
+        restoreActiveSessionIfNeeded()
+
         if currentSessionId != nil {
             return
         }
@@ -40,6 +53,25 @@ final class SleepSessionManager {
             triggerTime: triggerTime,
             reason: reason,
             confidence: confidence,
+            sessionId: currentSessionId
+        )
+
+        self.currentSessionId = nil
+        self.startTime = nil
+        self.alarmTime = nil
+    }
+
+    func cancelActiveSession(reason: String) {
+        restoreActiveSessionIfNeeded()
+
+        guard let currentSessionId else {
+            return
+        }
+
+        DatabaseManager.shared.completeSleepSession(
+            triggerTime: Date(),
+            reason: reason,
+            confidence: 0,
             sessionId: currentSessionId
         )
 

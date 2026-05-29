@@ -76,7 +76,7 @@ final class WatchConnectionMonitor {
         if Thread.isMainThread {
             work()
         } else {
-            DispatchQueue.main.sync(execute: work)
+            DispatchQueue.main.async(execute: work)
         }
     }
 

@@ -79,6 +79,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
     }()
 
     private var thumbLeadingConstraint: NSLayoutConstraint!
+    private var clockTimer: Timer?
 
     // Pulse layers
     private var pulseLayer1: CALayer?
@@ -93,9 +94,13 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
         setupSlideGesture()
         startPulse()
         updateClock()
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        clockTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.updateClock()
         }
+    }
+
+    deinit {
+        clockTimer?.invalidate()
     }
 
     // MARK: - UNNotificationContentExtension

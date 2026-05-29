@@ -10,6 +10,7 @@ import UserNotifications
 
 protocol AlarmSchedulerViewModelDelegate: AnyObject {
     func alarmDidSave(wakeUpTime: Date, isSmart: Bool)
+    func alarmDidDisable()
     func alarmSaveFailed(message: String)
 }
 
@@ -22,7 +23,9 @@ final class AlarmSchedulerViewModel {
     // MARK: - Save alarm
     func saveAlarm() {
         guard config.wakeUpEnabled else {
-            delegate?.alarmSaveFailed(message: "Enable the Wake Up toggle to set an alarm.")
+            AlarmManager.shared.clearAlarm()
+            NotificationCenter.default.post(name: .alarmTimeDidChange, object: nil)
+            delegate?.alarmDidDisable()
             return
         }
 
@@ -37,7 +40,7 @@ final class AlarmSchedulerViewModel {
     // MARK: - Permissions
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .sound, .criticalAlert]
+            options: [.alert, .sound]
         ) { _, _ in }
     }
 

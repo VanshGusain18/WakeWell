@@ -19,12 +19,12 @@ final class AlarmManager {
     // MARK: - Public API
 
     func setAlarm(_ alarm: AlarmModel, smartWindowMinutes: Int = 30) {
-        currentAlarm = alarm
-
-        guard let time = alarm.time else {
+        guard let configuredTime = alarm.time else {
             return
         }
 
+        let time = nextAlarmTime(from: configuredTime)
+        currentAlarm = AlarmModel(time: time)
         UserDefaults.standard.set(time.timeIntervalSince1970, forKey: alarmKey)
         UserDefaults.standard.set(time, forKey: savedAlarmDateKey)
         UserDefaults.standard.set(smartWindowMinutes, forKey: smartWindowMinutesKey)
@@ -36,6 +36,17 @@ final class AlarmManager {
         SmartAlarmEngine.shared.beginMonitoring()
         WatchConnectivityReceiver.shared.sendScheduledSession(alarmTime: time, windowStart: alarmWindowStart(for: time), windowEnd: time)
 
+    }
+
+    func clearAlarm() {
+        currentAlarm = nil
+        UserDefaults.standard.removeObject(forKey: alarmKey)
+        UserDefaults.standard.removeObject(forKey: savedAlarmDateKey)
+        UserDefaults.standard.removeObject(forKey: smartWindowMinutesKey)
+        NotificationManager.shared.cancelAllScheduledAlarms()
+        WatchConnectivityReceiver.shared.endWatchSession()
+        SleepSessionManager.shared.cancelActiveSession(reason: "alarm_disabled")
+        SmartAlarmEngine.shared.reset()
     }
 
     func getAlarm() -> AlarmModel? {

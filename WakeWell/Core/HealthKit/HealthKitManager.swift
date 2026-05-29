@@ -18,9 +18,8 @@ final class HealthKitManager {
             return
         }
 
-        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-
-        guard let heartRateType,
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
+              let heartRateType,
               let hrvType,
               let respiratoryRateType else {
             completion(false)

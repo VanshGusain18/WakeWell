@@ -54,39 +54,44 @@ final class DatabaseManager {
         defer { sqlite3_finalize(statement) }
 
         if sqlite3_step(statement) == SQLITE_ROW {
-            let id = Int(sqlite3_column_int(statement, 0))
-            let startTime = Date(timeIntervalSince1970: sqlite3_column_double(statement, 1))
-            let endTime = sqlite3_column_type(statement, 2) == SQLITE_NULL
-                ? nil
-                : Date(timeIntervalSince1970: sqlite3_column_double(statement, 2))
-            let alarmTime = Date(timeIntervalSince1970: sqlite3_column_double(statement, 3))
-            let triggerTime = sqlite3_column_type(statement, 4) == SQLITE_NULL
-                ? nil
-                : Date(timeIntervalSince1970: sqlite3_column_double(statement, 4))
-            let triggerReason = sqlite3_column_type(statement, 5) == SQLITE_NULL
-                ? nil
-                : String(cString: sqlite3_column_text(statement, 5))
-            let confidence = sqlite3_column_type(statement, 6) == SQLITE_NULL
-                ? nil
-                : sqlite3_column_double(statement, 6)
-            let createdAt = Date(timeIntervalSince1970: sqlite3_column_double(statement, 7))
-
-            let session = SleepSessionModel(
-                id: id,
-                startTime: startTime,
-                endTime: endTime,
-                alarmTime: alarmTime,
-                triggerTime: triggerTime,
-                triggerReason: triggerReason,
-                confidence: confidence,
-                createdAt: createdAt
-            )
-
-
-            return session
+            return readSleepSession(from: statement)
         }
 
         return nil
+    }
+
+    func fetchOpenSleepSession() -> SleepSessionModel? {
+        ensureSleepSessionsTable()
+
+        var db: OpaquePointer?
+
+        if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
+            return nil
+        }
+
+        defer { sqlite3_close(db) }
+
+        let query = """
+        SELECT id, start_time, end_time, alarm_time, trigger_time, trigger_reason, confidence, created_at
+        FROM sleep_sessions
+        WHERE end_time IS NULL
+        ORDER BY created_at DESC
+        LIMIT 1;
+        """
+
+        var statement: OpaquePointer?
+
+        if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
+            return nil
+        }
+
+        defer { sqlite3_finalize(statement) }
+
+        guard sqlite3_step(statement) == SQLITE_ROW else {
+            return nil
+        }
+
+        return readSleepSession(from: statement)
     }
 
     @discardableResult
@@ -355,5 +360,35 @@ final class DatabaseManager {
 
         let alterQuery = "ALTER TABLE sleep_sessions ADD COLUMN \(columnName) \(type);"
         _ = sqlite3_exec(db, alterQuery, nil, nil, nil)
+    }
+
+    private func readSleepSession(from statement: OpaquePointer?) -> SleepSessionModel {
+        let id = Int(sqlite3_column_int(statement, 0))
+        let startTime = Date(timeIntervalSince1970: sqlite3_column_double(statement, 1))
+        let endTime = sqlite3_column_type(statement, 2) == SQLITE_NULL
+            ? nil
+            : Date(timeIntervalSince1970: sqlite3_column_double(statement, 2))
+        let alarmTime = Date(timeIntervalSince1970: sqlite3_column_double(statement, 3))
+        let triggerTime = sqlite3_column_type(statement, 4) == SQLITE_NULL
+            ? nil
+            : Date(timeIntervalSince1970: sqlite3_column_double(statement, 4))
+        let triggerReason = sqlite3_column_type(statement, 5) == SQLITE_NULL
+            ? nil
+            : String(cString: sqlite3_column_text(statement, 5))
+        let confidence = sqlite3_column_type(statement, 6) == SQLITE_NULL
+            ? nil
+            : sqlite3_column_double(statement, 6)
+        let createdAt = Date(timeIntervalSince1970: sqlite3_column_double(statement, 7))
+
+        return SleepSessionModel(
+            id: id,
+            startTime: startTime,
+            endTime: endTime,
+            alarmTime: alarmTime,
+            triggerTime: triggerTime,
+            triggerReason: triggerReason,
+            confidence: confidence,
+            createdAt: createdAt
+        )
     }
 }

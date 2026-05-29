@@ -59,9 +59,12 @@ final class HealthKitSleepRepository {
     func prefetch(for range: StatsTimeRange, completion: @escaping () -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else { completion(); return }
 
-        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let hrType    = HKObjectType.quantityType(forIdentifier: .heartRate)!
-        let hrvType   = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
+              let hrType = HKObjectType.quantityType(forIdentifier: .heartRate),
+              let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else {
+            completion()
+            return
+        }
 
         store.requestAuthorization(toShare: nil, read: [sleepType, hrType, hrvType]) { [weak self] granted, _ in
             guard granted, let self else { completion(); return }
@@ -77,7 +80,10 @@ final class HealthKitSleepRepository {
         let predicate  = HKQuery.predicateForSamples(withStart: interval.start,
                                                       end: interval.end,
                                                       options: .strictStartDate)
-        let sleepType  = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            completion([])
+            return
+        }
         let sortDesc   = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 
         let query = HKSampleQuery(sampleType: sleepType,
@@ -233,13 +239,13 @@ extension StatsTimeRange {
         let cal = Calendar.current
         switch self {
         case .week:
-            let start = cal.date(byAdding: .day, value: -6, to: cal.startOfDay(for: now))!
+            let start = cal.date(byAdding: .day, value: -6, to: cal.startOfDay(for: now)) ?? now
             return DateInterval(start: start, end: now)
         case .month:
-            let start = cal.date(byAdding: .day, value: -29, to: cal.startOfDay(for: now))!
+            let start = cal.date(byAdding: .day, value: -29, to: cal.startOfDay(for: now)) ?? now
             return DateInterval(start: start, end: now)
         case .year:
-            let start = cal.date(byAdding: .month, value: -11, to: cal.startOfDay(for: now))!
+            let start = cal.date(byAdding: .month, value: -11, to: cal.startOfDay(for: now)) ?? now
             return DateInterval(start: start, end: now)
         }
     }

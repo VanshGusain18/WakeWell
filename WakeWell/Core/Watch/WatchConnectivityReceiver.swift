@@ -57,7 +57,6 @@ final class WatchConnectivityReceiver: NSObject {
 
         guard session.activationState == .activated else {
             WatchConnectionMonitor.shared.markDeliveryQueued()
-            print("⌚️ Queued start_session until WCSession activation completes")
             return
         }
 
@@ -130,7 +129,6 @@ final class WatchConnectivityReceiver: NSObject {
 
         guard WCSession.default.activationState == .activated else {
             WatchConnectionMonitor.shared.markDeliveryQueued()
-            print("⌚️ Queued watch command until WCSession activation completes")
             return
         }
 
@@ -150,7 +148,6 @@ final class WatchConnectivityReceiver: NSObject {
             session.transferUserInfo(payload)
         } else {
             WatchConnectionMonitor.shared.markUnavailable()
-            print("⌚️ Watch app is not installed")
             pendingStartPayload = nil
             return
         }
@@ -158,18 +155,15 @@ final class WatchConnectivityReceiver: NSObject {
         do {
             try session.updateApplicationContext(payload)
         } catch {
-            print("⌚️ Failed to update watch command context:", error.localizedDescription)
         }
 
         guard session.isReachable else {
             WatchConnectionMonitor.shared.markDeliveryQueued()
-            print("⌚️ Watch not reachable; start_session queued via context/userInfo")
             pendingStartPayload = nil
             return
         }
 
         session.sendMessage(payload, replyHandler: nil) { error in
-            print("⌚️ Failed to send start_session:", error.localizedDescription)
         }
 
         pendingStartPayload = nil
@@ -188,7 +182,6 @@ final class WatchConnectivityReceiver: NSObject {
             session.transferUserInfo(payload)
         } else {
             WatchConnectionMonitor.shared.markUnavailable()
-            print("⌚️ Watch app is not installed")
             pendingCommandPayload = nil
             return
         }
@@ -196,18 +189,15 @@ final class WatchConnectivityReceiver: NSObject {
         do {
             try session.updateApplicationContext(payload)
         } catch {
-            print("⌚️ Failed to update watch command context:", error.localizedDescription)
         }
 
         guard session.isReachable else {
             WatchConnectionMonitor.shared.markDeliveryQueued()
-            print("⌚️ Watch not reachable; command queued via context/userInfo")
             pendingCommandPayload = nil
             return
         }
 
         session.sendMessage(payload, replyHandler: nil) { error in
-            print("⌚️ Failed to send watch command:", error.localizedDescription)
         }
 
         pendingCommandPayload = nil
@@ -217,13 +207,11 @@ final class WatchConnectivityReceiver: NSObject {
 extension WatchConnectivityReceiver: WCSessionDelegate {
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        if let error {
-            print("⌚️ iPhone WCSession activation error:", error.localizedDescription)
+        if error != nil {
             WatchConnectionMonitor.shared.markUnavailable()
             return
         }
 
-        print("⌚️ iPhone WCSession activated:", activationState.rawValue)
         isActivated = activationState == .activated
         WatchConnectionMonitor.shared.updateReachability(session.isReachable)
         flushPendingStartPayload()
@@ -245,7 +233,6 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        print("📥 Received raw:", applicationContext)
         process(payload: applicationContext)
     }
 
@@ -254,7 +241,6 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     }
 
     private func process(payload: [String: Any]) {
-        print("📥 Received raw payload:", payload)
 
         guard let heartRate = requiredDouble("heartRate", in: payload),
               let motion = requiredDouble("motion", in: payload),
@@ -268,21 +254,13 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
         let hrvUnavailableReason = payload["hrvUnavailableReason"] as? String
         let validityFlags = WatchValidityFlags(dictionary: payload["validityFlags"] as? [String: Any])
         if rawHRV == nil {
-            print("⚠️ HRV missing from Watch payload:", hrvUnavailableReason ?? "NO_DATA")
         } else if hrv == nil {
-            print("HRV MISSING - IGNORED NOT ZEROED")
         }
-        print("HR:", heartRate)
-        print("HRV:", rawHRV as Any)
-        print("Motion:", motion)
-        print("Respiratory Rate:", respiratoryRate as Any)
-        print("Source labels: HR=HealthKit HRV=\(validityFlags.hrvReal ? "HealthKit" : "unavailable") Motion=CoreMotion")
 
         WatchConnectionMonitor.shared.markPayloadReceived()
         AppConnectionState.shared.markWatchPayloadReceived()
 
         if !hasSwitchedToWatchStream {
-            print("🔄 Switching to REAL watch stream")
 
             WatchDataManager.shared.stop()
             WatchDataManager.shared.start(resetData: false)
@@ -317,12 +295,10 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
 
     private func requiredDouble(_ key: String, in payload: [String: Any]) -> Double? {
         guard payload.keys.contains(key) else {
-            print("⚠️ Missing key from Watch payload:", key)
             return nil
         }
 
         guard let value = payload[key] as? Double else {
-            print("⚠️ Invalid value for Watch payload key:", key, payload[key] as Any)
             return nil
         }
 

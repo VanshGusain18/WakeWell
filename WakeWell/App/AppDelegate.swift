@@ -12,10 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DatabaseManager.shared.createDailyJournalTable()
 
         HealthKitManager.shared.requestAuthorization { success in
-//            print("HealthKit Permission:", success)
-
             if success {
-                HealthKitManager.shared.fetchLastNightSleep()
                 HealthKitVitalsFallbackManager.shared.start()
             }
         }

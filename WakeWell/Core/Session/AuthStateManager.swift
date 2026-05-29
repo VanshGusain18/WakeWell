@@ -15,7 +15,7 @@ final class AuthStateManager {
     private(set) var currentSession: UserSession?
 
     private init() {
-        restoreSession()
+        _ = restoreSession()
     }
 
     var isAuthenticated: Bool {

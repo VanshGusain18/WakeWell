@@ -37,7 +37,6 @@ final class AudioManager {
             forResource: sound.fileName,
             withExtension: "mp3"
         ) else {
-            print(" Sound not found")
             return
         }
 
@@ -49,7 +48,6 @@ final class AudioManager {
             currentSound = sound
 
         } catch {
-            print(" Audio error:", error)
         }
     }
 

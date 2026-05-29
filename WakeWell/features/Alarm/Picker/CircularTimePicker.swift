@@ -284,7 +284,7 @@ class CircularTimePicker: UIControl {
     }
 
     private func durationString() -> String {
-        var diff = Calendar.current.dateComponents([.hour, .minute], from: bedtime, to: wakeUp)
+        let diff = Calendar.current.dateComponents([.hour, .minute], from: bedtime, to: wakeUp)
 
         var h = diff.hour ?? 0
         var m = diff.minute ?? 0

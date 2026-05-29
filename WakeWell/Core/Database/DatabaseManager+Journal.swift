@@ -98,8 +98,7 @@ extension DatabaseManager {
         switch ensureDailyJournalTable() {
         case .success:
             break
-        case .failure(let error):
-            print(error.localizedDescription)
+        case .failure:
             return nil
         }
 
@@ -113,8 +112,7 @@ extension DatabaseManager {
         switch ensureDailyJournalTable() {
         case .success:
             break
-        case .failure(let error):
-            print(error.localizedDescription)
+        case .failure:
             return nil
         }
 
@@ -155,7 +153,6 @@ extension DatabaseManager {
 
         guard sqlite3_exec(db, sql, nil, nil, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
-            print("daily_journal_entries table error:", err)
             return .failure(.tableCreationFailed(err))
         }
 
@@ -182,12 +179,7 @@ extension DatabaseManager {
         guard !existingColumns.contains(columnName) else { return }
 
         let alterQuery = "ALTER TABLE daily_journal_entries ADD COLUMN \(columnName) \(type);"
-        if sqlite3_exec(db, alterQuery, nil, nil, nil) == SQLITE_OK {
-            print("🛠️ Migrated daily_journal_entries: added \(columnName)")
-        } else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ Failed migration for \(columnName):", errorMsg)
-        }
+        _ = sqlite3_exec(db, alterQuery, nil, nil, nil)
     }
 
     private func fetchDailyJournalEntry(for date: Date, db: OpaquePointer?) -> DailyJournalEntry? {

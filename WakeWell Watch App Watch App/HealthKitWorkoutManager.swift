@@ -24,7 +24,6 @@ final class HealthKitWorkoutManager: NSObject {
 
     func start() {
         guard HKHealthStore.isHealthDataAvailable() else {
-            print("Workout unavailable: HealthKit data unavailable")
             return
         }
 
@@ -60,9 +59,6 @@ final class HealthKitWorkoutManager: NSObject {
         session?.end()
         builder?.endCollection(withEnd: Date()) { [weak self] _, _ in
             self?.builder?.finishWorkout { _, error in
-                if let error {
-                    print("Workout finish error:", error.localizedDescription)
-                }
             }
         }
         session = nil
@@ -103,7 +99,6 @@ final class HealthKitWorkoutManager: NSObject {
             let startDate = Date()
             session.startActivity(with: startDate)
             builder.beginCollection(withStart: startDate) { success, error in
-                print("Workout started", success, error?.localizedDescription ?? "")
                 DispatchQueue.main.async {
                     self.isWorkoutActive = success
                     if success {
@@ -116,7 +111,6 @@ final class HealthKitWorkoutManager: NSObject {
                 }
             }
         } catch {
-            print("Workout start error:", error.localizedDescription)
         }
     }
 
@@ -214,8 +208,7 @@ final class HealthKitWorkoutManager: NSObject {
     }
 
     private func handleHeartRate(samples: [HKSample]?, error: Error?) {
-        if let error {
-            print("Heart rate query error:", error.localizedDescription)
+        if error != nil {
             return
         }
 
@@ -225,15 +218,13 @@ final class HealthKitWorkoutManager: NSObject {
         for sample in quantitySamples {
             let heartRate = sample.quantity.doubleValue(for: unit)
             DispatchQueue.main.async {
-                print("REAL HR RECEIVED", heartRate)
                 self.onHeartRate?(heartRate)
             }
         }
     }
 
     private func handleHRV(samples: [HKSample]?, error: Error?) {
-        if let error {
-            print("HRV query error:", error.localizedDescription)
+        if error != nil {
             return
         }
 
@@ -243,15 +234,13 @@ final class HealthKitWorkoutManager: NSObject {
         for sample in quantitySamples {
             let hrv = sample.quantity.doubleValue(for: unit)
             DispatchQueue.main.async {
-                print("REAL HRV RECEIVED", hrv)
                 self.onHRV?(hrv, sample.endDate)
             }
         }
     }
 
     private func handleRespiratoryRate(samples: [HKSample]?, error: Error?) {
-        if let error {
-            print("Respiratory rate query error:", error.localizedDescription)
+        if error != nil {
             return
         }
 
@@ -261,7 +250,6 @@ final class HealthKitWorkoutManager: NSObject {
         for sample in quantitySamples {
             let respiratoryRate = sample.quantity.doubleValue(for: unit)
             DispatchQueue.main.async {
-                print("REAL RESPIRATORY RATE RECEIVED", respiratoryRate)
                 self.onRespiratoryRate?(respiratoryRate, sample.endDate)
             }
         }
@@ -275,11 +263,9 @@ extension HealthKitWorkoutManager: HKWorkoutSessionDelegate {
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-        print("Workout session state:", toState.rawValue)
     }
 
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
-        print("Workout session error:", error.localizedDescription)
     }
 }
 
@@ -302,7 +288,6 @@ extension HealthKitWorkoutManager: HKLiveWorkoutBuilderDelegate {
 
                 guard let value, value > 0 else { continue }
                 DispatchQueue.main.async {
-                    print("REAL HR RECEIVED", value)
                     self.onHeartRate?(value)
                 }
 
@@ -314,7 +299,6 @@ extension HealthKitWorkoutManager: HKLiveWorkoutBuilderDelegate {
                 }
 
                 DispatchQueue.main.async {
-                    print("REAL HRV RECEIVED", value)
                     self.onHRV?(value, Date())
                 }
 
@@ -326,7 +310,6 @@ extension HealthKitWorkoutManager: HKLiveWorkoutBuilderDelegate {
                 }
 
                 DispatchQueue.main.async {
-                    print("REAL RESPIRATORY RATE RECEIVED", value)
                     self.onRespiratoryRate?(value, Date())
                 }
 

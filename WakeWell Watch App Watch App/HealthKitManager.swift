@@ -9,7 +9,6 @@ final class HealthKitManager {
 
     func requestPermissions(completion: ((Bool) -> Void)? = nil) {
         guard HKHealthStore.isHealthDataAvailable() else {
-            print("HealthKit auth:", false, "Health data unavailable")
             completion?(false)
             return
         }
@@ -22,9 +21,7 @@ final class HealthKitManager {
 
         store.requestAuthorization(toShare: [], read: types) { success, error in
             if success {
-                print("HealthKit auth:", true, "")
             } else {
-                print("HealthKit auth:", false, error?.localizedDescription ?? "permission denied")
             }
             DispatchQueue.main.async {
                 completion?(success)
@@ -45,9 +42,6 @@ final class HealthKitManager {
             limit: 1,
             sortDescriptors: [sort]
         ) { _, samples, error in
-            if let error {
-                print("HRV query error:", error.localizedDescription)
-            }
 
             let value = (samples?.first as? HKQuantitySample)?
                 .quantity
@@ -74,9 +68,6 @@ final class HealthKitManager {
             limit: 1,
             sortDescriptors: [sort]
         ) { _, samples, error in
-            if let error {
-                print("Respiratory rate query error:", error.localizedDescription)
-            }
 
             let value = (samples?.first as? HKQuantitySample)?
                 .quantity

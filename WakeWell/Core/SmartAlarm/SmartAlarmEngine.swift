@@ -219,7 +219,6 @@ final class SmartAlarmEngine {
         let vitals = fetchRecentVitals()
 
         guard hasContinuousSignalWindow(vitals) else {
-            print("DATA STALE - NO DECISION")
             freezeSignalState()
             let decision = noDecision(reason: "stale_watch_data")
             return decision
@@ -418,7 +417,6 @@ final class SmartAlarmEngine {
         if !vitals.isEmpty {
             let validHRVValues = vitals.compactMap(\.hrv).filter { $0 > 0 }
             if validHRVValues.isEmpty {
-                print("HRV MISSING - IGNORED NOT ZEROED")
             }
 
             let averages = VitalAverages(
@@ -470,7 +468,6 @@ final class SmartAlarmEngine {
             let hrvScore = normalize(avgHRV, minValue: 20, maxValue: 80)
             baseScore += 0.05 * (1 - hrvScore)
         } else {
-            print("HRV MISSING - IGNORED NOT ZEROED")
         }
 
         let motionBoost = signals.motionSpike ? 0.05 : 0
@@ -675,16 +672,13 @@ final class SmartAlarmEngine {
 
         guard monitor.state == .connected else {
             if monitor.state == .disconnected {
-                print("WATCH DISCONNECTED - FREEZING ENGINE")
             } else {
-                print("WAITING FOR LIVE WATCH DATA - FREEZING ENGINE")
             }
             freezeSignalState()
             return noDecision(reason: monitor.state == .disconnected ? "watch_disconnected" : "waiting_for_watch_data")
         }
 
         guard !monitor.isStaleData else {
-            print("DATA STALE - NO DECISION")
             freezeSignalState()
             return noDecision(reason: "stale_watch_data")
         }
@@ -734,19 +728,9 @@ final class SmartAlarmEngine {
         let confidencePassed = wakeConfidence > evaluation.thresholdUsed
 
         if confidencePassed && dataFresh && watchConnected {
-            print("SAFE TRIGGER ALLOWED")
             return true
         }
 
-        print("SAFE TRIGGER BLOCKED")
-        if monitor.state == .disconnected {
-            print("WATCH DISCONNECTED - FREEZING ENGINE")
-        } else if !watchConnected {
-            print("WAITING FOR LIVE WATCH DATA - FREEZING ENGINE")
-        }
-        if !dataFresh {
-            print("DATA STALE - NO DECISION")
-        }
         return false
     }
 
@@ -781,8 +765,6 @@ final class SmartAlarmEngine {
             reason: "fallback"
         )
 
-        print("[FAILSAFE] Triggering due to time expiry")
-        print("⏰ Fallback alarm triggered")
         logTriggered(
             reason: "fallback",
             confidence: wakeConfidence,
@@ -861,30 +843,13 @@ final class SmartAlarmEngine {
     // MARK: - Logging
 
     private func logInput(_ input: InputSnapshot) {
-        print("[INPUT]")
-        print("- motion: \(formatted(input.motion))")
-        print("- hr: \(formatted(input.hr))")
-        print("- hrv: \(formattedOptional(input.hrv))")
     }
 
     private func logSignalWindow() {
-        print("[WINDOW]")
-        print("- motionWindow: [\(formattedWindow(lastMotionValues))]")
-        print("- hrWindow: [\(formattedWindow(lastHRValues))]")
 
-        print("📊 SIGNAL WINDOW:")
-        print("- Motion: \(formattedWindow(lastMotionValues))")
-        print("- HR: \(formattedWindow(lastHRValues))")
-        print("- HRV: \(formattedWindow(lastHRVValues))")
     }
 
     private func logTrendAnalysis(_ analysis: TrendAnalysis) {
-        print("[TREND]")
-        print("- hrDelta: \(formatted(analysis.hrDelta))")
-        print("- motionDelta: \(formatted(analysis.motionDelta))")
-        print("- hrTrend: \(analysis.hrTrend)")
-        print("- motionSpike: \(analysis.motionSpike)")
-        print("- motionIncreasing: \(analysis.motionIncreasing)")
     }
 
     private func logDecision(
@@ -897,29 +862,7 @@ final class SmartAlarmEngine {
         timeToAlarm: TimeInterval,
         decision: WakeDecision
     ) {
-        print("[CONFIDENCE]")
-        print("- baseScore: \(formatted(components.baseScore))")
-        print("- trendBonus: \(formatted(components.trendBonus))")
-        print("- spikeBonus: \(formatted(components.spikeBonus))")
-        print("- motionIncreaseBonus: \(formatted(components.motionIncreaseBonus))")
-        print("- hrvTransitionBonus: \(formatted(components.hrvTransitionBonus))")
-        print("- timePressureBonus: \(formatted(components.timePressureBonus))")
-        print("- finalConfidence: \(formatted(decision.confidence))")
 
-        print("[DECISION]")
-        print("- triggerType: \(triggerEvaluation.type.rawValue)")
-        print("- reason: \(triggerEvaluation.reason)")
-        print("- score: \(formatted(score.finalScore))")
-        print("- confidence: \(formatted(decision.confidence))")
-        print("- thresholdUsed: \(formatted(triggerEvaluation.thresholdUsed))")
-        print("- timeToAlarm: \(formattedMinutes(timeToAlarm))")
-        print("- avgHR: \(formatted(averages.avgHR))")
-        print("- avgMotion: \(formatted(averages.avgMotion))")
-        print("- motionSpike: \(signals.motionSpike)")
-        print("- hrTrend: \(signals.hrTrend)")
-        print("- motionIncreasing: \(analysis.motionIncreasing)")
-        print("- motionIncreasingCount: \(motionIncreasingCount)")
-        print("- shouldTrigger: \(decision.shouldTrigger)")
 
         let snapshot = SmartAlarmDebugSnapshot(
             currentHR: latestLiveInput.hr,
@@ -943,7 +886,6 @@ final class SmartAlarmEngine {
 
     private func logTriggerPath(_ evaluation: TriggerEvaluation, confidence: Double) {
         guard evaluation.type != .none else { return }
-        print("[TRIGGER] type: \(evaluation.type.rawValue) confidence: \(formatted(confidence)) motionCount: \(motionIncreasingCount)")
     }
 
     private func logTriggered(
@@ -953,20 +895,10 @@ final class SmartAlarmEngine {
         timeToAlarm: TimeInterval,
         usedFallback: Bool
     ) {
-        print("""
-          🚨 TRIGGERED:
-          
-          * reason: \(reason)
-          * confidence: \(formatted(confidence))
-          * score: \(formatted(score))
-          * timeToAlarm: \(formattedMinutes(timeToAlarm))
-          * usedFallback: \(usedFallback)
-          """)
     }
 
     private func transitionState(to newState: AlarmState) {
         guard alarmState != newState else { return }
-        print("[STATE] \(alarmState.rawValue) → \(newState.rawValue)")
         alarmState = newState
         debugSnapshot = SmartAlarmDebugSnapshot(
             currentHR: debugSnapshot.currentHR,

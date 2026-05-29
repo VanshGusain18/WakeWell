@@ -33,7 +33,6 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate {
     }
 
     func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
-        print("Watch woke in background")
         WatchConnectivityManager.shared.handle(backgroundTasks: backgroundTasks)
     }
 }

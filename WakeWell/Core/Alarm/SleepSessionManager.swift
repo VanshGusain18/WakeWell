@@ -12,14 +12,11 @@ final class SleepSessionManager {
 
     func startSession(alarmTime: Date) {
         if currentSessionId != nil {
-            print("⚠️ Active session already exists")
             return
         }
 
         let startTime = Date()
 
-        print("🟢 SESSION STARTED")
-        print("alarmTime:", alarmTime)
 
         guard let sessionId = DatabaseManager.shared.createSleepSession(
             startTime: startTime,
@@ -35,14 +32,9 @@ final class SleepSessionManager {
 
     func endSession(triggerTime: Date, reason: String, confidence: Double) {
         guard let currentSessionId else {
-            print("⚠️ No active session to end")
             return
         }
 
-        print("🛑 SESSION ENDED")
-        print("- triggerTime:", triggerTime)
-        print("- reason:", reason)
-        print("- confidence:", confidence)
 
         DatabaseManager.shared.completeSleepSession(
             triggerTime: triggerTime,

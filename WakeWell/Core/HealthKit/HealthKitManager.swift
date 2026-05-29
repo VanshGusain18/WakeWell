@@ -45,7 +45,6 @@ final class HealthKitManager {
         ]
 
         healthStore.requestAuthorization(toShare: shareTypes, read: readTypes) { success, error in
-            print("iPhone HealthKit auth:", success, error?.localizedDescription ?? "")
             DispatchQueue.main.async {
                 completion(success)
             }
@@ -68,10 +67,6 @@ final class HealthKitManager {
             let value = (samples?.first as? HKQuantitySample)?
                 .quantity
                 .doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
-
-            if let value {
-                print("❤️ Live HR: \(String(format: "%.2f", value))")
-            }
 
             DispatchQueue.main.async {
                 completion(value)
@@ -98,10 +93,6 @@ final class HealthKitManager {
                 .quantity
                 .doubleValue(for: HKUnit.secondUnit(with: .milli))
 
-            if let value {
-                print("📈 HRV: \(String(format: "%.2f", value))")
-            }
-
             DispatchQueue.main.async {
                 completion(value)
             }
@@ -127,74 +118,8 @@ final class HealthKitManager {
                 .quantity
                 .doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
 
-            if let value {
-                print("🫁 Respiratory Rate: \(String(format: "%.2f", value))")
-            }
-
             DispatchQueue.main.async {
                 completion(value)
-            }
-        }
-
-        healthStore.execute(query)
-    }
-
-    func fetchLastNightSleep() {
-        
-//        print("fetchLastNightSleep CALLED")
-
-        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-
-        let calendar = Calendar.current
-        let now = Date()
-
-        let startDate = calendar.date(byAdding: .day, value: -2, to: now)!
-
-        let predicate = HKQuery.predicateForSamples(
-            withStart: startDate,
-            end: now,
-            options: .strictStartDate
-        )
-
-        let query = HKSampleQuery(
-            sampleType: sleepType,
-            predicate: predicate,
-            limit: HKObjectQueryNoLimit,
-            sortDescriptors: nil
-        ) { _, samples, error in
-
-            guard let samples = samples as? [HKCategorySample] else {
-                print("Query failed or no samples")
-                return
-            }
-
-//            print("Total samples:", samples.count)
-
-            for sample in samples {
-
-                let value = sample.value
-
-                var stage = "Unknown"
-
-                switch value {
-                case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                    stage = "In Bed"
-                case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                    stage = "Core Sleep"
-                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                    stage = "Deep Sleep"
-                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                    stage = "REM Sleep"
-                case HKCategoryValueSleepAnalysis.awake.rawValue:
-                    stage = "Awake"
-                default:
-                    break
-                }
-
-                print("Sleep Stage:", stage)
-                print("Start:", sample.startDate)
-                print("End:", sample.endDate)
-                print("-----------")
             }
         }
 

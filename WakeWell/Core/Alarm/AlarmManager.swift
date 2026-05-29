@@ -15,14 +15,13 @@ final class AlarmManager {
     private let alarmKey = "wakewell_alarm_time"
     private let savedAlarmDateKey = "wakewell.savedAlarmTime"
     private let smartWindowMinutesKey = "wakewell.smartWindowMinutes"
-
+    
     // MARK: - Public API
 
     func setAlarm(_ alarm: AlarmModel, smartWindowMinutes: Int = 30) {
         currentAlarm = alarm
 
         guard let time = alarm.time else {
-            print("⛔ Cannot set alarm without a time")
             return
         }
 
@@ -37,7 +36,6 @@ final class AlarmManager {
         SmartAlarmEngine.shared.beginMonitoring()
         WatchConnectivityReceiver.shared.sendScheduledSession(alarmTime: time, windowStart: alarmWindowStart(for: time), windowEnd: time)
 
-        print("⏰ Alarm set for:", time)
     }
 
     func getAlarm() -> AlarmModel? {
@@ -88,7 +86,6 @@ final class AlarmManager {
             windowEnd: alarmTime
         )
 
-        print("📦 Loaded saved alarm:", alarmTime)
     }
 
     private func nextAlarmTime(from savedDate: Date) -> Date {
@@ -157,7 +154,6 @@ final class AlarmPresentationManager {
             player.play()
             audioPlayer = player
         } catch {
-            print("Alarm audio failed:", error.localizedDescription)
             AudioServicesPlaySystemSound(1005)
         }
     }
@@ -284,13 +280,7 @@ final class NotificationManager: NSObject {
                 self.registerNotificationCategory()
                 completion?(true)
             case .notDetermined:
-                self.notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                    if let error {
-                        print("❌ Notification permission error:", error.localizedDescription)
-                    } else {
-                        print("🔔 Notification permission granted:", granted)
-                    }
-
+                self.notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
                     if granted {
                         self.registerNotificationCategory()
                     }
@@ -298,7 +288,6 @@ final class NotificationManager: NSObject {
                     completion?(granted)
                 }
             case .denied:
-                print("⛔ Notification permission denied")
                 completion?(false)
             @unknown default:
                 completion?(false)
@@ -309,7 +298,6 @@ final class NotificationManager: NSObject {
     func scheduleSmartAlarmWindow(baseTime: Date) {
         requestAuthorizationIfNeeded { [weak self] granted in
             guard let self, granted else {
-                print("⛔ Smart alarm scheduling skipped: notification permission unavailable")
                 return
             }
 
@@ -317,7 +305,6 @@ final class NotificationManager: NSObject {
             let fireDates = [normalizedBaseTime].filter { $0 > Date().addingTimeInterval(1) }
 
             guard !fireDates.isEmpty else {
-                print("⛔ No valid smart alarm notifications to schedule")
                 return
             }
 
@@ -340,15 +327,8 @@ final class NotificationManager: NSObject {
                 let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
                 let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
-                self.notificationCenter.add(request) { error in
-                    if let error {
-                        print("❌ Failed to schedule alarm \(identifier):", error.localizedDescription)
-                    }
-                }
+                self.notificationCenter.add(request) { _ in }
             }
-
-            let formattedTimes = fireDates.map { self.timestampFormatter.string(from: $0) }.joined(separator: ", ")
-            print("✅ Final alarm fallback scheduled:", formattedTimes)
         }
     }
 
@@ -376,7 +356,6 @@ final class NotificationManager: NSObject {
                     self.notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiers)
                 }
 
-                print("🗑️ Cancelled scheduled alarms:", pendingIdentifiers.count + deliveredIdentifiers.count)
                 completion?()
             }
         }
@@ -388,7 +367,6 @@ final class NotificationManager: NSObject {
 
             self.requestAuthorizationIfNeeded { granted in
                 guard granted else {
-                    print("⛔ Immediate alarm skipped: notification permission unavailable")
                     return
                 }
 
@@ -409,13 +387,7 @@ final class NotificationManager: NSObject {
                 let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
                 let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
-                self.notificationCenter.add(request) { error in
-                    if let error {
-                        print("❌ Failed to trigger immediate alarm:", error.localizedDescription)
-                    } else {
-                        print("🚨 Immediate alarm triggered for:", self.timestampFormatter.string(from: fireDate))
-                    }
-                }
+                self.notificationCenter.add(request) { _ in }
             }
         }
     }

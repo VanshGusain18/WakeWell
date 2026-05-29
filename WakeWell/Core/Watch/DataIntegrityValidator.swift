@@ -51,12 +51,10 @@ final class DataIntegrityValidator {
 
     func validate(_ sample: WatchPayloadSample) -> ValidatedVitalsSample? {
         guard sample.validityFlags.hrReal else {
-            print("DATA INTEGRITY ISSUE: HR source is not HealthKit")
             return nil
         }
 
         guard sample.heartRate >= 30 && sample.heartRate <= 220 else {
-            print("DATA INTEGRITY ISSUE: HR outside 30-220 bpm:", sample.heartRate)
             return nil
         }
 
@@ -64,7 +62,6 @@ final class DataIntegrityValidator {
             let elapsed = max(sample.timestamp.timeIntervalSince(previousHeartRate.timestamp), 0.001)
             let bpmPerSecond = abs(sample.heartRate - previousHeartRate.value) / elapsed
             if bpmPerSecond > 40 {
-                print("DATA INTEGRITY ISSUE: HR jump >40 bpm/sec:", bpmPerSecond)
                 return nil
             }
         }
@@ -73,7 +70,6 @@ final class DataIntegrityValidator {
         let validHRV: Double?
         if let hrv = sample.hrv {
             guard hrv > 0 && hrv < 200 else {
-                print("DATA INTEGRITY ISSUE: HRV outside 0-200 ms:", hrv)
                 validHRV = nil
                 return ValidatedVitalsSample(
                     timestamp: sample.timestamp,
@@ -86,23 +82,19 @@ final class DataIntegrityValidator {
             }
             validHRV = hrv
         } else {
-            print("HRV NO_DATA:", sample.hrvUnavailableReason ?? "NO_DATA")
             validHRV = nil
         }
 
         guard sample.motion >= 0 && sample.motion <= 1 else {
-            print("DATA INTEGRITY ISSUE: motion outside normalized 0-1:", sample.motion)
             return nil
         }
 
         if let respiratoryRate = sample.respiratoryRate,
            (respiratoryRate < 4 || respiratoryRate > 60) {
-            print("DATA INTEGRITY ISSUE: respiratory rate outside 4-60:", respiratoryRate)
             return nil
         }
 
         if sample.motion > 0.7 && sample.heartRate < 45 {
-            print("DATA INTEGRITY ISSUE: motion/HR sanity check failed")
         }
 
         return ValidatedVitalsSample(

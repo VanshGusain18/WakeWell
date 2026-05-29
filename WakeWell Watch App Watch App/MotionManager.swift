@@ -12,14 +12,12 @@ final class MotionManager {
 
     func start(onUpdate: @escaping (Double) -> Void) {
         guard manager.isDeviceMotionAvailable else {
-            print("Motion unavailable")
             return
         }
 
         manager.deviceMotionUpdateInterval = 1.0
         manager.startDeviceMotionUpdates(to: .main) { [weak self] data, error in
-            if let error {
-                print("Motion error:", error.localizedDescription)
+            if error != nil {
                 return
             }
 
@@ -34,7 +32,6 @@ final class MotionManager {
             let normalized = min(max(magnitude / 1.5, 0), 1)
             let average = self.appendAndAverage(normalized)
 
-            print("REAL MOTION AVG", average)
             onUpdate(average)
         }
     }

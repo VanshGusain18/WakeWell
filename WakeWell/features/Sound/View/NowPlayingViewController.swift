@@ -39,7 +39,6 @@ class NowPlayingViewController: UIViewController {
 
         guard let sound = AudioManager.shared.currentSound,
               let image = UIImage(named: sound.imageName) else {
-            print("Missing sound or image")
             return
         }
 

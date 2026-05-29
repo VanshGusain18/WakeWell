@@ -84,7 +84,6 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
             }
 
             self.statusText = "LIVE HEALTH DATA MODE"
-            print("Streaming started")
 
             self.aggregator.onVitalsReady = { [weak self] vitals in
                 self?.handleAggregatedVitals(vitals)
@@ -293,12 +292,10 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     private func fetchLatestRespiratoryRate() {
         HealthKitManager.shared.fetchLatestRespiratoryRate { [weak self] respiratoryRate in
             guard let self, let respiratoryRate, respiratoryRate > 0 else {
-                print("REAL RESPIRATORY RATE unavailable: no_recent_sample")
                 return
             }
 
             let timestamp = Date()
-            print("REAL RESPIRATORY RATE RECEIVED", respiratoryRate)
             self.lastRespiratoryRate = respiratoryRate
             self.hasReceivedRespiratoryRate = true
             self.aggregator.updateRespiratoryRate(respiratoryRate, timestamp: timestamp)
@@ -310,14 +307,9 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
         isReachable = session.isReachable
 
-        print("Watch HR:", vitals.heartRate)
         if let hrv = vitals.hrv {
-            print("Watch HRV:", hrv)
         } else {
-            print("Watch HRV unavailable:", vitals.hrvUnavailableReason ?? "unknown")
         }
-        print("Watch Motion:", vitals.motion)
-        print("📤 Sending payload:", payload)
 
         guard isActivated else {
             pendingVitals = vitals

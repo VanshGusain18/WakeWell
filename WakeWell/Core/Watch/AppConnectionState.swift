@@ -27,7 +27,6 @@ final class AppConnectionState: ObservableObject {
     private func applyWatchPayloadReceived() {
         lastPayloadTime = Date()
         if state != .liveWatch {
-            print("🟢 Switching to LIVE WATCH mode")
             state = .liveWatch
         }
     }

@@ -30,14 +30,11 @@ final class HRVManager {
                 let reason = HealthKitWorkoutManager.shared.isWorkoutActive
                     ? "system_delay_no_recent_sdnn"
                     : "no_workout_session_active"
-                print("REAL HRV unavailable:", reason)
-                print("RR interval logs unavailable: HealthKit SDNN sample not present")
                 self?.onUnavailable?(reason)
                 return
             }
 
             let timestamp = Date()
-            print("REAL HRV RECEIVED", hrv)
             self?.onHRV?(hrv, timestamp)
         }
     }

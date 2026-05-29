@@ -1208,11 +1208,14 @@ private final class MultiSelectCell: UITableViewCell {
 
         for (index, option) in options.enumerated() {
             let button = UIButton(type: .system)
+            var configuration = UIButton.Configuration.plain()
+            var title = AttributedString(option)
+            title.font = .systemFont(ofSize: 12, weight: .semibold)
+            configuration.attributedTitle = title
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)
             button.tag = index
-            button.setTitle(option, for: .normal)
-            button.titleLabel?.font = .systemFont(ofSize: 12, weight: .semibold)
+            button.configuration = configuration
             button.layer.cornerRadius = 12
-            button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
             button.contentHorizontalAlignment = .center
             button.titleLabel?.numberOfLines = 1
             button.titleLabel?.lineBreakMode = .byTruncatingTail
@@ -1225,8 +1228,10 @@ private final class MultiSelectCell: UITableViewCell {
     }
 
     private func style(_ button: UIButton, selected: Bool) {
+        var configuration = button.configuration ?? .plain()
+        configuration.baseForegroundColor = selected ? WakeWellTheme.accentPurple : WakeWellTheme.labelPrimary
+        button.configuration = configuration
         button.backgroundColor = selected ? WakeWellTheme.purpleTint : WakeWellTheme.background
-        button.setTitleColor(selected ? WakeWellTheme.accentPurple : WakeWellTheme.labelPrimary, for: .normal)
         button.layer.borderWidth = 1
         button.layer.borderColor = (selected ? WakeWellTheme.accentPurple : WakeWellTheme.border).cgColor
     }

@@ -90,7 +90,6 @@ final class UnifiedVitalsAggregator {
         }
 
         guard !heartRateSamples.isEmpty else {
-            print("Waiting for real HealthKit heart rate before sending vitals")
             return
         }
 
@@ -104,7 +103,6 @@ final class UnifiedVitalsAggregator {
         )
 
         lastEmitTime = now
-        print("SENDING AGGREGATED VITALS", vitals.payload)
         onVitalsReady?(vitals)
     }
 

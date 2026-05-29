@@ -173,10 +173,6 @@ final class HealthKitSleepRepository {
         let hoursSlept   = totalAsleep / 3600
         let timeInBed    = max(totalInBed, totalAsleep) / 3600
 
-        let deepPct  = totalAsleep > 0 ? (deepSecs  / totalAsleep) * 100 : 0
-        let remPct   = totalAsleep > 0 ? (remSecs   / totalAsleep) * 100 : 0
-        let lightPct = totalAsleep > 0 ? (lightSecs / totalAsleep) * 100 : max(0, 100 - deepPct - remPct)
-
         let sleepOnset   = bucket.filter { asleepStages.contains($0.stage) }.map { $0.startDate }.min() ?? bucket[0].startDate
         let bedComponents = cal.dateComponents([.hour, .minute], from: sleepOnset)
         var bedDecimal    = Double(bedComponents.hour ?? 23) + Double(bedComponents.minute ?? 0) / 60.0

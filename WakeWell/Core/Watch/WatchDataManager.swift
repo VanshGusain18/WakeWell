@@ -22,7 +22,6 @@ final class WatchDataManager {
             SmartAlarmEngine.shared.reset()
         }
 
-        print("Using provider: LiveWatchPayloadStream")
         SmartAlarmEngine.shared.beginMonitoring()
     }
 

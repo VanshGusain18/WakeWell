@@ -74,7 +74,6 @@ extension DatabaseManager {
 
         guard sqlite3_exec(db, sql, nil, nil, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
-            print("user_profile table error:", err)
             return .failure(.tableCreationFailed(err))
         }
 
@@ -91,7 +90,6 @@ extension DatabaseManager {
         ensureUserProfileColumn(named: "watch_status", type: "TEXT NOT NULL DEFAULT 'unknown'", db: db)
         ensureUserProfileColumn(named: "notification_permission_granted", type: "INTEGER NOT NULL DEFAULT 0", db: db)
 
-        print("user_profile table ready")
         return .success(())
     }
 
@@ -113,12 +111,7 @@ extension DatabaseManager {
         guard !existingColumns.contains(columnName) else { return }
 
         let alterQuery = "ALTER TABLE user_profile ADD COLUMN \(columnName) \(type);"
-        if sqlite3_exec(db, alterQuery, nil, nil, nil) == SQLITE_OK {
-            print("🛠️ Migrated user_profile: added \(columnName)")
-        } else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ Failed migration for user_profile.\(columnName):", errorMsg)
-        }
+        _ = sqlite3_exec(db, alterQuery, nil, nil, nil)
     }
 
     // MARK: - Insert / Register
@@ -178,18 +171,16 @@ extension DatabaseManager {
 
         if sqlite3_step(stmt) == SQLITE_DONE {
             let rowID = Int(sqlite3_last_insert_rowid(db))
-            print("User profile saved, id =", rowID)
             return .success(rowID)
         }
 
         let errorCode = sqlite3_errcode(db)
-        let err = String(cString: sqlite3_errmsg(db))
-        print("Insert user_profile failed:", err)
 
         if errorCode == SQLITE_CONSTRAINT {
             return .failure(.duplicateEmail)
         }
 
+        let err = String(cString: sqlite3_errmsg(db))
         return .failure(.insertFailed(err))
     }
 
@@ -204,8 +195,7 @@ extension DatabaseManager {
         switch ensureUserProfileTable() {
         case .success:
             break
-        case .failure(let error):
-            print(error.localizedDescription)
+        case .failure:
             return nil
         }
 
@@ -231,8 +221,7 @@ extension DatabaseManager {
         switch ensureUserProfileTable() {
         case .success:
             break
-        case .failure(let error):
-            print(error.localizedDescription)
+        case .failure:
             return nil
         }
 
@@ -260,8 +249,7 @@ extension DatabaseManager {
         switch ensureUserProfileTable() {
         case .success:
             break
-        case .failure(let error):
-            print(error.localizedDescription)
+        case .failure:
             return false
         }
 
@@ -349,7 +337,6 @@ extension DatabaseManager {
             return .failure(.updateFailed(err))
         }
 
-        print("user_profile updated")
         return .success(())
     }
 
@@ -362,7 +349,6 @@ extension DatabaseManager {
         guard sqlite3_open(dbURL.path, &db) == SQLITE_OK else { return }
         defer { sqlite3_close(db) }
         sqlite3_exec(db, "DELETE FROM user_profile;", nil, nil, nil)
-        print("user_profile cleared")
     }
 
     // MARK: - Helpers

@@ -37,7 +37,6 @@ final class HealthKitVitalsFallbackManager {
             )
 
             guard let motionSample = self.latestReusableMotionSample() else {
-                print("HealthKit fallback waiting: no recent real motion sample")
                 return
             }
 

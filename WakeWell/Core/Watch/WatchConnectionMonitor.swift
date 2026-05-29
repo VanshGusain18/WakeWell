@@ -85,16 +85,6 @@ final class WatchConnectionMonitor {
         state = nextState
         NotificationCenter.default.post(name: .watchConnectionDidChange, object: nil)
 
-        switch nextState {
-        case .connected:
-            print("WATCH CONNECTED")
-        case .waiting:
-            print("WATCH WAITING FOR LIVE DATA")
-        case .disconnected:
-            print("WATCH DISCONNECTED - FREEZING ENGINE")
-        case .unknown:
-            break
-        }
     }
 }
 

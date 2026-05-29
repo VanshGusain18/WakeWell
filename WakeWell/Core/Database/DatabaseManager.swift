@@ -19,13 +19,10 @@ final class DatabaseManager {
 
             if let bundleURL = Bundle.main.url(forResource: "wakewell_v2", withExtension: "sqlite3") {
                 try? fileManager.copyItem(at: bundleURL, to: dbURL)
-                print("Database copied to Documents")
             } else {
-                print("No preloaded DB found, creating new one")
             }
         }
 
-        print("DB PATH:", dbURL.path)
         
         return dbURL
     }
@@ -36,7 +33,6 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return nil
         }
 
@@ -52,7 +48,6 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("Failed to prepare query")
             return nil
         }
 
@@ -87,10 +82,6 @@ final class DatabaseManager {
                 createdAt: createdAt
             )
 
-            print("📊 FETCH LATEST SESSION")
-            print("- id:", session.id)
-            print("- start:", session.startTime)
-            print("- trigger:", session.triggerTime as Any)
 
             return session
         }
@@ -105,7 +96,6 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return nil
         }
 
@@ -120,7 +110,6 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("Failed to prepare sleep session insert")
             return nil
         }
 
@@ -132,14 +121,10 @@ final class DatabaseManager {
         sqlite3_bind_double(statement, 3, createdAt)
 
         guard sqlite3_step(statement) == SQLITE_DONE else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ SESSION INSERT FAILED:", errorMsg)
             return nil
         }
 
         let sessionId = Int(sqlite3_last_insert_rowid(db))
-        print("💾 SESSION INSERTED")
-        print("- sessionId:", sessionId)
         return sessionId
     }
 
@@ -154,7 +139,6 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return
         }
 
@@ -183,7 +167,6 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("Failed to prepare sleep session update")
             return
         }
 
@@ -199,12 +182,9 @@ final class DatabaseManager {
         }
 
         guard sqlite3_step(statement) == SQLITE_DONE else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ SESSION UPDATE FAILED:", errorMsg)
             return
         }
 
-        print("✅ SESSION UPDATED IN DB")
     }
 
     func insertWatchVitals(_ data: WatchVitalsModel) {
@@ -212,7 +192,6 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return
         }
 
@@ -227,7 +206,6 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("Failed to prepare insert")
             return
         }
 
@@ -253,10 +231,7 @@ final class DatabaseManager {
         sqlite3_bind_double(statement, 7, data.oxygenSaturation ?? 0)
 
         if sqlite3_step(statement) == SQLITE_DONE {
-            print("✅ INSERT SUCCESS at:", data.timestamp)
         } else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ INSERT FAILED:", errorMsg)
         }
     }
     
@@ -266,7 +241,6 @@ final class DatabaseManager {
         var results: [WatchVitalsModel] = []
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return []
         }
 
@@ -282,7 +256,6 @@ final class DatabaseManager {
         var statement: OpaquePointer?
 
         if sqlite3_prepare_v2(db, query, -1, &statement, nil) != SQLITE_OK {
-            print("Failed to prepare fetch vitals")
             return []
         }
 
@@ -308,7 +281,6 @@ final class DatabaseManager {
             results.append(data)
         }
 
-//        print("Fetched \(results.count) vitals from DB")
 
         return results
     }
@@ -317,7 +289,6 @@ final class DatabaseManager {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Failed to open DB for clearing")
             return
         }
 
@@ -329,14 +300,12 @@ final class DatabaseManager {
         // 2. Reset AUTOINCREMENT counter
         sqlite3_exec(db, "DELETE FROM sqlite_sequence WHERE name='watch_vitals';", nil, nil, nil)
 
-        print("🧹 Vitals cleared + ID reset")
     }
 
     private func ensureSleepSessionsTable() {
         var db: OpaquePointer?
 
         if sqlite3_open(dbURL.path, &db) != SQLITE_OK {
-            print("Unable to open database")
             return
         }
 
@@ -355,10 +324,7 @@ final class DatabaseManager {
         );
         """
 
-        if sqlite3_exec(db, createTableQuery, nil, nil, nil) != SQLITE_OK {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("Failed to ensure sleep_sessions table:", errorMsg)
-        }
+        _ = sqlite3_exec(db, createTableQuery, nil, nil, nil)
 
         // Preserve existing installs by adding newly required columns in place.
         ensureSleepSessionColumn(named: "start_time", type: "DATETIME", db: db)
@@ -388,11 +354,6 @@ final class DatabaseManager {
         guard !existingColumns.contains(columnName) else { return }
 
         let alterQuery = "ALTER TABLE sleep_sessions ADD COLUMN \(columnName) \(type);"
-        if sqlite3_exec(db, alterQuery, nil, nil, nil) == SQLITE_OK {
-            print("🛠️ Migrated sleep_sessions: added \(columnName)")
-        } else {
-            let errorMsg = String(cString: sqlite3_errmsg(db))
-            print("❌ Failed migration for \(columnName):", errorMsg)
-        }
+        _ = sqlite3_exec(db, alterQuery, nil, nil, nil)
     }
 }

@@ -233,7 +233,6 @@ class SoundTableViewController: UITableViewController {
                 .setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("Audio session error:", error)
         }
     }
 

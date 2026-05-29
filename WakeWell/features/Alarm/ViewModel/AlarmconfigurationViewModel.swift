@@ -39,9 +39,7 @@ final class AlarmViewModel {
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(
             options: [.alert, .sound, .criticalAlert]
-        ) { _, error in
-            if let error { print("Notification permission error: \(error)") }
-        }
+        ) { _, _ in }
     }
 
 }

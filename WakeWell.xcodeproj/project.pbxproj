@@ -278,7 +278,7 @@
 				CODE_SIGN_ENTITLEMENTS = "WakeWell Watch App Watch App/WakeWell_Watch_App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = DHPL4MPB34;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
@@ -317,7 +317,7 @@
 				CODE_SIGN_ENTITLEMENTS = "WakeWell Watch App Watch App/WakeWell_Watch_App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = DHPL4MPB34;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "WakeWell Watch App Watch App/Info.plist";
@@ -356,7 +356,7 @@
 				CODE_SIGN_ENTITLEMENTS = WakeWell/WakeWell.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = DHPL4MPB34;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SetSail;
@@ -396,7 +396,7 @@
 				CODE_SIGN_ENTITLEMENTS = WakeWell/WakeWell.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JG2ATY92J8;
+				DEVELOPMENT_TEAM = DHPL4MPB34;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WakeWell/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SetSail;

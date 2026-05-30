@@ -56,7 +56,7 @@ class AlarmCollectionViewCell: UICollectionViewCell {
             : "\(viewModel.subtitleText)\n\(viewModel.wakeWindowText)"
         titleLabel.textColor = viewModel.hasAlarm ? WakeWellTheme.labelPrimary : WakeWellTheme.labelSecondary
         timeLabel.font = viewModel.hasAlarm
-            ? .systemFont(ofSize: 28, weight: .bold)
+            ? .systemFont(ofSize: 36, weight: .bold)
             : .systemFont(ofSize: 18, weight: .semibold)
         timeLabel.numberOfLines = 2
         timeLabel.textColor = viewModel.hasAlarm ? WakeWellTheme.accentGold : WakeWellTheme.labelSecondary

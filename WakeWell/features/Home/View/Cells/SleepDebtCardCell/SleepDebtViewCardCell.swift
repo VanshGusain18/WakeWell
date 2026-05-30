@@ -52,7 +52,7 @@ final class SleepDebtViewCardCell: UICollectionViewCell {
         valueLabel.numberOfLines = 1
 
         subtitleLabel.font = .systemFont(ofSize: 13, weight: .medium)
-        subtitleLabel.numberOfLines = 2
+        subtitleLabel.numberOfLines = 4
     }
 
     private func addSwipeGesture() {

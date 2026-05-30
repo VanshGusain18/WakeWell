@@ -319,7 +319,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         let halfWidth = (fullWidth - 8) / 2
 
         switch viewModel.cards[indexPath.item] {
-        case .sleepDebt:    return CGSize(width: fullWidth, height: 96)
+        case .sleepDebt:    return CGSize(width: fullWidth, height: 120)
         case .sleepRing:    return CGSize(width: halfWidth, height: 200)
         case .alarm:        return CGSize(width: halfWidth, height: 200)
         case .metrics:      return CGSize(width: fullWidth, height: 200)

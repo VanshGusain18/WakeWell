@@ -13,7 +13,7 @@
 		<string></string>
 	</array>
 	<key>CFBundleIconName</key>
-	<string></string>
+	<string>AppIcon</string>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
@@ -23,7 +23,7 @@
 				<string></string>
 			</array>
 			<key>CFBundleIconName</key>
-			<string></string>
+			<string>AppIcon</string>
 			<key>UIPrerenderedIcon</key>
 			<false/>
 		</dict>
